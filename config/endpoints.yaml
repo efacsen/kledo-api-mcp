@@ -1,0 +1,112 @@
+# Kledo API Endpoints Configuration
+# This file maps friendly names to actual API endpoints
+
+endpoints:
+  # Authentication
+  auth:
+    login: /authentication/singleLogin
+    logout: /authentication/logout
+
+  # Financial Reports
+  reports:
+    activity_team: /reportings/activity-team
+    profit_loss: /reportings/profit-loss
+    balance_sheet: /reportings/balance-sheet
+    cash_flow: /reportings/cash-flow
+    sales_by_contact: /reportings/sales-by-contact
+    purchase_by_contact: /reportings/purchase-by-contact
+
+  # Invoices
+  invoices:
+    list: /finance/invoices
+    detail: /finance/invoices/{id}
+    totals: /finance/invoices/totals
+    available_memos: /finance/invoices/availableMemos
+
+  # Purchase Invoices
+  purchase_invoices:
+    list: /finance/purchaseInvoices
+    detail: /finance/purchaseInvoices/{id}
+    totals: /finance/purchaseInvoices/totals
+
+  # Orders
+  orders:
+    list: /finance/orders
+    detail: /finance/orders/{id}
+    totals: /finance/orders/totals
+
+  # Purchase Orders
+  purchase_orders:
+    list: /finance/purchaseOrders
+    detail: /finance/purchaseOrders/{id}
+    totals: /finance/purchaseOrders/totals
+
+  # Products
+  products:
+    list: /finance/products
+    detail: /finance/products/{id}
+    suggestion: /finance/products/suggestion
+    categories: /finance/productCategories
+
+  # Contacts
+  contacts:
+    list: /finance/contacts
+    detail: /finance/contacts/{id}
+    transactions: /finance/contacts/{id}/transactions
+    invoice_status: /finance/contacts/{id}/invoiceStatus
+    purchase_status: /finance/contacts/{id}/purchaseStatus
+    groups: /finance/contactGroups
+
+  # Deliveries
+  deliveries:
+    list: /finance/deliveries
+    detail: /finance/deliveries/{id}
+    totals: /finance/deliveries/totals
+
+  # Purchase Deliveries
+  purchase_deliveries:
+    list: /finance/purchaseDeliveries
+    detail: /finance/purchaseDeliveries/{id}
+
+  # Bank & Payments
+  bank:
+    transactions: /finance/bankTrans
+    transaction_detail: /finance/bankTrans/{id}
+    totals: /finance/bankTrans/totals
+    balances: /finance/bank/balances
+    list: /banks
+    bank_detail: /banks/{id}
+
+  # Accounts
+  accounts:
+    list: /finance/accounts
+    detail: /finance/accounts/{id}
+    suggestion: /finance/accounts/suggestion
+
+  # Supporting Data
+  supporting:
+    units: /finance/units
+    tags: /finance/tags
+    fees: /finance/fees
+    warehouses: /warehouses
+    locations: /locations
+
+# Query parameters templates
+query_params:
+  pagination:
+    - per_page
+    - page
+
+  date_range:
+    - date_from
+    - date_to
+
+  search:
+    - search
+    - search_column
+
+  filters:
+    - status_id
+    - contact_id
+    - include_archive
+    - include_deletable
