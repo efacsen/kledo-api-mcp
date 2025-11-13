@@ -86,16 +86,18 @@ async def _get_cache_stats(args: Dict[str, Any], client: KledoAPIClient) -> str:
 
         # Performance assessment
         hit_rate_value = float(stats['hit_rate'].rstrip('%'))
-        result.append("\n**Performance**: ", end="")
 
+        performance = ""
         if hit_rate_value >= 80:
-            result.append("Excellent - Cache is working very effectively")
+            performance = "Excellent - Cache is working very effectively"
         elif hit_rate_value >= 60:
-            result.append("Good - Cache is providing significant benefit")
+            performance = "Good - Cache is providing significant benefit"
         elif hit_rate_value >= 40:
-            result.append("Fair - Consider adjusting TTL settings")
+            performance = "Fair - Consider adjusting TTL settings"
         else:
-            result.append("Poor - Cache may need optimization")
+            performance = "Poor - Cache may need optimization"
+
+        result.append(f"\n**Performance**: {performance}")
 
         return "\n".join(result)
 
