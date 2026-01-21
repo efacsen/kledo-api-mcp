@@ -12,7 +12,7 @@ This roadmap transforms the existing Kledo MCP server (30+ tools) into a self-do
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Entity Registry** - Establish single source of truth for all Kledo entities and relationships
+- [x] **Phase 1: Entity Registry** - Establish single source of truth for all Kledo entities and relationships
 - [ ] **Phase 2: Documentation Layer** - Generate comprehensive API documentation from entity definitions
 - [ ] **Phase 3: Tool Enhancement** - Create disambiguation matrix and document tool overlaps
 - [ ] **Phase 4: Smart Routing** - Implement intelligent tool discovery from natural language queries
@@ -31,9 +31,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 01-01-PLAN.md - Core entity models (Contact, Product, Invoice) + package structure
-- [ ] 01-02-PLAN.md - Transaction entity models (Order, Delivery, Account)
-- [ ] 01-03-PLAN.md - Entity loader utilities + YAML export + ERD generation
+- [x] 01-01-PLAN.md - Core entity models (Contact, Product, Invoice) + package structure
+- [x] 01-02-PLAN.md - Transaction entity models (Order, Delivery, Account)
+- [x] 01-03-PLAN.md - Entity loader utilities + YAML export + ERD generation
 
 ### Phase 2: Documentation Layer
 **Goal**: Generate comprehensive, AI-readable API documentation from entity definitions
@@ -86,11 +86,11 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Entity Registry | 0/3 | Planned | - |
+| 1. Entity Registry | 3/3 | ✓ Complete | 2026-01-22 |
 | 2. Documentation Layer | 0/? | Not started | - |
 | 3. Tool Enhancement | 0/? | Not started | - |
 | 4. Smart Routing | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-01-21*
-*Last updated: 2026-01-21*
+*Last updated: 2026-01-22*

@@ -9,9 +9,9 @@ Requirements for comprehensive API mapping and smart routing.
 
 ### Entity Registry
 
-- [ ] **ENTY-01**: Define all Kledo entities in YAML format (Invoice, Contact, Product, Order, Delivery, Account, Bank, etc.)
-- [ ] **ENTY-02**: Map relationships between entities (Invoice -> Contact, Order -> Product, etc.)
-- [ ] **ENTY-03**: Generate visual ERD diagram from entity definitions
+- [x] **ENTY-01**: Define all Kledo entities in YAML format (Invoice, Contact, Product, Order, Delivery, Account, Bank, etc.)
+- [x] **ENTY-02**: Map relationships between entities (Invoice -> Contact, Order -> Product, etc.)
+- [x] **ENTY-03**: Generate visual ERD diagram from entity definitions
 
 ### Tool Enhancement
 
@@ -67,9 +67,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ENTY-01 | Phase 1 | Pending |
-| ENTY-02 | Phase 1 | Pending |
-| ENTY-03 | Phase 1 | Pending |
+| ENTY-01 | Phase 1 | Complete |
+| ENTY-02 | Phase 1 | Complete |
+| ENTY-03 | Phase 1 | Complete |
 | DOCS-01 | Phase 2 | Pending |
 | DOCS-02 | Phase 2 | Pending |
 | DOCS-03 | Phase 2 | Pending |
@@ -87,4 +87,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-21*
-*Last updated: 2026-01-21 after roadmap creation*
+*Last updated: 2026-01-22 after Phase 1 completion*
