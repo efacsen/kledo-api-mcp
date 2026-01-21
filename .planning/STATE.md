@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-21)
 ## Current Position
 
 Phase: 1 of 4 (Entity Registry)
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-01-22 - Completed 01-02-PLAN.md
+Last activity: 2026-01-22 - Completed 01-03-PLAN.md
 
-Progress: [██░░░░░░░░] 12.5%
+Progress: [███░░░░░░░] 18.75%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 4.5 minutes
-- Total execution time: 9 minutes
+- Total plans completed: 3
+- Average duration: 4 minutes
+- Total execution time: 12 minutes
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-entity-registry | 2 | 9 min | 4.5 min |
+| 01-entity-registry | 3 | 12 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (5 min), 01-02 (4 min)
-- Trend: Initial execution
+- Last 5 plans: 01-01 (5 min), 01-02 (4 min), 01-03 (3 min)
+- Trend: Improving velocity
 
 *Updated after each plan completion*
 
@@ -50,6 +50,9 @@ Recent decisions affecting current work:
 - [01-01-D3]: Relationship metadata via json_schema_extra for ERD generation
 - [01-02-D1]: Created Plan 01-01 entities as blocking fix (Contact, Product, Invoice needed for imports)
 - [01-02-D2]: Used Decimal('0') for default values (explicit Pydantic serialization)
+- [01-03-D1]: ENTITY_REGISTRY for top-level entities, EMBEDDED_TYPES for nested models
+- [01-03-D2]: Case-insensitive entity lookup via name.lower()
+- [01-03-D3]: ERD generation optional (requires graphviz system binary)
 
 ### Pending Todos
 
@@ -62,5 +65,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-22
-Stopped at: Completed 01-02-PLAN.md
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None
