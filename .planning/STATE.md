@@ -19,18 +19,18 @@ Progress: [██░░░░░░░░] 12.5%
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 4 minutes
-- Total execution time: 4 minutes
+- Total plans completed: 2
+- Average duration: 4.5 minutes
+- Total execution time: 9 minutes
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-entity-registry | 1 | 4 min | 4 min |
+| 01-entity-registry | 2 | 9 min | 4.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (4 min)
+- Last 5 plans: 01-01 (5 min), 01-02 (4 min)
 - Trend: Initial execution
 
 *Updated after each plan completion*
@@ -45,6 +45,9 @@ Recent decisions affecting current work:
 - [Init]: Embedded + Simple Routing approach (balance simplicity and power)
 - [Init]: Map first, extend later (understand API landscape before adding tools)
 - [Init]: Focus on read operations (reporting is primary use case)
+- [01-01-D1]: Used Decimal type for all currency fields (avoid float precision)
+- [01-01-D2]: Embedded types (Warehouse, InvoiceItem) as BaseModel not BaseEntity
+- [01-01-D3]: Relationship metadata via json_schema_extra for ERD generation
 - [01-02-D1]: Created Plan 01-01 entities as blocking fix (Contact, Product, Invoice needed for imports)
 - [01-02-D2]: Used Decimal('0') for default values (explicit Pydantic serialization)
 
