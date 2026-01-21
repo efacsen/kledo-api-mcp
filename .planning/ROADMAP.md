@@ -20,19 +20,20 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Phase Details
 
 ### Phase 1: Entity Registry
-**Goal**: Establish a complete, machine-readable catalog of all Kledo entities and their relationships
+**Goal**: Establish a complete, machine-readable catalog of all Kledo entities and their relationships using Pydantic models
 **Depends on**: Nothing (first phase)
 **Requirements**: ENTY-01, ENTY-02, ENTY-03
 **Success Criteria** (what must be TRUE):
-  1. All Kledo entities (Invoice, Contact, Product, Order, Delivery, Account, Bank) are defined in YAML format with fields and types
-  2. Relationships between entities are explicitly mapped (e.g., Invoice references Contact, Order contains Products)
-  3. A visual ERD diagram can be generated from the entity definitions
-  4. Entity definitions are loadable by Python code for programmatic access
-**Plans**: TBD
+  1. All Kledo entities (Invoice, Contact, Product, Order, Delivery, Account) are defined as Pydantic models with fields and types
+  2. Relationships between entities are explicitly mapped via Field metadata (e.g., Invoice references Contact, Order contains Products)
+  3. A visual ERD diagram can be generated from the entity definitions using erdantic
+  4. Entity definitions are loadable by Python code via `get_all_entities()` and `get_entity_class()`
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md - Core entity models (Contact, Product, Invoice) + package structure
+- [ ] 01-02-PLAN.md - Transaction entity models (Order, Delivery, Account)
+- [ ] 01-03-PLAN.md - Entity loader utilities + YAML export + ERD generation
 
 ### Phase 2: Documentation Layer
 **Goal**: Generate comprehensive, AI-readable API documentation from entity definitions
@@ -85,7 +86,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Entity Registry | 0/? | Not started | - |
+| 1. Entity Registry | 0/3 | Planned | - |
 | 2. Documentation Layer | 0/? | Not started | - |
 | 3. Tool Enhancement | 0/? | Not started | - |
 | 4. Smart Routing | 0/? | Not started | - |
