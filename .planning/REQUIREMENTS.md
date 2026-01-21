@@ -10,7 +10,7 @@ Requirements for comprehensive API mapping and smart routing.
 ### Entity Registry
 
 - [ ] **ENTY-01**: Define all Kledo entities in YAML format (Invoice, Contact, Product, Order, Delivery, Account, Bank, etc.)
-- [ ] **ENTY-02**: Map relationships between entities (Invoice → Contact, Order → Product, etc.)
+- [ ] **ENTY-02**: Map relationships between entities (Invoice -> Contact, Order -> Product, etc.)
 - [ ] **ENTY-03**: Generate visual ERD diagram from entity definitions
 
 ### Tool Enhancement
@@ -20,7 +20,7 @@ Requirements for comprehensive API mapping and smart routing.
 
 ### Documentation
 
-- [ ] **DOCS-01**: Create API endpoint catalog (endpoint → operation mapping)
+- [ ] **DOCS-01**: Create API endpoint catalog (endpoint -> operation mapping)
 - [ ] **DOCS-02**: Write entity relationship documentation in Markdown
 - [ ] **DOCS-03**: Setup MkDocs with Material theme for auto-generated docs
 - [ ] **DOCS-04**: Generate llms.txt for AI-optimized discovery
@@ -29,7 +29,7 @@ Requirements for comprehensive API mapping and smart routing.
 
 - [ ] **ROUT-01**: Build synonym dictionary for business terms (revenue=sales, vendor=supplier, bill=invoice)
 - [ ] **ROUT-02**: Implement tool discovery/search capability
-- [ ] **ROUT-03**: Add intent-to-tool resolution (natural language → tool + parameters)
+- [ ] **ROUT-03**: Add intent-to-tool resolution (natural language -> tool + parameters)
 
 ## v2 Requirements
 
@@ -67,24 +67,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ENTY-01 | TBD | Pending |
-| ENTY-02 | TBD | Pending |
-| ENTY-03 | TBD | Pending |
-| TOOL-01 | TBD | Pending |
-| TOOL-02 | TBD | Pending |
-| DOCS-01 | TBD | Pending |
-| DOCS-02 | TBD | Pending |
-| DOCS-03 | TBD | Pending |
-| DOCS-04 | TBD | Pending |
-| ROUT-01 | TBD | Pending |
-| ROUT-02 | TBD | Pending |
-| ROUT-03 | TBD | Pending |
+| ENTY-01 | Phase 1 | Pending |
+| ENTY-02 | Phase 1 | Pending |
+| ENTY-03 | Phase 1 | Pending |
+| DOCS-01 | Phase 2 | Pending |
+| DOCS-02 | Phase 2 | Pending |
+| DOCS-03 | Phase 2 | Pending |
+| DOCS-04 | Phase 2 | Pending |
+| TOOL-01 | Phase 3 | Pending |
+| TOOL-02 | Phase 3 | Pending |
+| ROUT-01 | Phase 4 | Pending |
+| ROUT-02 | Phase 4 | Pending |
+| ROUT-03 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 12 total
-- Mapped to phases: 0
-- Unmapped: 12 ⚠️
+- Mapped to phases: 12
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-21*
-*Last updated: 2026-01-21 after initial definition*
+*Last updated: 2026-01-21 after roadmap creation*
