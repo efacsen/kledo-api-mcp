@@ -1,0 +1,739 @@
+_meta:
+  description: Kledo Entity Schema Definitions
+  version: 1.0.0
+  entities:
+  - contact
+  - product
+  - invoice
+  - order
+  - delivery
+  - account
+contact:
+  description: Customer or Vendor contact.
+  properties:
+    id:
+      description: Unique identifier
+      title: Id
+      type: integer
+    created_at:
+      anyOf:
+      - format: date-time
+        type: string
+      - type: 'null'
+      default: null
+      description: Creation timestamp
+      title: Created At
+    updated_at:
+      anyOf:
+      - format: date-time
+        type: string
+      - type: 'null'
+      default: null
+      description: Last update timestamp
+      title: Updated At
+    name:
+      description: Contact's full name
+      title: Name
+      type: string
+    company:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Company/organization name
+      title: Company
+    email:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Email address
+      title: Email
+    phone:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Phone number
+      title: Phone
+    address:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Physical address
+      title: Address
+    type_id:
+      description: 'Contact type: 1=Customer, 2=Vendor, 3=Both'
+      enum_values:
+        '1': Customer
+        '2': Vendor
+        '3': Both
+      title: Type Id
+      type: integer
+    type_name:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Denormalized type name
+      title: Type Name
+    total_receivable:
+      anyOf:
+      - type: number
+      - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+        type: string
+      default: '0'
+      description: Amount owed by this contact
+      title: Total Receivable
+    total_payable:
+      anyOf:
+      - type: number
+      - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+        type: string
+      default: '0'
+      description: Amount owed to this contact
+      title: Total Payable
+  required:
+  - id
+  - name
+  - type_id
+  title: Contact
+  type: object
+product:
+  $defs:
+    Warehouse:
+      description: Warehouse stock location.
+      properties:
+        name:
+          description: Warehouse name
+          title: Name
+          type: string
+        qty:
+          anyOf:
+          - type: number
+          - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+            type: string
+          default: '0'
+          description: Stock quantity in this warehouse
+          title: Qty
+      required:
+      - name
+      title: Warehouse
+      type: object
+  description: Product or service item.
+  properties:
+    id:
+      description: Unique identifier
+      title: Id
+      type: integer
+    created_at:
+      anyOf:
+      - format: date-time
+        type: string
+      - type: 'null'
+      default: null
+      description: Creation timestamp
+      title: Created At
+    updated_at:
+      anyOf:
+      - format: date-time
+        type: string
+      - type: 'null'
+      default: null
+      description: Last update timestamp
+      title: Updated At
+    name:
+      description: Product name
+      title: Name
+      type: string
+    code:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: SKU/product code
+      title: Code
+    description:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Product description
+      title: Description
+    price:
+      anyOf:
+      - type: number
+      - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+        type: string
+      default: '0'
+      description: Selling price
+      title: Price
+    buy_price:
+      anyOf:
+      - type: number
+      - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+        type: string
+      default: '0'
+      description: Cost/purchase price
+      title: Buy Price
+    qty:
+      anyOf:
+      - type: number
+      - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+        type: string
+      default: '0'
+      description: Total stock quantity
+      title: Qty
+    category_id:
+      anyOf:
+      - type: integer
+      - type: 'null'
+      default: null
+      description: Product category reference
+      title: Category Id
+    category_name:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Denormalized category name
+      title: Category Name
+    warehouses:
+      description: Stock by warehouse
+      items:
+        $ref: '#/$defs/Warehouse'
+      relationship:
+        embedded: true
+        target: Warehouse
+        type: one-to-many
+      title: Warehouses
+      type: array
+  required:
+  - id
+  - name
+  title: Product
+  type: object
+invoice:
+  $defs:
+    InvoiceItem:
+      description: Line item within an invoice.
+      properties:
+        product_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          default: null
+          description: Product reference
+          relationship:
+            target: Product
+            type: many-to-one
+          title: Product Id
+        desc:
+          description: Item description
+          title: Desc
+          type: string
+        qty:
+          anyOf:
+          - type: number
+          - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+            type: string
+          description: Quantity
+          title: Qty
+        price:
+          anyOf:
+          - type: number
+          - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+            type: string
+          description: Unit price
+          title: Price
+        amount:
+          anyOf:
+          - type: number
+          - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+            type: string
+          description: Line total (qty * price)
+          title: Amount
+      required:
+      - desc
+      - qty
+      - price
+      - amount
+      title: InvoiceItem
+      type: object
+  description: Sales or Purchase invoice.
+  properties:
+    id:
+      description: Unique identifier
+      title: Id
+      type: integer
+    created_at:
+      anyOf:
+      - format: date-time
+        type: string
+      - type: 'null'
+      default: null
+      description: Creation timestamp
+      title: Created At
+    updated_at:
+      anyOf:
+      - format: date-time
+        type: string
+      - type: 'null'
+      default: null
+      description: Last update timestamp
+      title: Updated At
+    trans_number:
+      description: Invoice number (e.g., INV-2026-0001)
+      title: Trans Number
+      type: string
+    trans_date:
+      description: Invoice date
+      format: date
+      title: Trans Date
+      type: string
+    due_date:
+      anyOf:
+      - format: date
+        type: string
+      - type: 'null'
+      default: null
+      description: Payment due date
+      title: Due Date
+    contact_id:
+      description: Customer/vendor reference
+      relationship:
+        target: Contact
+        type: many-to-one
+      title: Contact Id
+      type: integer
+    contact_name:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Denormalized contact name
+      title: Contact Name
+    status_id:
+      description: Invoice status ID
+      title: Status Id
+      type: integer
+    status_name:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Denormalized status name
+      title: Status Name
+    subtotal:
+      anyOf:
+      - type: number
+      - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+        type: string
+      default: '0'
+      description: Sum of line items before tax
+      title: Subtotal
+    tax_amount:
+      anyOf:
+      - type: number
+      - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+        type: string
+      default: '0'
+      description: Total tax amount
+      title: Tax Amount
+    grand_total:
+      anyOf:
+      - type: number
+      - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+        type: string
+      default: '0'
+      description: Total including tax
+      title: Grand Total
+    amount_paid:
+      anyOf:
+      - type: number
+      - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+        type: string
+      default: '0'
+      description: Amount already paid
+      title: Amount Paid
+    detail:
+      description: Invoice line items
+      items:
+        $ref: '#/$defs/InvoiceItem'
+      relationship:
+        embedded: true
+        target: InvoiceItem
+        type: one-to-many
+      title: Detail
+      type: array
+    memo:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Internal notes
+      title: Memo
+  required:
+  - id
+  - trans_number
+  - trans_date
+  - contact_id
+  - status_id
+  title: Invoice
+  type: object
+order:
+  $defs:
+    OrderItem:
+      description: Line item within an order.
+      properties:
+        product_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          default: null
+          description: Product reference
+          relationship:
+            target: Product
+            type: many-to-one
+          title: Product Id
+        desc:
+          description: Item description
+          title: Desc
+          type: string
+        qty:
+          anyOf:
+          - type: number
+          - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+            type: string
+          description: Quantity ordered
+          title: Qty
+        price:
+          anyOf:
+          - type: number
+          - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+            type: string
+          description: Unit price
+          title: Price
+        amount:
+          anyOf:
+          - type: number
+          - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+            type: string
+          description: Line total
+          title: Amount
+      required:
+      - desc
+      - qty
+      - price
+      - amount
+      title: OrderItem
+      type: object
+  description: Sales or Purchase order.
+  properties:
+    id:
+      description: Unique identifier
+      title: Id
+      type: integer
+    created_at:
+      anyOf:
+      - format: date-time
+        type: string
+      - type: 'null'
+      default: null
+      description: Creation timestamp
+      title: Created At
+    updated_at:
+      anyOf:
+      - format: date-time
+        type: string
+      - type: 'null'
+      default: null
+      description: Last update timestamp
+      title: Updated At
+    trans_number:
+      description: Order number (e.g., SO-2026-0001)
+      title: Trans Number
+      type: string
+    trans_date:
+      description: Order date
+      format: date
+      title: Trans Date
+      type: string
+    contact_id:
+      description: Customer (sales) or Vendor (purchase) reference
+      relationship:
+        target: Contact
+        type: many-to-one
+      title: Contact Id
+      type: integer
+    contact_name:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Denormalized contact name
+      title: Contact Name
+    status_id:
+      description: Order status ID
+      title: Status Id
+      type: integer
+    status_name:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Denormalized status name
+      title: Status Name
+    subtotal:
+      anyOf:
+      - type: number
+      - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+        type: string
+      default: '0'
+      description: Sum of line items
+      title: Subtotal
+    grand_total:
+      anyOf:
+      - type: number
+      - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+        type: string
+      default: '0'
+      description: Total including adjustments
+      title: Grand Total
+    detail:
+      description: Order line items
+      items:
+        $ref: '#/$defs/OrderItem'
+      relationship:
+        embedded: true
+        target: OrderItem
+        type: one-to-many
+      title: Detail
+      type: array
+    order_type:
+      default: sales
+      description: 'Order type: ''sales'' or ''purchase'''
+      enum_values:
+      - sales
+      - purchase
+      title: Order Type
+      type: string
+  required:
+  - id
+  - trans_number
+  - trans_date
+  - contact_id
+  - status_id
+  title: Order
+  type: object
+delivery:
+  $defs:
+    DeliveryItem:
+      description: Item being delivered.
+      properties:
+        product_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          default: null
+          description: Product reference
+          relationship:
+            target: Product
+            type: many-to-one
+          title: Product Id
+        desc:
+          description: Item description
+          title: Desc
+          type: string
+        qty:
+          anyOf:
+          - type: number
+          - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+            type: string
+          description: Quantity being delivered
+          title: Qty
+      required:
+      - desc
+      - qty
+      title: DeliveryItem
+      type: object
+  description: Shipment/delivery record.
+  properties:
+    id:
+      description: Unique identifier
+      title: Id
+      type: integer
+    created_at:
+      anyOf:
+      - format: date-time
+        type: string
+      - type: 'null'
+      default: null
+      description: Creation timestamp
+      title: Created At
+    updated_at:
+      anyOf:
+      - format: date-time
+        type: string
+      - type: 'null'
+      default: null
+      description: Last update timestamp
+      title: Updated At
+    trans_number:
+      description: Delivery number (e.g., DEL-2026-0001)
+      title: Trans Number
+      type: string
+    trans_date:
+      description: Delivery date
+      format: date
+      title: Trans Date
+      type: string
+    contact_id:
+      anyOf:
+      - type: integer
+      - type: 'null'
+      default: null
+      description: Customer receiving delivery
+      relationship:
+        target: Contact
+        type: many-to-one
+      title: Contact Id
+    contact_name:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Denormalized contact name
+      title: Contact Name
+    status_id:
+      description: Delivery status ID
+      title: Status Id
+      type: integer
+    status_name:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Denormalized status name
+      title: Status Name
+    shipping_company_name:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Carrier/shipping company
+      title: Shipping Company Name
+    tracking_number:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Shipment tracking number
+      title: Tracking Number
+    shipping_address:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Destination address
+      title: Shipping Address
+    ref_number:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Reference to source order
+      relationship:
+        target: Order
+        type: many-to-one
+        via: trans_number
+      title: Ref Number
+    detail:
+      description: Items being delivered
+      items:
+        $ref: '#/$defs/DeliveryItem'
+      relationship:
+        embedded: true
+        target: DeliveryItem
+        type: one-to-many
+      title: Detail
+      type: array
+    memo:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Delivery notes
+      title: Memo
+  required:
+  - id
+  - trans_number
+  - trans_date
+  - status_id
+  title: Delivery
+  type: object
+account:
+  description: Bank/cash account.
+  properties:
+    id:
+      description: Unique identifier
+      title: Id
+      type: integer
+    created_at:
+      anyOf:
+      - format: date-time
+        type: string
+      - type: 'null'
+      default: null
+      description: Creation timestamp
+      title: Created At
+    updated_at:
+      anyOf:
+      - format: date-time
+        type: string
+      - type: 'null'
+      default: null
+      description: Last update timestamp
+      title: Updated At
+    name:
+      description: Account name (e.g., 'BCA Checking')
+      title: Name
+      type: string
+    account_number:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Bank account number
+      title: Account Number
+    balance:
+      anyOf:
+      - type: number
+      - pattern: ^(?!^[-+.]*$)[+-]?0*\d*\.?\d*$
+        type: string
+      default: '0'
+      description: Current balance
+      title: Balance
+    currency:
+      default: IDR
+      description: Currency code (ISO 4217)
+      title: Currency
+      type: string
+    account_type:
+      anyOf:
+      - type: string
+      - type: 'null'
+      default: null
+      description: Account type (e.g., 'bank', 'cash', 'credit_card')
+      title: Account Type
+    is_active:
+      default: true
+      description: Whether account is active
+      title: Is Active
+      type: boolean
+  required:
+  - id
+  - name
+  title: Account
+  type: object
