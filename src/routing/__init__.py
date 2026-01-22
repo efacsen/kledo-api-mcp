@@ -9,5 +9,12 @@ This package provides foundation components for smart routing:
 
 from src.routing.synonyms import SYNONYM_MAP, TERM_TO_TOOLS, normalize_term
 from src.routing.date_parser import parse_natural_date
+from src.routing.fuzzy import fuzzy_lookup
 
-__all__ = ["SYNONYM_MAP", "TERM_TO_TOOLS", "normalize_term", "parse_natural_date"]
+__all__ = [
+    "SYNONYM_MAP",
+    "TERM_TO_TOOLS",
+    "normalize_term",
+    "parse_natural_date",
+    "fuzzy_lookup",
+]
