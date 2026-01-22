@@ -7,7 +7,22 @@ and canonical terms to relevant tools.
 
 # Synonym map: alternate term -> canonical term
 # English and Indonesian terms map to the same canonical form
+# Canonical terms also map to themselves for fuzzy matching
 SYNONYM_MAP: dict[str, str] = {
+    # Canonical terms (self-mapping for fuzzy lookup)
+    "sales": "sales",
+    "invoice": "invoice",
+    "customer": "customer",
+    "vendor": "vendor",
+    "receivable": "receivable",
+    "payable": "payable",
+    "balance": "balance",
+    "cash": "cash",
+    "product": "product",
+    "order": "order",
+    "delivery": "delivery",
+    "stock": "stock",
+
     # Sales/Revenue terms
     "revenue": "sales",
     "income": "sales",
