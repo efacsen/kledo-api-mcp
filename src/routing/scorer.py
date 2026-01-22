@@ -134,9 +134,13 @@ def load_tool_keywords() -> dict[str, set[str]]:
     """
     Parse llms.txt to extract keywords per tool from "Use for:" hints.
 
+    Keywords are normalized to canonical forms for better matching.
+
     Returns:
-        Dict mapping tool_name -> set of keywords from hints
+        Dict mapping tool_name -> set of normalized keywords from hints
     """
+    from src.routing.synonyms import normalize_term
+
     tool_keywords: dict[str, set[str]] = {}
 
     # Find llms.txt in project root
@@ -164,6 +168,9 @@ def load_tool_keywords() -> dict[str, set[str]]:
         name_parts = set(tool_name.replace("_", " ").split())
         keywords.update(name_parts)
 
-        tool_keywords[tool_name] = keywords
+        # Normalize keywords to canonical forms
+        normalized_keywords = {normalize_term(kw) for kw in keywords}
+
+        tool_keywords[tool_name] = normalized_keywords
 
     return tool_keywords
