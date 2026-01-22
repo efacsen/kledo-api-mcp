@@ -60,10 +60,10 @@ Plans:
   1. Tool disambiguation matrix shows which tool to use for each common use case
   2. Tool overlap documentation explains when to use similar tools (e.g., invoice_list vs financial_sales_summary)
   3. Each tool's unique purpose is clearly distinguished from related tools
-**Plans**: TBD
+**Plans**: 1 plan in 1 wave
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md - Disambiguation matrix + tool choosing guide
 
 ### Phase 4: Smart Routing
 **Goal**: Enable AI agents to find the right tool from natural language business queries
@@ -89,7 +89,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 |-------|----------------|--------|-----------|
 | 1. Entity Registry | 3/3 | Complete | 2026-01-22 |
 | 2. Documentation Layer | 3/3 | Complete | 2026-01-22 |
-| 3. Tool Enhancement | 0/? | Not started | - |
+| 3. Tool Enhancement | 0/1 | Not started | - |
 | 4. Smart Routing | 0/? | Not started | - |
 
 ---
