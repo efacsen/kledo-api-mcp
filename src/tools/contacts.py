@@ -198,17 +198,21 @@ async def _get_contact_transactions(args: Dict[str, Any], client: KledoAPIClient
         result.append(f"**Total Transactions**: {len(transactions)}\n")
 
         # Calculate summary
-        total_amount = sum(safe_get(t, "amount", 0) for t in transactions)
+        total_amount = sum(safe_get(t, "amount_after_tax", 0) for t in transactions)
         result.append(f"**Total Amount**: {format_currency(total_amount)}\n")
 
         result.append("\n## Recent Transactions:\n")
 
+        # Status mapping
+        status_map = {1: "Draft", 2: "Pending", 3: "Paid", 4: "Partial", 5: "Overdue"}
+
         for trans in transactions[:20]:
             trans_type = safe_get(trans, "type", "Unknown")
-            trans_number = safe_get(trans, "trans_number", "N/A")
-            date = safe_get(trans, "date", "")
-            amount = safe_get(trans, "amount", 0)
-            status = safe_get(trans, "status", "Unknown")
+            trans_number = safe_get(trans, "ref_number", "N/A")
+            date = safe_get(trans, "trans_date", "")
+            amount = safe_get(trans, "amount_after_tax", 0)
+            status_id = safe_get(trans, "status_id", 0)
+            status = status_map.get(status_id, f"Status-{status_id}")
 
             result.append(f"### {trans_number}")
             result.append(f"- **Type**: {trans_type}")

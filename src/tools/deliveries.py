@@ -112,12 +112,16 @@ async def _list_deliveries(args: Dict[str, Any], client: KledoAPIClient) -> str:
 
         result.append("\n## Delivery List:\n")
 
+        # Status mapping
+        status_map = {1: "Draft", 2: "Pending", 3: "Shipped", 4: "Delivered", 5: "Cancelled"}
+
         for delivery in deliveries[:20]:
-            delivery_number = safe_get(delivery, "trans_number", "N/A")
-            customer = safe_get(delivery, "contact_name", "Unknown")
+            delivery_number = safe_get(delivery, "ref_number", "N/A")
+            customer = safe_get(delivery, "contact.name", "Unknown")
             date = safe_get(delivery, "trans_date", "")
-            status = safe_get(delivery, "status_name", "Unknown")
-            shipping_company = safe_get(delivery, "shipping_company_name", "N/A")
+            status_id = safe_get(delivery, "status_id", 0)
+            status = status_map.get(status_id, f"Status-{status_id}")
+            shipping_company = safe_get(delivery, "shipping_company.name", "N/A")
 
             result.append(f"### {delivery_number}")
             result.append(f"- **Customer**: {customer}")
@@ -155,13 +159,18 @@ async def _get_delivery_detail(args: Dict[str, Any], client: KledoAPIClient) -> 
 
         result = ["# Delivery Details\n"]
 
-        result.append(f"**Delivery Number**: {safe_get(delivery, 'trans_number', 'N/A')}")
-        result.append(f"**Customer**: {safe_get(delivery, 'contact_name', 'Unknown')}")
+        # Status mapping
+        status_map = {1: "Draft", 2: "Pending", 3: "Shipped", 4: "Delivered", 5: "Cancelled"}
+        status_id = safe_get(delivery, "status_id", 0)
+        status = status_map.get(status_id, f"Status-{status_id}")
+
+        result.append(f"**Delivery Number**: {safe_get(delivery, 'ref_number', 'N/A')}")
+        result.append(f"**Customer**: {safe_get(delivery, 'contact.name', 'Unknown')}")
         result.append(f"**Date**: {safe_get(delivery, 'trans_date', '')}")
-        result.append(f"**Status**: {safe_get(delivery, 'status_name', 'Unknown')}")
+        result.append(f"**Status**: {status}")
 
         # Shipping info
-        shipping_company = safe_get(delivery, "shipping_company_name")
+        shipping_company = safe_get(delivery, "shipping_company.name")
         if shipping_company:
             result.append(f"**Shipping Company**: {shipping_company}")
 
@@ -227,8 +236,8 @@ async def _get_pending_deliveries(args: Dict[str, Any], client: KledoAPIClient) 
         result.append("\n## Orders Waiting for Delivery:\n")
 
         for delivery in deliveries:
-            delivery_number = safe_get(delivery, "trans_number", "N/A")
-            customer = safe_get(delivery, "contact_name", "Unknown")
+            delivery_number = safe_get(delivery, "ref_number", "N/A")
+            customer = safe_get(delivery, "contact.name", "Unknown")
             date = safe_get(delivery, "trans_date", "")
 
             result.append(f"- **{delivery_number}** - {customer} (Created: {date})")
