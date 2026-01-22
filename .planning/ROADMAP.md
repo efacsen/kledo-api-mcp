@@ -77,7 +77,7 @@ Plans:
 **Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 04-01-PLAN.md - Routing foundation (synonyms, date parser, fuzzy matching)
+- [x] 04-01-PLAN.md - Routing foundation (synonyms, date parser, fuzzy matching)
 - [ ] 04-02-PLAN.md - Pattern library + scoring + main router
 
 ## Progress
@@ -90,7 +90,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | 1. Entity Registry | 3/3 | Complete | 2026-01-22 |
 | 2. Documentation Layer | 3/3 | Complete | 2026-01-22 |
 | 3. Tool Enhancement | 1/1 | Complete | 2026-01-22 |
-| 4. Smart Routing | 0/2 | Planned | - |
+| 4. Smart Routing | 1/2 | In progress | - |
 
 ---
 *Roadmap created: 2026-01-21*

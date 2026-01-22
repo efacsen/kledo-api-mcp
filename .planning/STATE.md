@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-21)
 ## Current Position
 
 Phase: 4 of 4 (Smart Routing)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-01-22 - Phase 3 complete (verified)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-01-22 - Completed 04-01-PLAN.md
 
-Progress: [███████░░░] 75%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: 3 minutes
-- Total execution time: 24 minutes
+- Total execution time: 27 minutes
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Progress: [███████░░░] 75%
 | 01-entity-registry | 3 | 12 min | 4 min |
 | 02-documentation-layer | 3 | 10 min | 3 min |
 | 03-tool-enhancement | 1 | 2 min | 2 min |
+| 04-smart-routing | 1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (4 min), 02-02 (4 min), 02-03 (2 min), 03-01 (2 min)
-- Trend: Consistent velocity, documentation plans faster
+- Last 5 plans: 02-02 (4 min), 02-03 (2 min), 03-01 (2 min), 04-01 (3 min)
+- Trend: Consistent velocity, 2-4 min per plan
 
 *Updated after each plan completion*
 
@@ -59,6 +60,9 @@ Recent decisions affecting current work:
 - [02-02-D1]: Tool count is 23 not 20 (plan estimated ~20) - all tools documented
 - [02-02-D2]: Domain grouping based on business function rather than module name
 - [02-02-D3]: Included entity mapping in extract_tools.py for cross-referencing
+- [04-01-D1]: Canonical terms self-map in SYNONYM_MAP for fuzzy discoverability
+- [04-01-D2]: 80 score threshold + 3-char minimum for fuzzy matching precision
+- [04-01-D3]: Calendar-based vs rolling window distinction for date parsing
 
 ### Pending Todos
 
@@ -71,5 +75,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-22
-Stopped at: Phase 3 complete, ready for Phase 4 planning
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
