@@ -1,0 +1,44 @@
+name: Deploy Documentation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'src/entities/**'
+      - 'src/tools/**'
+      - 'llms.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure Git Credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          key: mkdocs-material-${{ hashFiles('requirements.txt') }}
+          path: ~/.cache/pip
+          restore-keys: |
+            mkdocs-material-
+
+      - name: Install dependencies
+        run: pip install mkdocs-material "mkdocstrings[python]"
+
+      - name: Deploy to GitHub Pages
+        run: mkdocs gh-deploy --force
