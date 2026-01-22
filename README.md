@@ -48,8 +48,18 @@ A Model Context Protocol (MCP) server that provides AI agents with read-only acc
    cp .env.example .env
    ```
 
-   Edit `.env` and add your Kledo credentials:
+   Edit `.env` and add your Kledo credentials.
+
+   **Option 1: API Key (Recommended)**
+   ```bash
+   # Generate API key from Kledo dashboard: Settings > API > Create API Key
+   KLEDO_API_KEY=kledo_pat_your_api_key_here
+   KLEDO_BASE_URL=https://api.kledo.com/api/v1
    ```
+
+   **Option 2: Email/Password (Legacy)**
+   ```bash
+   # Only use if API key is not available
    KLEDO_EMAIL=your-email@example.com
    KLEDO_PASSWORD=your-password
    KLEDO_BASE_URL=https://api.kledo.com/api/v1
@@ -66,6 +76,23 @@ python -m src.server
 
 Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
 
+**Using API Key (Recommended):**
+```json
+{
+  "mcpServers": {
+    "kledo-crm": {
+      "command": "python",
+      "args": ["-m", "src.server"],
+      "cwd": "/path/to/kledo-api-mcp",
+      "env": {
+        "KLEDO_API_KEY": "kledo_pat_your_api_key_here"
+      }
+    }
+  }
+}
+```
+
+**Using Email/Password (Legacy):**
 ```json
 {
   "mcpServers": {
@@ -160,12 +187,15 @@ cache_tiers:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `KLEDO_EMAIL` | Kledo account email | (required) |
-| `KLEDO_PASSWORD` | Kledo account password | (required) |
+| `KLEDO_API_KEY` | Kledo API key (recommended) | - |
+| `KLEDO_EMAIL` | Kledo account email (legacy) | - |
+| `KLEDO_PASSWORD` | Kledo account password (legacy) | - |
 | `KLEDO_BASE_URL` | API base URL | `https://api.kledo.com/api/v1` |
-| `KLEDO_APP_CLIENT` | Device type | `android` |
+| `KLEDO_APP_CLIENT` | Device type (email/password only) | `android` |
 | `CACHE_ENABLED` | Enable caching | `true` |
 | `LOG_LEVEL` | Logging level | `INFO` |
+
+**Note:** Either `KLEDO_API_KEY` (recommended) or `KLEDO_EMAIL` + `KLEDO_PASSWORD` must be provided.
 
 ## Architecture
 
@@ -243,10 +273,13 @@ kledo-api-mcp/
 
 ## Security Considerations
 
+- **Use API key authentication** (recommended over email/password)
+- Generate API key from Kledo dashboard: Settings > API > Create API Key
 - Store credentials in `.env` file (never commit to git)
-- Use a dedicated read-only Kledo account
+- If using email/password, use a dedicated service account (not personal)
 - Enable logging to monitor API usage
 - Review cache settings for sensitive data
+- Rotate API keys periodically
 
 ## Troubleshooting
 
