@@ -45,11 +45,12 @@ Plans:
   3. MkDocs site generates and serves documentation locally
   4. llms.txt file exists with AI-optimized tool discovery information
   5. Documentation references entity definitions from Phase 1
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md - MkDocs setup + entity documentation with Mermaid ERDs
+- [ ] 02-02-PLAN.md - Tool extraction script + domain-organized tool documentation
+- [ ] 02-03-PLAN.md - llms.txt + getting-started guide + GitHub Pages deployment
 
 ### Phase 3: Tool Enhancement
 **Goal**: Clarify tool selection by documenting overlaps and creating a disambiguation matrix
@@ -86,8 +87,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Entity Registry | 3/3 | ✓ Complete | 2026-01-22 |
-| 2. Documentation Layer | 0/? | Not started | - |
+| 1. Entity Registry | 3/3 | Complete | 2026-01-22 |
+| 2. Documentation Layer | 0/3 | Planned | - |
 | 3. Tool Enhancement | 0/? | Not started | - |
 | 4. Smart Routing | 0/? | Not started | - |
 
