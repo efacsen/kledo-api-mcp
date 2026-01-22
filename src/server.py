@@ -47,19 +47,41 @@ class KledoMCPServer:
     async def initialize_client(self) -> None:
         """Initialize Kledo API client with authentication."""
         try:
-            # Get credentials from environment
-            email = os.getenv("KLEDO_EMAIL")
-            password = os.getenv("KLEDO_PASSWORD")
+            # Get configuration from environment
             base_url = os.getenv("KLEDO_BASE_URL", "https://api.kledo.com/api/v1")
             app_client = os.getenv("KLEDO_APP_CLIENT", "android")
 
-            if not email or not password:
-                raise ValueError("KLEDO_EMAIL and KLEDO_PASSWORD must be set in environment")
+            # Try API key first (recommended method)
+            api_key = os.getenv("KLEDO_API_KEY")
+            if api_key:
+                logger.info("Using API key authentication (recommended)")
+                auth = KledoAuthenticator(
+                    base_url=base_url,
+                    api_key=api_key
+                )
+            else:
+                # Fallback to email/password (legacy method)
+                email = os.getenv("KLEDO_EMAIL")
+                password = os.getenv("KLEDO_PASSWORD")
 
-            # Initialize authenticator
-            auth = KledoAuthenticator(email, password, base_url, app_client)
+                if not email or not password:
+                    raise ValueError(
+                        "Must provide either KLEDO_API_KEY (recommended) or "
+                        "(KLEDO_EMAIL and KLEDO_PASSWORD) in environment variables"
+                    )
 
-            # Perform initial login
+                logger.warning(
+                    "Using email/password authentication (legacy). "
+                    "Consider using KLEDO_API_KEY for better security."
+                )
+                auth = KledoAuthenticator(
+                    base_url=base_url,
+                    email=email,
+                    password=password,
+                    app_client=app_client
+                )
+
+            # Perform initial login (no-op for API key, actual login for email/password)
             logger.info("Performing initial authentication...")
             if not await auth.login():
                 raise ValueError("Failed to authenticate with Kledo API")
