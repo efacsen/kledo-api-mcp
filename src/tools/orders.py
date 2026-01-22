@@ -132,17 +132,21 @@ async def _list_sales_orders(args: Dict[str, Any], client: KledoAPIClient) -> st
 
         result.append(f"**Total Found**: {len(orders)}\n")
 
-        total_amount = sum(safe_get(order, "grand_total", 0) for order in orders)
+        total_amount = sum(safe_get(order, "amount_after_tax", 0) for order in orders)
         result.append(f"**Total Amount**: {format_currency(total_amount)}\n")
 
         result.append("\n## Orders:\n")
 
+        # Status mapping
+        status_map = {1: "Draft", 2: "Pending", 3: "Confirmed", 4: "Completed", 5: "Cancelled"}
+
         for order in orders[:20]:
-            order_number = safe_get(order, "trans_number", "N/A")
-            customer = safe_get(order, "contact_name", "Unknown")
+            order_number = safe_get(order, "ref_number", "N/A")
+            customer = safe_get(order, "contact.name", "Unknown")
             date = safe_get(order, "trans_date", "")
-            amount = safe_get(order, "grand_total", 0)
-            status = safe_get(order, "status_name", "Unknown")
+            amount = safe_get(order, "amount_after_tax", 0)
+            status_id = safe_get(order, "status_id", 0)
+            status = status_map.get(status_id, f"Status-{status_id}")
 
             result.append(f"### {order_number}")
             result.append(f"- **Customer**: {customer}")
@@ -180,13 +184,18 @@ async def _get_order_detail(args: Dict[str, Any], client: KledoAPIClient) -> str
 
         result = ["# Sales Order Details\n"]
 
-        result.append(f"**Order Number**: {safe_get(order, 'trans_number', 'N/A')}")
-        result.append(f"**Customer**: {safe_get(order, 'contact_name', 'Unknown')}")
+        # Status mapping
+        status_map = {1: "Draft", 2: "Pending", 3: "Confirmed", 4: "Completed", 5: "Cancelled"}
+        status_id = safe_get(order, "status_id", 0)
+        status = status_map.get(status_id, f"Status-{status_id}")
+
+        result.append(f"**Order Number**: {safe_get(order, 'ref_number', 'N/A')}")
+        result.append(f"**Customer**: {safe_get(order, 'contact.name', 'Unknown')}")
         result.append(f"**Date**: {safe_get(order, 'trans_date', '')}")
-        result.append(f"**Status**: {safe_get(order, 'status_name', 'Unknown')}\n")
+        result.append(f"**Status**: {status}\n")
 
         subtotal = safe_get(order, "subtotal", 0)
-        total = safe_get(order, "grand_total", 0)
+        total = safe_get(order, "amount_after_tax", 0)
 
         result.append(f"**Subtotal**: {format_currency(subtotal)}")
         result.append(f"**Total**: {format_currency(total)}\n")
@@ -245,21 +254,27 @@ async def _list_purchase_orders(args: Dict[str, Any], client: KledoAPIClient) ->
 
         result.append(f"**Total Found**: {len(orders)}\n")
 
-        total_amount = sum(safe_get(order, "grand_total", 0) for order in orders)
+        total_amount = sum(safe_get(order, "amount_after_tax", 0) for order in orders)
         result.append(f"**Total Amount**: {format_currency(total_amount)}\n")
 
         result.append("\n## Purchase Orders:\n")
 
+        # Status mapping
+        status_map = {1: "Draft", 2: "Pending", 3: "Confirmed", 4: "Completed", 5: "Cancelled"}
+
         for order in orders[:20]:
-            order_number = safe_get(order, "trans_number", "N/A")
-            vendor = safe_get(order, "contact_name", "Unknown")
+            order_number = safe_get(order, "ref_number", "N/A")
+            vendor = safe_get(order, "contact.name", "Unknown")
             date = safe_get(order, "trans_date", "")
-            amount = safe_get(order, "grand_total", 0)
+            amount = safe_get(order, "amount_after_tax", 0)
+            status_id = safe_get(order, "status_id", 0)
+            status = status_map.get(status_id, f"Status-{status_id}")
 
             result.append(f"### {order_number}")
             result.append(f"- **Vendor**: {vendor}")
             result.append(f"- **Date**: {date}")
-            result.append(f"- **Amount**: {format_currency(amount)}\n")
+            result.append(f"- **Amount**: {format_currency(amount)}")
+            result.append(f"- **Status**: {status}\n")
 
         if len(orders) > 20:
             result.append(f"... and {len(orders) - 20} more orders")

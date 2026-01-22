@@ -13,13 +13,23 @@ def get_tools() -> list[Tool]:
     return [
         Tool(
             name="invoice_list_sales",
-            description="List sales invoices with optional filtering by customer, status, date range, or search term.",
+            description="""List sales invoices with optional filtering.
+
+Shows invoice details including revenue before/after tax, payment status, and customer info.
+
+Status codes (VERIFIED):
+- 1 = Belum Dibayar (Unpaid)
+- 2 = Dibayar Sebagian (Partially Paid)
+- 3 = Lunas (Fully Paid) - Use this for revenue calculation
+
+For commission calculation, use status_id=3 (paid only) with subtotal field.
+For actual revenue, use status_id=3 with amount_after_tax field.""",
             inputSchema={
                 "type": "object",
                 "properties": {
                     "search": {
                         "type": "string",
-                        "description": "Search term for invoice number or details"
+                        "description": "Search invoice number, customer name, or reference"
                     },
                     "contact_id": {
                         "type": "integer",
@@ -27,11 +37,11 @@ def get_tools() -> list[Tool]:
                     },
                     "status_id": {
                         "type": "integer",
-                        "description": "Filter by status (1=Draft, 2=Pending, 3=Paid, etc.)"
+                        "description": "Filter by status: 1=Belum Dibayar (Unpaid), 2=Dibayar Sebagian (Partial), 3=Lunas (Paid)"
                     },
                     "date_from": {
                         "type": "string",
-                        "description": "Start date (YYYY-MM-DD or shortcuts like 'last_month')"
+                        "description": "Start date (YYYY-MM-DD or 'last_month', 'this_month', etc.)"
                     },
                     "date_to": {
                         "type": "string",
@@ -39,7 +49,7 @@ def get_tools() -> list[Tool]:
                     },
                     "per_page": {
                         "type": "integer",
-                        "description": "Results per page (default: 50)"
+                        "description": "Results per page (default: 50, max: 100)"
                     }
                 },
                 "required": []
@@ -161,30 +171,50 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
 
         result.append(f"**Total Found**: {len(invoices)}\n")
 
-        # Calculate summary
-        total_amount = sum(safe_get(inv, "grand_total", 0) for inv in invoices)
-        total_paid = sum(safe_get(inv, "amount_paid", 0) for inv in invoices)
-        total_due = total_amount - total_paid
+        # Calculate summary (both before and after tax)
+        total_before_tax = sum(float(safe_get(inv, "subtotal", 0)) for inv in invoices)
+        total_tax = sum(float(safe_get(inv, "total_tax", 0)) for inv in invoices)
+        total_after_tax = sum(float(safe_get(inv, "amount_after_tax", 0)) for inv in invoices)
+        total_due = sum(float(safe_get(inv, "due", 0)) for inv in invoices)
+        total_paid = total_after_tax - total_due
 
-        result.append(f"**Total Amount**: {format_currency(total_amount)}")
-        result.append(f"**Total Paid**: {format_currency(total_paid)}")
-        result.append(f"**Total Outstanding**: {format_currency(total_due)}\n")
+        result.append("## Summary:")
+        result.append(f"**Revenue Before Tax** (for commission): {format_currency(total_before_tax)}")
+        result.append(f"**Tax (PPN)**: {format_currency(total_tax)}")
+        result.append(f"**Revenue After Tax** (actual): {format_currency(total_after_tax)}")
+        result.append(f"**Paid**: {format_currency(total_paid)}")
+        result.append(f"**Outstanding**: {format_currency(total_due)}\n")
 
         result.append("\n## Invoices:\n")
 
+        # Status mapping (VERIFIED from dashboard)
+        status_map = {
+            1: "Belum Dibayar (Unpaid)",
+            2: "Dibayar Sebagian (Partially Paid)",
+            3: "Lunas (Paid)"
+        }
+
         for invoice in invoices[:20]:  # Limit display
-            inv_number = safe_get(invoice, "trans_number", "N/A")
-            customer = safe_get(invoice, "contact_name", "Unknown")
+            inv_number = safe_get(invoice, "ref_number", "N/A")
+            customer = safe_get(invoice, "contact.name", "Unknown")
             date = safe_get(invoice, "trans_date", "")
-            amount = safe_get(invoice, "grand_total", 0)
-            paid = safe_get(invoice, "amount_paid", 0)
-            status = safe_get(invoice, "status_name", "Unknown")
+
+            # Get amounts
+            subtotal = float(safe_get(invoice, "subtotal", 0))
+            tax = float(safe_get(invoice, "total_tax", 0))
+            amount_after_tax = float(safe_get(invoice, "amount_after_tax", 0))
+            due = float(safe_get(invoice, "due", 0))
+
+            status_id = safe_get(invoice, "status_id", 0)
+            status = status_map.get(status_id, f"Status-{status_id}")
 
             result.append(f"### {inv_number}")
             result.append(f"- **Customer**: {customer}")
             result.append(f"- **Date**: {date}")
-            result.append(f"- **Amount**: {format_currency(amount)}")
-            result.append(f"- **Paid**: {format_currency(paid)}")
+            result.append(f"- **Before Tax**: {format_currency(subtotal)} (for commission)")
+            result.append(f"- **Tax**: {format_currency(tax)}")
+            result.append(f"- **After Tax**: {format_currency(amount_after_tax)} (actual)")
+            result.append(f"- **Outstanding**: {format_currency(due)}")
             result.append(f"- **Status**: {status}\n")
 
         if len(invoices) > 20:
@@ -339,22 +369,38 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
 
         result.append(f"**Total Found**: {len(invoices)}\n")
 
-        total_amount = sum(safe_get(inv, "grand_total", 0) for inv in invoices)
-        result.append(f"**Total Amount**: {format_currency(total_amount)}\n")
+        total_amount = sum(float(safe_get(inv, "amount_after_tax", 0)) for inv in invoices)
+        total_due = sum(float(safe_get(inv, "due", 0)) for inv in invoices)
+        total_paid = total_amount - total_due
+
+        result.append(f"**Total Amount**: {format_currency(total_amount)}")
+        result.append(f"**Total Paid**: {format_currency(total_paid)}")
+        result.append(f"**Total Outstanding**: {format_currency(total_due)}\n")
 
         result.append("\n## Purchase Invoices:\n")
 
+        # Status mapping (VERIFIED from dashboard - purchase invoices only have status 1 and 3)
+        status_map = {
+            1: "Belum Dibayar (Unpaid)",
+            3: "Lunas (Paid)"
+        }
+
         for invoice in invoices[:20]:
-            inv_number = safe_get(invoice, "trans_number", "N/A")
-            vendor = safe_get(invoice, "contact_name", "Unknown")
+            inv_number = safe_get(invoice, "ref_number", "N/A")
+            vendor = safe_get(invoice, "contact.name", "Unknown")
             date = safe_get(invoice, "trans_date", "")
-            amount = safe_get(invoice, "grand_total", 0)
-            status = safe_get(invoice, "status_name", "Unknown")
+            amount = float(safe_get(invoice, "amount_after_tax", 0))
+            due = float(safe_get(invoice, "due", 0))
+            paid = amount - due
+            status_id = safe_get(invoice, "status_id", 0)
+            status = status_map.get(status_id, f"Status-{status_id}")
 
             result.append(f"### {inv_number}")
             result.append(f"- **Vendor**: {vendor}")
             result.append(f"- **Date**: {date}")
             result.append(f"- **Amount**: {format_currency(amount)}")
+            result.append(f"- **Paid**: {format_currency(paid)}")
+            result.append(f"- **Outstanding**: {format_currency(due)}")
             result.append(f"- **Status**: {status}\n")
 
         if len(invoices) > 20:

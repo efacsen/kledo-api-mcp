@@ -169,3 +169,82 @@ def format_table(data: list[Dict[str, Any]], columns: list[str]) -> str:
         rows.append(row_str)
 
     return "\n".join([header, separator] + rows)
+
+
+def parse_natural_date(date_str: str) -> Optional[date]:
+    """
+    Parse natural language dates or ISO dates.
+
+    Args:
+        date_str: Date string ("2026-01-01", "today", "last month", etc.)
+
+    Returns:
+        date object or None if unparseable
+    """
+    if not date_str:
+        return None
+
+    today = date.today()
+
+    # Handle natural language
+    if date_str.lower() == "today":
+        return today
+    elif date_str.lower() == "yesterday":
+        from datetime import timedelta
+        return today - timedelta(days=1)
+    elif date_str.lower() in ("last month", "last_month"):
+        # First day of last month
+        if today.month == 1:
+            return date(today.year - 1, 12, 1)
+        else:
+            return date(today.year, today.month - 1, 1)
+    elif date_str.lower() in ("this month", "this_month"):
+        return date(today.year, today.month, 1)
+
+    # Try to parse as ISO date (YYYY-MM-DD)
+    try:
+        return datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        pass
+
+    # Try to parse as YYYY-MM (month)
+    try:
+        return datetime.strptime(date_str, "%Y-%m").date()
+    except ValueError:
+        pass
+
+    return None
+
+
+def format_markdown_table(headers: list[str], rows: list[list[str]]) -> str:
+    """
+    Format data as a Markdown table.
+
+    Args:
+        headers: Column headers
+        rows: List of row data
+
+    Returns:
+        Markdown-formatted table string
+    """
+    if not rows:
+        return "No data available"
+
+    # Calculate column widths
+    widths = [len(h) for h in headers]
+    for row in rows:
+        for i, cell in enumerate(row):
+            if i < len(widths):
+                widths[i] = max(widths[i], len(str(cell)))
+
+    # Build header
+    header_row = "| " + " | ".join(headers[i].ljust(widths[i]) for i in range(len(headers))) + " |"
+    separator = "| " + " | ".join("-" * widths[i] for i in range(len(headers))) + " |"
+
+    # Build rows
+    table_rows = []
+    for row in rows:
+        row_str = "| " + " | ".join(str(row[i]).ljust(widths[i]) if i < len(row) else " " * widths[i] for i in range(len(headers))) + " |"
+        table_rows.append(row_str)
+
+    return "\n".join([header_row, separator] + table_rows)

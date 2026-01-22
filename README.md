@@ -1,338 +1,482 @@
-# Kledo CRM MCP Server
+# Kledo MCP Server
 
-A Model Context Protocol (MCP) server that provides AI agents with read-only access to Kledo CRM/Finance API data. This enables natural language queries for financial reports, invoices, orders, products, contacts, and delivery tracking.
+Model Context Protocol (MCP) server for Kledo accounting software API - enables Claude AI to interact with your Kledo data for revenue reporting, sales analytics, customer management, and commission calculation.
 
-## Features
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
-- **Read-only access** to Kledo CRM data
-- **30+ MCP tools** for querying financial and operational data
-- **Smart caching** with configurable TTL for optimal performance
-- **Natural language queries** via AI agents
-- **Comprehensive coverage** of core CRM entities:
-  - Financial reports (P&L, sales/purchase summaries, bank balances)
-  - Invoices (sales & purchase)
-  - Orders (sales & purchase)
-  - Products & inventory
-  - Contacts (customers & vendors)
-  - Delivery tracking
+## 🎯 Key Features
 
-## Quick Start
+- **28 Production-Ready Tools** - Complete coverage of Kledo API endpoints
+- **100% Verified Field Mappings** - All status codes and fields verified from real API data (1,300+ records analyzed)
+- **Dual Revenue Calculation** - Both before-tax (commission) and after-tax (actual) amounts
+- **Paid-Only Commission** - Automatically filters by status_id=3 (Lunas/Paid) for accurate commission calculation
+- **Bilingual Support** - Understands Indonesian and English queries
+- **Smart Caching** - Configurable caching for optimal performance
+- **Type-Safe** - Comprehensive type hints throughout
+
+## 📊 Revenue & Commission Features
+
+### Commission Calculation (Verified ✓)
+
+Commission is calculated using **revenue BEFORE tax** (subtotal) from **PAID invoices only** (status_id=3):
+
+```python
+commission_base = SUM(subtotal WHERE status_id=3 AND date_range)
+```
+
+### Status Codes (Verified from Dashboard)
+
+- **Status 1**: Belum Dibayar (Unpaid) - Not counted in commission
+- **Status 2**: Dibayar Sebagian (Partially Paid) - Not counted in commission
+- **Status 3**: Lunas (Paid) - **USE FOR COMMISSION CALCULATION**
+
+### Revenue Formula (100% Verified)
+
+```python
+amount_after_tax = subtotal + total_tax
+```
+
+All tools show BOTH revenue calculations:
+- **Before Tax** (subtotal) - For commission
+- **After Tax** (amount_after_tax) - Actual revenue
+
+## 🛠️ Available Tools (28 Total)
+
+### Revenue & Analytics (8 tools)
+- `revenue_summary` - Quick revenue for period (before/after tax)
+- `outstanding_receivables` - Unpaid invoices tracking (piutang)
+- `customer_revenue_ranking` - Top customers by revenue
+- `sales_rep_revenue_report` - Sales rep performance with commission
+- `sales_rep_list` - List all sales reps with revenue
+- `invoice_list_sales` - Sales invoices list
+- `invoice_get_detail` - Invoice details
+- `invoice_get_totals` - Invoice totals summary
+
+### Purchase/Expenses (1 tool)
+- `invoice_list_purchase` - Purchase invoices
+
+### Products (3 tools)
+- `product_list` - List products
+- `product_get_detail` - Product details
+- `product_search_by_sku` - Search by SKU
+
+### Customers/Contacts (3 tools)
+- `contact_list` - List customers/vendors
+- `contact_get_detail` - Contact details
+- `contact_get_transactions` - Contact transaction history
+
+### Orders (4 tools)
+- `order_list_sales` - Sales orders
+- `order_get_detail` - Order details
+- `order_list_purchase` - Purchase orders
+- `order_get_purchase_detail` - Purchase order details
+
+### Deliveries (4 tools)
+- `delivery_list` - List deliveries
+- `delivery_get_detail` - Delivery details
+- `delivery_list_pending` - Pending deliveries
+- `delivery_get_by_order` - Deliveries by order
+
+### Financial (1 tool)
+- `financial_get_account_list` - Chart of accounts
+
+### Utilities (4 tools)
+- `utility_cache_clear` - Clear cache
+- `utility_cache_stats` - Cache statistics
+- `utility_test_connection` - Test API connection
+- `utility_get_business_info` - Business information
+
+## 📦 Installation
 
 ### Prerequisites
 
-- Python 3.10 or higher
+- Python 3.11 or higher
 - Kledo account with API access
-- An MCP-compatible AI agent (e.g., Claude Desktop)
+- Claude Code CLI or Claude Desktop
 
-### Installation
+### Option 1: Install for Claude Code CLI
 
-1. **Clone the repository**:
+1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/kledo-api-mcp.git
+   git clone https://github.com/YOUR_USERNAME/kledo-api-mcp.git
    cd kledo-api-mcp
    ```
 
-2. **Create virtual environment**:
+2. **Install dependencies:**
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -e .
    ```
 
-3. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Configure environment**:
+3. **Create environment file:**
    ```bash
    cp .env.example .env
    ```
 
-   Edit `.env` and add your Kledo credentials.
-
-   **Option 1: API Key (Recommended)**
-   ```bash
-   # Generate API key from Kledo dashboard: Settings > API > Create API Key
-   KLEDO_API_KEY=kledo_pat_your_api_key_here
+4. **Configure your Kledo API credentials in `.env`:**
+   ```env
+   # Recommended: API Key Authentication
+   KLEDO_API_KEY=your_api_key_here
    KLEDO_BASE_URL=https://api.kledo.com/api/v1
+
+   # Optional: Legacy Email/Password Authentication
+   # KLEDO_EMAIL=your_email@example.com
+   # KLEDO_PASSWORD=your_password
+
+   # Server Configuration
+   MCP_SERVER_NAME=kledo-crm
+   CACHE_ENABLED=true
+   LOG_LEVEL=INFO
    ```
 
-   **Option 2: Email/Password (Legacy)**
-   ```bash
-   # Only use if API key is not available
-   KLEDO_EMAIL=your-email@example.com
-   KLEDO_PASSWORD=your-password
-   KLEDO_BASE_URL=https://api.kledo.com/api/v1
+5. **Add to Claude Code CLI configuration:**
+
+   Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or equivalent:
+
+   ```json
+   {
+     "mcpServers": {
+       "kledo-crm": {
+         "command": "python",
+         "args": ["-m", "src.server"],
+         "cwd": "/FULL/PATH/TO/kledo-api-mcp",
+         "env": {
+           "KLEDO_API_KEY": "your_api_key_here",
+           "KLEDO_BASE_URL": "https://api.kledo.com/api/v1",
+           "MCP_SERVER_NAME": "kledo-crm",
+           "CACHE_ENABLED": "true",
+           "LOG_LEVEL": "INFO"
+         }
+       }
+     }
+   }
    ```
 
-### Running the Server
+   **Important**: Replace `/FULL/PATH/TO/kledo-api-mcp` with the absolute path to your cloned repository.
 
-#### Standalone Mode
-```bash
-python -m src.server
+6. **Restart Claude Code CLI** to load the MCP server.
+
+### Option 2: Install for Claude Desktop
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/kledo-api-mcp.git
+   cd kledo-api-mcp
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   pip install -e .
+   ```
+
+3. **Create environment file:**
+   ```bash
+   cp .env.example .env
+   ```
+
+4. **Configure your Kledo API credentials in `.env`** (same as Option 1)
+
+5. **Add to Claude Desktop configuration:**
+
+   **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+   **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+   **Linux**: `~/.config/Claude/claude_desktop_config.json`
+
+   ```json
+   {
+     "mcpServers": {
+       "kledo-crm": {
+         "command": "python",
+         "args": ["-m", "src.server"],
+         "cwd": "/FULL/PATH/TO/kledo-api-mcp",
+         "env": {
+           "KLEDO_API_KEY": "your_api_key_here",
+           "KLEDO_BASE_URL": "https://api.kledo.com/api/v1",
+           "MCP_SERVER_NAME": "kledo-crm",
+           "CACHE_ENABLED": "true",
+           "LOG_LEVEL": "INFO"
+         }
+       }
+     }
+   }
+   ```
+
+6. **Restart Claude Desktop** to load the MCP server.
+
+### Getting Your Kledo API Key
+
+1. Log in to your Kledo account at https://kledo.com
+2. Go to **Settings** → **Integration** → **API**
+3. Generate a new API key
+4. Copy the key and add it to your `.env` file
+
+**Security Note**: Never commit your `.env` file to version control. The `.gitignore` file already excludes it.
+
+## 🚀 Usage Examples
+
+### Get Monthly Revenue (with Commission Base)
+
+Ask Claude:
+```
+"Berapa revenue bulan ini?"
+"What's this month's revenue?"
 ```
 
-#### With Claude Desktop
+Claude will use `revenue_summary` tool and return:
+```
+Revenue Summary (PAID INVOICES ONLY)
+Period: 2026-01-01 to 2026-01-31
+Paid Invoices: 45
 
-Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
-
-**Using API Key (Recommended):**
-```json
-{
-  "mcpServers": {
-    "kledo-crm": {
-      "command": "python",
-      "args": ["-m", "src.server"],
-      "cwd": "/path/to/kledo-api-mcp",
-      "env": {
-        "KLEDO_API_KEY": "kledo_pat_your_api_key_here"
-      }
-    }
-  }
-}
+Revenue Calculation:
+Revenue Before Tax (for commission): Rp 96,373,250
+Tax (PPN): Rp 9,068,950
+Revenue After Tax (actual): Rp 105,442,200
 ```
 
-**Using Email/Password (Legacy):**
-```json
-{
-  "mcpServers": {
-    "kledo-crm": {
-      "command": "python",
-      "args": ["-m", "src.server"],
-      "cwd": "/path/to/kledo-api-mcp",
-      "env": {
-        "KLEDO_EMAIL": "your-email@example.com",
-        "KLEDO_PASSWORD": "your-password"
-      }
-    }
-  }
-}
+### Sales Rep Commission Report
+
+Ask Claude:
+```
+"Show sales rep performance for January"
+"Siapa sales rep dengan revenue tertinggi bulan ini?"
 ```
 
-Restart Claude Desktop and the Kledo CRM tools will be available.
+Claude will use `sales_rep_revenue_report` tool showing:
+- Revenue Before Tax (Commission base)
+- Revenue After Tax (Actual revenue)
+- Only PAID invoices (status_id=3)
+- Monthly breakdown per rep
+- Top deals sorted by commission amount
 
-## Usage Examples
+### Outstanding Receivables (Piutang)
 
-### Natural Language Queries
+Ask Claude:
+```
+"Siapa yang belum bayar?"
+"Show outstanding invoices"
+```
 
-With the MCP server connected to an AI agent, you can ask questions like:
+Claude will use `outstanding_receivables` tool showing:
+- Belum Dibayar (Unpaid) - status_id=1
+- Dibayar Sebagian (Partially Paid) - status_id=2
+- Customer names, amounts, dates
 
-- "Show me all unpaid invoices from last month"
-- "What's our total sales revenue for October 2024?"
-- "Who are my top 10 customers by revenue?"
-- "What's the current stock level for product SKU-123?"
-- "Which deliveries are still pending?"
-- "Show me the profit from the distribution channel last month"
+### Top Customers by Revenue
 
-### Using Tools Directly
+Ask Claude:
+```
+"Who are our top 10 customers this month?"
+"Customer dengan revenue tertinggi?"
+```
 
-The server exposes 30+ tools organized by category:
+Claude will use `customer_revenue_ranking` tool showing:
+- Both before-tax and after-tax revenue
+- Number of invoices
+- Average invoice value
+- Only PAID invoices
 
-#### Financial Reports
-- `financial_activity_team_report` - Team activity summary
-- `financial_sales_summary` - Sales by customer
-- `financial_purchase_summary` - Purchases by vendor
-- `financial_bank_balances` - Current bank balances
-
-#### Invoices
-- `invoice_list_sales` - List sales invoices
-- `invoice_get_detail` - Get invoice details
-- `invoice_get_totals` - Invoice totals summary
-- `invoice_list_purchase` - List purchase invoices
-
-#### Orders
-- `order_list_sales` - List sales orders
-- `order_get_detail` - Get order details
-- `order_list_purchase` - List purchase orders
-
-#### Products
-- `product_list` - List products with prices
-- `product_get_detail` - Get product details
-- `product_search_by_sku` - Find product by SKU
-
-#### Contacts
-- `contact_list` - List customers/vendors
-- `contact_get_detail` - Get contact details
-- `contact_get_transactions` - Transaction history
-
-#### Deliveries
-- `delivery_list` - List deliveries
-- `delivery_get_detail` - Get delivery details
-- `delivery_get_pending` - Pending deliveries
-
-#### Utilities
-- `utility_clear_cache` - Clear all cached data
-- `utility_get_cache_stats` - Cache performance stats
-- `utility_test_connection` - Test API connection
-
-## Configuration
+## 🔧 Configuration
 
 ### Cache Configuration
 
-Cache TTLs are configured in `config/cache_config.yaml`:
+The server uses intelligent caching to reduce API calls. Configure in `config/cache_config.yaml`:
 
 ```yaml
-cache_tiers:
-  master_data:
-    products: 7200        # 2 hours
-    contacts: 7200        # 2 hours
-  transactional:
-    invoices: 1800        # 30 minutes
-    orders: 1800          # 30 minutes
-  analytical:
-    reports: 3600         # 1 hour
+default:
+  ttl: 300
+  max_size: 1000
+
+categories:
+  invoices:
+    ttl: 60
+  products:
+    ttl: 3600
+  contacts:
+    ttl: 1800
 ```
+
+### Endpoint Configuration
+
+API endpoints are configured in `config/endpoints.yaml`. All endpoints are pre-configured for the Kledo API v1.
 
 ### Environment Variables
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `KLEDO_API_KEY` | Kledo API key (recommended) | - |
-| `KLEDO_EMAIL` | Kledo account email (legacy) | - |
-| `KLEDO_PASSWORD` | Kledo account password (legacy) | - |
-| `KLEDO_BASE_URL` | API base URL | `https://api.kledo.com/api/v1` |
-| `KLEDO_APP_CLIENT` | Device type (email/password only) | `android` |
-| `CACHE_ENABLED` | Enable caching | `true` |
+| `KLEDO_API_KEY` | Your Kledo API key (recommended) | - |
+| `KLEDO_EMAIL` | Your Kledo email (legacy) | - |
+| `KLEDO_PASSWORD` | Your Kledo password (legacy) | - |
+| `KLEDO_BASE_URL` | Kledo API base URL | `https://api.kledo.com/api/v1` |
+| `MCP_SERVER_NAME` | MCP server name | `kledo-crm` |
+| `CACHE_ENABLED` | Enable/disable caching | `true` |
 | `LOG_LEVEL` | Logging level | `INFO` |
+| `LOG_FILE` | Log file path (optional) | - |
 
-**Note:** Either `KLEDO_API_KEY` (recommended) or `KLEDO_EMAIL` + `KLEDO_PASSWORD` must be provided.
+## 📖 Documentation
 
-## Architecture
+- **[MCP_SERVER_UPDATES.md](MCP_SERVER_UPDATES.md)** - Complete changelog and update details
+- **[tests/FINAL_FIELD_MAPPING.md](tests/FINAL_FIELD_MAPPING.md)** - Complete field reference (100% verified)
+- **[tests/STATUS_ANALYSIS.md](tests/STATUS_ANALYSIS.md)** - Deep status code analysis from 1,300+ records
+- **[.planning/phases/](./planning/phases/)** - Development phases and planning documents
 
-The server follows a layered architecture:
+## 🧪 Testing
 
-```
-┌─────────────────────────────────────┐
-│         AI Agent (Claude)           │
-└────────────────┬────────────────────┘
-                 │ MCP Protocol
-┌────────────────▼────────────────────┐
-│         MCP Server Layer            │
-│  (Tool Registration & Routing)      │
-└────────────────┬────────────────────┘
-                 │
-┌────────────────▼────────────────────┐
-│         Tool Handlers               │
-│  (Financial, Invoice, Order, etc)   │
-└────────────────┬────────────────────┘
-                 │
-┌────────────────▼────────────────────┐
-│       Kledo API Client              │
-│  (Request Management & Caching)     │
-└────────────────┬────────────────────┘
-                 │
-┌────────────────▼────────────────────┐
-│      Authentication Layer           │
-│   (Token Management & Refresh)      │
-└────────────────┬────────────────────┘
-                 │ HTTPS
-┌────────────────▼────────────────────┐
-│          Kledo API                  │
-└─────────────────────────────────────┘
-```
+### Run Verification Tests
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed design documentation.
-
-## Development
-
-### Running Tests
+All field mappings have been verified with real API data:
 
 ```bash
-pytest tests/
+cd tests
+python test_field_mappings.py
 ```
 
-### Code Formatting
+**Test Results**: 7/7 tests passed (100%)
+- ✅ Status ID mappings (1=Unpaid, 2=Partial, 3=Paid)
+- ✅ Revenue formula (amount_after_tax = subtotal + total_tax)
+- ✅ Revenue calculation (before/after tax)
+- ✅ Sales rep performance tracking
+- ✅ Customer revenue analysis
+- ✅ Outstanding receivables calculation
+- ✅ Profit margin calculation
 
-```bash
-black src/ tests/
-ruff check src/ tests/
+### Test API Connection
+
+Ask Claude:
+```
+"Test connection to Kledo API"
 ```
 
-### Project Structure
+Claude will use `utility_test_connection` to verify authentication and API access.
 
-```
-kledo-api-mcp/
-├── src/
-│   ├── server.py          # Main MCP server
-│   ├── kledo_client.py    # API client
-│   ├── auth.py            # Authentication
-│   ├── cache.py           # Caching mechanism
-│   ├── tools/             # Tool implementations
-│   │   ├── financial.py
-│   │   ├── invoices.py
-│   │   ├── orders.py
-│   │   ├── products.py
-│   │   ├── contacts.py
-│   │   ├── deliveries.py
-│   │   └── utilities.py
-│   └── utils/             # Helper utilities
-├── config/                # Configuration files
-├── tests/                 # Test suite
-└── docs/                  # Documentation
-```
+## 🐛 Troubleshooting
 
-## Security Considerations
+### MCP Server Not Showing in Claude
 
-- **Use API key authentication** (recommended over email/password)
-- Generate API key from Kledo dashboard: Settings > API > Create API Key
-- Store credentials in `.env` file (never commit to git)
-- If using email/password, use a dedicated service account (not personal)
-- Enable logging to monitor API usage
-- Review cache settings for sensitive data
-- Rotate API keys periodically
+1. **Check configuration file location:**
+   - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+   - Linux: `~/.config/Claude/claude_desktop_config.json`
 
-## Troubleshooting
+2. **Verify JSON syntax** - Use a JSON validator to check for errors
+
+3. **Check absolute path** - Ensure `cwd` points to the correct absolute path
+
+4. **Restart Claude** completely (not just refresh)
+
+5. **Check logs:**
+   ```bash
+   # macOS/Linux
+   tail -f ~/Library/Logs/Claude/mcp*.log
+
+   # Windows
+   # Check %LOCALAPPDATA%\Claude\Logs\
+   ```
 
 ### Authentication Errors
 
-If you see authentication failures:
-1. Verify credentials in `.env` file
-2. Check if your Kledo account is active
-3. Ensure API access is enabled for your account
+1. **Verify API key** in `.env` file
+2. **Check API key permissions** in Kledo dashboard
+3. **Test with curl:**
+   ```bash
+   curl -H "Authorization: Bearer YOUR_API_KEY" \
+        https://api.kledo.com/api/v1/finance/account
+   ```
+
+### Import Errors
+
+If you see `ModuleNotFoundError`:
+
+```bash
+# Reinstall in development mode
+pip install -e .
+
+# Or install dependencies manually
+pip install -r requirements.txt
+```
 
 ### Cache Issues
 
-Clear cache if you see stale data:
-- Use `utility_clear_cache` tool
-- Or delete the cache manually and restart
+Clear the cache if you see stale data:
 
-### Connection Errors
+Ask Claude:
+```
+"Clear Kledo cache"
+```
 
-Test connectivity:
-- Use `utility_test_connection` tool
-- Check firewall settings
-- Verify `KLEDO_BASE_URL` is correct
+Or disable caching in `.env`:
+```env
+CACHE_ENABLED=false
+```
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please:
+
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## License
+### Development Setup
 
-MIT License - see [LICENSE](LICENSE) for details
+```bash
+# Clone your fork
+git clone https://github.com/YOUR_USERNAME/kledo-api-mcp.git
+cd kledo-api-mcp
 
-## Support
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-For issues and questions:
-- Open an issue on GitHub
-- Check [API_MAPPING.md](API_MAPPING.md) for endpoint details
-- Review [ARCHITECTURE.md](ARCHITECTURE.md) for design documentation
+# Install in development mode with dev dependencies
+pip install -e ".[dev]"
 
-## Roadmap
+# Run tests
+pytest tests/
 
-- [ ] Add write operations (with explicit user confirmation)
-- [ ] Support for webhooks
-- [ ] Advanced reporting and analytics
-- [ ] Multi-company support
-- [ ] Export to Excel/CSV
-- [ ] Dashboard generation
+# Run linters
+ruff check src/
+mypy src/
+```
 
-## Acknowledgments
+## 📄 License
 
-- Built with [MCP (Model Context Protocol)](https://github.com/anthropics/mcp)
-- Powered by [Kledo API](https://www.kledo.com/)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) by Anthropic
+- Integrates with [Kledo](https://kledo.com) accounting software API
+- All field mappings verified through empirical analysis of 1,300+ real API records
+
+## 📞 Support
+
+- **Issues**: [GitHub Issues](https://github.com/YOUR_USERNAME/kledo-api-mcp/issues)
+- **Kledo API Docs**: https://api-docs.kledo.com/
+- **MCP Documentation**: https://modelcontextprotocol.io/
+
+## 🎓 For AI Models Using This MCP Server
+
+When users ask about revenue, remember:
+
+1. **For commission:** Use revenue BEFORE tax (`subtotal`)
+2. **For actual revenue:** Use revenue AFTER tax (`amount_after_tax`)
+3. **Filter by status_id=3** (Lunas/Paid) for confirmed revenue
+4. **Status codes:**
+   - 1 = Belum Dibayar (Unpaid)
+   - 2 = Dibayar Sebagian (Partially Paid)
+   - 3 = Lunas (Fully Paid) ← USE THIS
+
+**Quick Tools for Common Questions:**
+- "Revenue bulan ini?" → `revenue_summary`
+- "Siapa yang belum bayar?" → `outstanding_receivables`
+- "Top customers?" → `customer_revenue_ranking`
+- "Performance sales rep?" → `sales_rep_revenue_report`
+
+---
+
+**Made with ❤️ for accurate revenue reporting and commission calculation**
