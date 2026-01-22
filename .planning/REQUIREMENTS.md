@@ -15,8 +15,8 @@ Requirements for comprehensive API mapping and smart routing.
 
 ### Tool Enhancement
 
-- [ ] **TOOL-01**: Create tool disambiguation matrix showing which tool for which use case
-- [ ] **TOOL-02**: Document tool overlaps and when to use each (e.g., invoice_list vs financial_sales_summary)
+- [x] **TOOL-01**: Create tool disambiguation matrix showing which tool for which use case
+- [x] **TOOL-02**: Document tool overlaps and when to use each (e.g., invoice_list vs financial_sales_summary)
 
 ### Documentation
 
@@ -74,8 +74,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DOCS-02 | Phase 2 | Complete |
 | DOCS-03 | Phase 2 | Complete |
 | DOCS-04 | Phase 2 | Complete |
-| TOOL-01 | Phase 3 | Pending |
-| TOOL-02 | Phase 3 | Pending |
+| TOOL-01 | Phase 3 | Complete |
+| TOOL-02 | Phase 3 | Complete |
 | ROUT-01 | Phase 4 | Pending |
 | ROUT-02 | Phase 4 | Pending |
 | ROUT-03 | Phase 4 | Pending |
@@ -87,4 +87,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-21*
-*Last updated: 2026-01-22 after Phase 2 completion*
+*Last updated: 2026-01-22 after Phase 3 completion*
