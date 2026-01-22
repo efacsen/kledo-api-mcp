@@ -1,0 +1,66 @@
+# Kledo MCP Server
+
+> MCP Server connecting AI agents to Kledo accounting software. Provides read-only access to invoices, contacts, products, orders, deliveries, and financial reports.
+
+This server exposes 23 tools organized by business domain. Use this file to find the right tool for querying Kledo business data.
+
+## Invoice Tools
+
+Tools for sales and purchase invoice operations.
+
+- [invoice_list_sales](docs/tools/sales/invoices.md#invoice_list_sales): List sales invoices. Use for: "show me invoices", "customer billing", "unpaid invoices", "accounts receivable", "recent sales", "invoice list". Parameters: search, contact_id, status_id, date_from, date_to, per_page.
+- [invoice_get_detail](docs/tools/sales/invoices.md#invoice_get_detail): Get invoice details with line items. Use for: "invoice details", "show invoice INV-001", "line items on invoice", "what's on this invoice". Required: invoice_id.
+- [invoice_get_totals](docs/tools/sales/invoices.md#invoice_get_totals): Get invoice summary totals. Use for: "total outstanding", "overdue amount", "receivables summary", "how much are we owed". Parameters: date_from, date_to.
+- [invoice_list_purchase](docs/tools/purchases/invoices.md#invoice_list_purchase): List purchase invoices (vendor bills). Use for: "bills from vendors", "purchase invoices", "accounts payable", "what do we owe", "vendor bills". Parameters: search, contact_id, status_id, date_from, date_to.
+
+## Contact Tools
+
+Tools for customer and vendor CRM operations.
+
+- [contact_list](docs/tools/crm/contacts.md#contact_list): List customers and vendors. Use for: "show customers", "find vendor", "contact list", "who do we sell to", "list suppliers", "our clients". Parameters: search, type_id (1=Customer, 2=Vendor, 3=Both).
+- [contact_get_detail](docs/tools/crm/contacts.md#contact_get_detail): Get contact details. Use for: "customer info", "vendor details", "contact address", "contact phone number", "customer email". Required: contact_id.
+- [contact_get_transactions](docs/tools/crm/contacts.md#contact_get_transactions): Get contact transaction history. Use for: "customer purchases", "transaction history", "what did this customer buy", "vendor payment history", "contact invoices". Required: contact_id.
+
+## Product Tools
+
+Tools for product catalog and inventory.
+
+- [product_list](docs/tools/inventory/products.md#product_list): List products with prices. Use for: "product catalog", "show inventory", "what do we sell", "list items", "our products". Parameters: search, include_inventory, per_page.
+- [product_get_detail](docs/tools/inventory/products.md#product_get_detail): Get product details. Use for: "product info", "check stock", "product price", "item details", "how much do we have". Required: product_id.
+- [product_search_by_sku](docs/tools/inventory/products.md#product_search_by_sku): Find product by SKU. Use for: "lookup SKU", "product by code", "find item ABC123", "search by product code", "SKU lookup". Required: sku.
+
+## Order Tools
+
+Tools for sales and purchase orders.
+
+- [order_list_sales](docs/tools/sales/orders.md#order_list_sales): List sales orders. Use for: "pending orders", "customer orders", "sales orders", "order list", "what orders do we have". Parameters: search, contact_id, status_id, date_from, date_to.
+- [order_get_detail](docs/tools/sales/orders.md#order_get_detail): Get order details. Use for: "order info", "order items", "what's in this order", "order line items", "show order details". Required: order_id.
+- [order_list_purchase](docs/tools/purchases/orders.md#order_list_purchase): List purchase orders. Use for: "POs", "orders to vendors", "purchase orders", "what did we order", "vendor orders". Parameters: search, contact_id, date_from, date_to.
+
+## Delivery Tools
+
+Tools for shipment tracking.
+
+- [delivery_list](docs/tools/inventory/deliveries.md#delivery_list): List deliveries. Use for: "shipments", "delivery status", "what shipped", "recent deliveries", "shipping list". Parameters: search, date_from, date_to, status_id.
+- [delivery_get_detail](docs/tools/inventory/deliveries.md#delivery_get_detail): Get delivery details. Use for: "tracking info", "shipment details", "delivery contents", "what's in this shipment". Required: delivery_id.
+- [delivery_get_pending](docs/tools/inventory/deliveries.md#delivery_get_pending): Get pending deliveries. Use for: "unshipped orders", "pending shipments", "what needs to ship", "orders awaiting delivery", "backlog".
+
+## Financial Tools
+
+Tools for financial reports.
+
+- [financial_activity_team_report](docs/tools/finance/reports.md#financial_activity_team_report): Team activity report. Use for: "what did team do", "activity log", "user actions", "audit trail", "who did what". Parameters: date_from, date_to.
+- [financial_sales_summary](docs/tools/finance/reports.md#financial_sales_summary): Sales by customer. Use for: "top customers", "sales report", "revenue by customer", "customer revenue", "sales breakdown". Parameters: date_from, date_to, contact_id.
+- [financial_purchase_summary](docs/tools/finance/reports.md#financial_purchase_summary): Purchases by vendor. Use for: "vendor spending", "purchase report", "costs by vendor", "supplier costs", "what did we spend". Parameters: date_from, date_to, contact_id.
+- [financial_bank_balances](docs/tools/finance/reports.md#financial_bank_balances): Bank account balances. Use for: "cash on hand", "bank balances", "available funds", "how much money do we have", "account balances".
+
+## System Tools
+
+- [utility_clear_cache](docs/tools/system/utilities.md#utility_clear_cache): Clear cached data. Use for: "refresh data", "clear cache", "reset cache", "force refresh".
+- [utility_get_cache_stats](docs/tools/system/utilities.md#utility_get_cache_stats): Cache performance metrics. Use for: "cache stats", "performance info", "cache hit rate", "cache size".
+- [utility_test_connection](docs/tools/system/utilities.md#utility_test_connection): Test API connection. Use for: "test connection", "is API working", "check connection", "API status".
+
+## Optional
+
+- [Full Documentation](docs/index.md): Complete MkDocs site with entity schemas, ERD diagrams, and API reference
+- [Entity Registry](docs/entities/index.md): Pydantic model schemas and relationships
