@@ -27,9 +27,9 @@ Requirements for comprehensive API mapping and smart routing.
 
 ### Smart Routing
 
-- [ ] **ROUT-01**: Build synonym dictionary for business terms (revenue=sales, vendor=supplier, bill=invoice)
-- [ ] **ROUT-02**: Implement tool discovery/search capability
-- [ ] **ROUT-03**: Add intent-to-tool resolution (natural language -> tool + parameters)
+- [x] **ROUT-01**: Build synonym dictionary for business terms (revenue=sales, vendor=supplier, bill=invoice)
+- [x] **ROUT-02**: Implement tool discovery/search capability
+- [x] **ROUT-03**: Add intent-to-tool resolution (natural language -> tool + parameters)
 
 ## v2 Requirements
 
@@ -76,9 +76,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DOCS-04 | Phase 2 | Complete |
 | TOOL-01 | Phase 3 | Complete |
 | TOOL-02 | Phase 3 | Complete |
-| ROUT-01 | Phase 4 | Pending |
-| ROUT-02 | Phase 4 | Pending |
-| ROUT-03 | Phase 4 | Pending |
+| ROUT-01 | Phase 4 | Complete |
+| ROUT-02 | Phase 4 | Complete |
+| ROUT-03 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 12 total
@@ -87,4 +87,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-21*
-*Last updated: 2026-01-22 after Phase 3 completion*
+*Last updated: 2026-01-22 after Phase 4 completion*
