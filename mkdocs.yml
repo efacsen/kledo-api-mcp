@@ -68,6 +68,8 @@ nav:
     - Account: entities/account.md
   - Tools:
     - Catalog: tools/index.md
+    - Find the Right Tool: tools/disambiguation.md
+    - Choosing Between Tools: tools/choosing.md
     - Sales:
       - Invoices: tools/sales/invoices.md
       - Orders: tools/sales/orders.md
