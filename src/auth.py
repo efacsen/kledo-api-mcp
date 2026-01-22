@@ -10,23 +10,54 @@ from loguru import logger
 class KledoAuthenticator:
     """Handles authentication with Kledo API."""
 
-    def __init__(self, email: str, password: str, base_url: str, app_client: str = "android"):
+    def __init__(
+        self,
+        base_url: str,
+        api_key: Optional[str] = None,
+        email: Optional[str] = None,
+        password: Optional[str] = None,
+        app_client: str = "android"
+    ):
         """
         Initialize authenticator.
 
+        Supports two authentication methods:
+        1. API Key (recommended) - Static token, no login required
+        2. Email/Password (legacy) - Dynamic token via login endpoint
+
         Args:
-            email: Kledo account email
-            password: Kledo account password
             base_url: API base URL
-            app_client: Device type (android/ios)
+            api_key: Kledo API key (e.g., kledo_pat_xxx) - recommended
+            email: Kledo account email (fallback method)
+            password: Kledo account password (fallback method)
+            app_client: Device type (android/ios) - only for email/password auth
+
+        Raises:
+            ValueError: If neither api_key nor (email and password) is provided
         """
-        self.email = email
-        self.password = password
         self.base_url = base_url.rstrip("/")
         self.app_client = app_client
 
-        self._access_token: Optional[str] = None
-        self._token_expiry: Optional[datetime] = None
+        # Determine authentication method
+        if api_key:
+            self.auth_method = "api_key"
+            self.api_key = api_key
+            self._access_token = None
+            self._token_expiry = None
+            logger.info("Using API key authentication (recommended)")
+        elif email and password:
+            self.auth_method = "email_password"
+            self.email = email
+            self.password = password
+            self.api_key = None
+            self._access_token: Optional[str] = None
+            self._token_expiry: Optional[datetime] = None
+            logger.info("Using email/password authentication (legacy)")
+        else:
+            raise ValueError(
+                "Must provide either api_key or (email and password). "
+                "API key authentication is recommended for security."
+            )
 
     @property
     def access_token(self) -> Optional[str]:
@@ -36,6 +67,11 @@ class KledoAuthenticator:
     @property
     def is_authenticated(self) -> bool:
         """Check if currently authenticated with valid token."""
+        # API key is always valid (doesn't expire)
+        if self.auth_method == "api_key":
+            return True
+
+        # Email/password requires valid token
         if not self._access_token:
             return False
 
@@ -49,9 +85,18 @@ class KledoAuthenticator:
         """
         Perform login to Kledo API.
 
+        For API key authentication: Always returns True (no login needed).
+        For email/password: Performs actual login request.
+
         Returns:
             True if login successful, False otherwise
         """
+        # API key doesn't need login
+        if self.auth_method == "api_key":
+            logger.debug("API key auth - no login required")
+            return True
+
+        # Email/password login flow
         logger.info(f"Attempting to login to Kledo API as {self.email}")
 
         try:
@@ -104,9 +149,18 @@ class KledoAuthenticator:
         """
         Logout from Kledo API.
 
+        For API key authentication: No-op (API keys don't have sessions).
+        For email/password: Performs actual logout request.
+
         Returns:
             True if logout successful
         """
+        # API key doesn't have sessions to logout
+        if self.auth_method == "api_key":
+            logger.debug("API key auth - no logout required")
+            return True
+
+        # Email/password logout flow
         if not self.is_authenticated:
             logger.warning("Cannot logout: not authenticated")
             return False
@@ -153,11 +207,18 @@ class KledoAuthenticator:
         Get authentication headers for API requests.
 
         Returns:
-            Dictionary of headers
+            Dictionary of headers with Authorization bearer token
         """
         if not self.is_authenticated:
             raise ValueError("Not authenticated. Call login() first.")
 
+        # API key uses the key directly as bearer token
+        if self.auth_method == "api_key":
+            return {
+                "Authorization": f"Bearer {self.api_key}"
+            }
+
+        # Email/password uses session token
         return {
             "Authorization": f"Bearer {self._access_token}",
             "app-client": self.app_client
