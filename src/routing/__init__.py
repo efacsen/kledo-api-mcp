@@ -7,4 +7,6 @@ This package provides foundation components for smart routing:
 - fuzzy: Typo-tolerant term matching
 """
 
-__all__ = []
+from src.routing.synonyms import SYNONYM_MAP, TERM_TO_TOOLS, normalize_term
+
+__all__ = ["SYNONYM_MAP", "TERM_TO_TOOLS", "normalize_term"]
