@@ -67,3 +67,18 @@ nav:
     - Account: entities/account.md
   - Tools:
     - Catalog: tools/index.md
+    - Sales:
+      - Invoices: tools/sales/invoices.md
+      - Orders: tools/sales/orders.md
+    - Purchases:
+      - Invoices: tools/purchases/invoices.md
+      - Orders: tools/purchases/orders.md
+    - Inventory:
+      - Products: tools/inventory/products.md
+      - Deliveries: tools/inventory/deliveries.md
+    - Finance:
+      - Reports: tools/finance/reports.md
+    - CRM:
+      - Contacts: tools/crm/contacts.md
+    - System:
+      - Utilities: tools/system/utilities.md
