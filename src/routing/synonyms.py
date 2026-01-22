@@ -31,6 +31,7 @@ SYNONYM_MAP: dict[str, str] = {
     "omzet": "sales",
 
     # Invoice terms
+    "invoices": "invoice",
     "bill": "invoice",
     "bills": "invoice",
     "faktur": "invoice",
@@ -38,6 +39,7 @@ SYNONYM_MAP: dict[str, str] = {
     "nota": "invoice",
 
     # Customer terms
+    "customers": "customer",
     "client": "customer",
     "clients": "customer",
     "pelanggan": "customer",
@@ -45,6 +47,7 @@ SYNONYM_MAP: dict[str, str] = {
     "konsumen": "customer",
 
     # Vendor/Supplier terms
+    "vendors": "vendor",
     "supplier": "vendor",
     "suppliers": "vendor",
     "pemasok": "vendor",
@@ -59,11 +62,13 @@ SYNONYM_MAP: dict[str, str] = {
     "utang": "payable",
 
     # Balance/Cash terms
+    "balances": "balance",
     "saldo": "balance",
     "kas": "cash",
     "uang": "cash",
 
     # Product terms
+    "products": "product",
     "item": "product",
     "items": "product",
     "produk": "product",
@@ -74,7 +79,9 @@ SYNONYM_MAP: dict[str, str] = {
     "pesanan": "order",
 
     # Delivery terms
+    "deliveries": "delivery",
     "shipment": "delivery",
+    "shipments": "delivery",
     "pengiriman": "delivery",
     "kirim": "delivery",
 
