@@ -1,0 +1,69 @@
+site_name: Kledo MCP Server
+site_url: https://example.github.io/kledo-api-mcp
+site_description: MCP Server for Kledo API - AI-readable documentation
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: false
+            show_root_heading: true
+            members_order: source
+
+nav:
+  - Home: index.md
+  - Entities:
+    - Overview: entities/index.md
+    - Contact: entities/contact.md
+    - Product: entities/product.md
+    - Invoice: entities/invoice.md
+    - Order: entities/order.md
+    - Delivery: entities/delivery.md
+    - Account: entities/account.md
+  - Tools:
+    - Catalog: tools/index.md
