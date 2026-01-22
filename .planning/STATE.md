@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-21)
 ## Current Position
 
 Phase: 4 of 4 (Smart Routing)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-01-22 - Completed 04-01-PLAN.md
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-01-22 - Completed 04-02-PLAN.md
 
-Progress: [████████░░] 80%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 3 minutes
-- Total execution time: 27 minutes
+- Total plans completed: 9
+- Average duration: 4 minutes
+- Total execution time: 33 minutes
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [████████░░] 80%
 | 01-entity-registry | 3 | 12 min | 4 min |
 | 02-documentation-layer | 3 | 10 min | 3 min |
 | 03-tool-enhancement | 1 | 2 min | 2 min |
-| 04-smart-routing | 1 | 3 min | 3 min |
+| 04-smart-routing | 2 | 9 min | 4.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (4 min), 02-03 (2 min), 03-01 (2 min), 04-01 (3 min)
-- Trend: Consistent velocity, 2-4 min per plan
+- Last 5 plans: 02-03 (2 min), 03-01 (2 min), 04-01 (3 min), 04-02 (6 min)
+- Trend: Consistent velocity, 2-6 min per plan
 
 *Updated after each plan completion*
 
@@ -63,6 +63,9 @@ Recent decisions affecting current work:
 - [04-01-D1]: Canonical terms self-map in SYNONYM_MAP for fuzzy discoverability
 - [04-01-D2]: 80 score threshold + 3-char minimum for fuzzy matching precision
 - [04-01-D3]: Calendar-based vs rolling window distinction for date parsing
+- [04-02-D1]: Pattern matching takes precedence over keyword scoring
+- [04-02-D2]: Vague queries request clarification instead of guessing
+- [04-02-D3]: Tool keywords normalized to canonical forms for matching
 
 ### Pending Todos
 
@@ -75,5 +78,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-22
-Stopped at: Completed 04-01-PLAN.md
+Stopped at: Completed 04-02-PLAN.md (Phase 4 complete, milestone complete)
 Resume file: None
