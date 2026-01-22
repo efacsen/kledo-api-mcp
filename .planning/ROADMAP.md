@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Entity Registry** - Establish single source of truth for all Kledo entities and relationships
 - [x] **Phase 2: Documentation Layer** - Generate comprehensive API documentation from entity definitions
 - [x] **Phase 3: Tool Enhancement** - Create disambiguation matrix and document tool overlaps
-- [x] **Phase 4: Smart Routing** - Implement intelligent tool discovery from natural language queries
+- [ ] **Phase 4: Smart Routing** - Implement intelligent tool discovery from natural language queries
 
 ## Phase Details
 
@@ -74,11 +74,12 @@ Plans:
   2. Tool search capability returns relevant tools for keyword queries
   3. Natural language queries resolve to specific tools with suggested parameters
   4. Indonesian business terms are supported (faktur, tagihan, piutang, saldo, kas)
-**Plans**: 2 plans in 2 waves
+**Plans**: 3 plans in 2 waves
 
 Plans:
 - [x] 04-01-PLAN.md - Routing foundation (synonyms, date parser, fuzzy matching)
 - [x] 04-02-PLAN.md - Pattern library + scoring + main router
+- [ ] 04-03-PLAN.md - Gap closure: Install rapidfuzz dependency
 
 ## Progress
 
@@ -90,7 +91,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | 1. Entity Registry | 3/3 | Complete | 2026-01-22 |
 | 2. Documentation Layer | 3/3 | Complete | 2026-01-22 |
 | 3. Tool Enhancement | 1/1 | Complete | 2026-01-22 |
-| 4. Smart Routing | 2/2 | Complete | 2026-01-22 |
+| 4. Smart Routing | 2/3 | Gap Closure | - |
 
 ---
 *Roadmap created: 2026-01-21*
