@@ -2,26 +2,28 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-21)
+See: .planning/PROJECT.md (updated 2026-01-24)
 
 **Core value:** AI agents can directly query Kledo business data with clear understanding of which endpoint to use
-**Current focus:** Phase 4 - Smart Routing (Gap Closure Complete)
+**Current focus:** Phase 5 - Domain Model & Field Mapping
 
 ## Current Position
 
-Phase: 4 of 4 (Smart Routing)
-Plan: 3 of 3 in current phase (gap closure complete)
-Status: Phase verified and functional
-Last activity: 2026-01-22 - Completed 04-03-PLAN.md (gap closure)
+Milestone: v1.1 Analytics Foundation
+Phase: 5 of 5 (05-domain-model-field-mapping)
+Plan: 1 of 2 complete
+Status: In progress
+Last activity: 2026-01-24 - Completed 05-01-PLAN.md
 
-Progress: [##########] 100%
+Progress: [====================          ] 55% (11/20 plans across all phases)
+Next Plan: 05-02 (Tool Integration)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 11
 - Average duration: 3.4 minutes
-- Total execution time: 34 minutes
+- Total execution time: 37 minutes
 
 **By Phase:**
 
@@ -31,9 +33,10 @@ Progress: [##########] 100%
 | 02-documentation-layer | 3 | 10 min | 3 min |
 | 03-tool-enhancement | 1 | 2 min | 2 min |
 | 04-smart-routing | 3 | 10 min | 3.3 min |
+| 05-domain-model-field-mapping | 1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (2 min), 04-01 (3 min), 04-02 (6 min), 04-03 (1 min)
+- Last 5 plans: 04-01 (3 min), 04-02 (6 min), 04-03 (1 min), 05-01 (3 min)
 - Trend: Consistent velocity, 1-6 min per plan
 
 *Updated after each plan completion*
@@ -42,35 +45,28 @@ Progress: [##########] 100%
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
+All v1.0 decisions logged in PROJECT.md Key Decisions table.
+See .planning/milestones/v1.0-ROADMAP.md for complete decision history.
 
-- [Init]: Embedded + Simple Routing approach (balance simplicity and power)
-- [Init]: Map first, extend later (understand API landscape before adding tools)
-- [Init]: Focus on read operations (reporting is primary use case)
-- [01-01-D1]: Used Decimal type for all currency fields (avoid float precision)
-- [01-01-D2]: Embedded types (Warehouse, InvoiceItem) as BaseModel not BaseEntity
-- [01-01-D3]: Relationship metadata via json_schema_extra for ERD generation
-- [01-02-D1]: Created Plan 01-01 entities as blocking fix (Contact, Product, Invoice needed for imports)
-- [01-02-D2]: Used Decimal('0') for default values (explicit Pydantic serialization)
-- [01-03-D1]: ENTITY_REGISTRY for top-level entities, EMBEDDED_TYPES for nested models
-- [01-03-D2]: Case-insensitive entity lookup via name.lower()
-- [01-03-D3]: ERD generation optional (requires graphviz system binary)
-- [02-01-D1]: Native Material Mermaid support over mermaid2-plugin (better integration)
-- [02-02-D1]: Tool count is 23 not 20 (plan estimated ~20) - all tools documented
-- [02-02-D2]: Domain grouping based on business function rather than module name
-- [02-02-D3]: Included entity mapping in extract_tools.py for cross-referencing
-- [04-01-D1]: Canonical terms self-map in SYNONYM_MAP for fuzzy discoverability
-- [04-01-D2]: 80 score threshold + 3-char minimum for fuzzy matching precision
-- [04-01-D3]: Calendar-based vs rolling window distinction for date parsing
-- [04-02-D1]: Pattern matching takes precedence over keyword scoring
-- [04-02-D2]: Vague queries request clarification instead of guessing
-- [04-02-D3]: Tool keywords normalized to canonical forms for matching
-- [04-03-D1]: Gap was environment activation issue, not missing dependency
+**Phase 5 Decisions:**
+
+| Decision | Rationale | Plan |
+|----------|-----------|------|
+| Pydantic BaseModel for domain models | Consistent with project patterns, validation included | 05-01 |
+| 1 rupiah tolerance for validation | Handle Kledo API rounding differences | 05-01 |
+| Decimal(str()) pattern | Avoid float precision issues | 05-01 |
+| skip_invalid option for batch | Production resilience | 05-01 |
+
+### Roadmap Evolution
+
+- Phase 5 added: Domain Model & Field Mapping (2026-01-24)
+  - Convert Kledo API fields to clear business terminology
+  - Foundation for professional analytics platform
+  - Based on validated data from 5 invoices proving field relationships
 
 ### Pending Todos
 
-None.
+- 05-02: Integrate domain model into existing tools (revenue.py, sales_analytics.py, invoices.py)
 
 ### Blockers/Concerns
 
@@ -78,6 +74,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-22
-Stopped at: Completed 04-03-PLAN.md (gap closure, phase 4 fully verified)
+Last session: 2026-01-24 17:03 UTC
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None
+Next action: Execute 05-02-PLAN.md (Tool Integration)
