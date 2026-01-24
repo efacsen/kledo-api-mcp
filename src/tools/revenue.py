@@ -9,6 +9,7 @@ from collections import defaultdict
 
 from ..kledo_client import KledoAPIClient
 from ..utils.helpers import parse_date_range, format_currency, safe_get, format_markdown_table
+from ..mappers.kledo_mapper import from_kledo_invoices, aggregate_financials
 
 
 def get_tools() -> list[Tool]:
@@ -18,9 +19,10 @@ def get_tools() -> list[Tool]:
             name="revenue_summary",
             description="""Get quick revenue summary for a time period.
 
-Shows BOTH revenue calculations:
-- Revenue BEFORE tax (subtotal) - FOR COMMISSION
-- Revenue AFTER tax (amount_after_tax) - ACTUAL REVENUE
+Shows financial overview:
+- Net Sales (Penjualan Neto) - revenue before tax
+- PPN Collected - tax collected
+- Gross Sales (Penjualan Bruto) - total including tax
 
 **IMPORTANT:** Only counts PAID invoices (status_id=3 / Lunas)
 
@@ -29,7 +31,7 @@ Perfect for answering:
 - "What's this month's revenue?"
 - "Revenue January 2026?"
 
-Returns both before-tax (commission) and after-tax (actual) amounts.""",
+Returns Net Sales and Gross Sales with Indonesian business terminology.""",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -86,7 +88,7 @@ Sorted by amount due (largest first).""",
             description="""Get top customers by revenue for a time period.
 
 Shows customer ranking with:
-- Total revenue (before and after tax)
+- Net Sales (Penjualan Neto) and Gross Sales (Penjualan Bruto)
 - Number of invoices
 - Average invoice value
 - Company name (if available)
@@ -98,7 +100,7 @@ Perfect for answering:
 - "Who are our top customers?"
 - "Customer dengan revenue tertinggi"
 
-Sorted by revenue (highest first).""",
+Sorted by Net Sales (highest first).""",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -159,27 +161,32 @@ async def _revenue_summary(args: Dict[str, Any], client: KledoAPIClient) -> str:
         if not invoices:
             return f"No paid invoices found for period: {date_from} to {date_to}"
 
-        # Calculate totals
-        revenue_before_tax = sum(float(safe_get(inv, "subtotal", 0)) for inv in invoices)
-        total_tax = sum(float(safe_get(inv, "total_tax", 0)) for inv in invoices)
-        revenue_after_tax = sum(float(safe_get(inv, "amount_after_tax", 0)) for inv in invoices)
+        # Convert to domain model and aggregate
+        financial_data = from_kledo_invoices(invoices, skip_invalid=True, include_metadata=False)
+        summary = aggregate_financials(financial_data)
+
+        # Use clear business terminology
+        total_net_sales = summary.net_sales
+        total_tax_collected = summary.tax_collected
+        total_gross_sales = summary.gross_sales
 
         result = ["# Revenue Summary (PAID INVOICES ONLY)\n"]
         result.append(f"**Period**: {date_from} to {date_to}")
         result.append(f"**Paid Invoices**: {len(invoices)}\n")
 
-        result.append("## Revenue Calculation:")
-        result.append(f"**Revenue Before Tax** (for commission): {format_currency(revenue_before_tax)}")
-        result.append(f"**Tax (PPN)**: {format_currency(total_tax)}")
-        result.append(f"**Revenue After Tax** (actual): {format_currency(revenue_after_tax)}\n")
+        result.append("## Financial Overview:")
+        result.append(f"**Penjualan Neto (Net Sales)**: {format_currency(float(total_net_sales))}")
+        result.append(f"**PPN Collected**: {format_currency(float(total_tax_collected))}")
+        result.append(f"**Penjualan Bruto (Gross Sales)**: {format_currency(float(total_gross_sales))}\n")
 
         # Calculate average invoice
-        avg_before_tax = revenue_before_tax / len(invoices) if invoices else 0
-        avg_after_tax = revenue_after_tax / len(invoices) if invoices else 0
+        invoice_count = len(financial_data) if financial_data else 1
+        avg_net_sales = total_net_sales / invoice_count
+        avg_gross_sales = total_gross_sales / invoice_count
 
         result.append("## Statistics:")
-        result.append(f"**Average Invoice (Before Tax)**: {format_currency(avg_before_tax)}")
-        result.append(f"**Average Invoice (After Tax)**: {format_currency(avg_after_tax)}")
+        result.append(f"**Average Invoice (Net Sales)**: {format_currency(float(avg_net_sales))}")
+        result.append(f"**Average Invoice (Gross Sales)**: {format_currency(float(avg_gross_sales))}")
 
         return "\n".join(result)
 
@@ -320,12 +327,12 @@ async def _customer_revenue_ranking(args: Dict[str, Any], client: KledoAPIClient
         if not invoices:
             return f"No paid invoices found for period: {date_from} to {date_to}"
 
-        # Group by customer
+        # Group by customer using domain terminology
         customer_data = defaultdict(lambda: {
             "name": "",
             "company": "",
-            "revenue_before_tax": Decimal(0),
-            "revenue_after_tax": Decimal(0),
+            "net_sales": Decimal(0),
+            "gross_sales": Decimal(0),
             "invoice_count": 0
         })
 
@@ -336,14 +343,14 @@ async def _customer_revenue_ranking(args: Dict[str, Any], client: KledoAPIClient
             if contact_id:
                 customer_data[contact_id]["name"] = contact.get("name", "Unknown")
                 customer_data[contact_id]["company"] = contact.get("company", "")
-                customer_data[contact_id]["revenue_before_tax"] += Decimal(str(safe_get(inv, "subtotal", 0)))
-                customer_data[contact_id]["revenue_after_tax"] += Decimal(str(safe_get(inv, "amount_after_tax", 0)))
+                customer_data[contact_id]["net_sales"] += Decimal(str(safe_get(inv, "subtotal", 0)))
+                customer_data[contact_id]["gross_sales"] += Decimal(str(safe_get(inv, "amount_after_tax", 0)))
                 customer_data[contact_id]["invoice_count"] += 1
 
-        # Sort by revenue (before tax for commission comparison)
+        # Sort by net sales (highest first)
         sorted_customers = sorted(
             customer_data.items(),
-            key=lambda x: x[1]["revenue_before_tax"],
+            key=lambda x: x[1]["net_sales"],
             reverse=True
         )[:limit]
 
@@ -351,26 +358,26 @@ async def _customer_revenue_ranking(args: Dict[str, Any], client: KledoAPIClient
         result.append(f"**Period**: {date_from} to {date_to}")
         result.append(f"**Total Customers**: {len(customer_data)}\n")
 
-        # Build table
+        # Build table with clear terminology
         rows = []
-        for i, (customer_id, data) in enumerate(sorted_customers, 1):
-            name = data["name"]
-            if data["company"]:
-                name = f"{name} ({data['company']})"
+        for i, (customer_id, cust_data) in enumerate(sorted_customers, 1):
+            name = cust_data["name"]
+            if cust_data["company"]:
+                name = f"{name} ({cust_data['company']})"
 
-            avg_before_tax = data["revenue_before_tax"] / data["invoice_count"] if data["invoice_count"] > 0 else Decimal(0)
+            avg_net_sales = cust_data["net_sales"] / cust_data["invoice_count"] if cust_data["invoice_count"] > 0 else Decimal(0)
 
             rows.append([
                 str(i),
                 name,
-                str(data["invoice_count"]),
-                f"Rp {data['revenue_before_tax']:,.0f}",
-                f"Rp {data['revenue_after_tax']:,.0f}",
-                f"Rp {avg_before_tax:,.0f}"
+                str(cust_data["invoice_count"]),
+                f"Rp {cust_data['net_sales']:,.0f}",
+                f"Rp {cust_data['gross_sales']:,.0f}",
+                f"Rp {avg_net_sales:,.0f}"
             ])
 
         result.append(format_markdown_table(
-            headers=["Rank", "Customer", "Invoices", "Revenue (Before Tax)", "Revenue (After Tax)", "Avg Invoice"],
+            headers=["Rank", "Customer", "Invoices", "Net Sales", "Gross Sales", "Avg Invoice"],
             rows=rows
         ))
 
