@@ -77,12 +77,26 @@ When using `sales_rep_name`, the system will:
 Shows:
 - Sales rep ID and name
 - Number of invoices created
-- Total revenue generated
+- Total revenue generated (Net Sales and Gross Sales)
+
+**IMPORTANT:** Only counts PAID invoices (status_id=3 / Lunas)
+
+Optional: Filter by date range to see performance for specific period.
+If no dates provided, shows last 100 paid invoices.
 
 Use this to find sales_rep_id for filtering in sales_rep_revenue_report.""",
             inputSchema={
                 "type": "object",
-                "properties": {},
+                "properties": {
+                    "date_from": {
+                        "type": "string",
+                        "description": "Start date (YYYY-MM-DD). Optional - if not provided, shows last 100 invoices"
+                    },
+                    "date_to": {
+                        "type": "string",
+                        "description": "End date (YYYY-MM-DD). Optional - required if date_from is provided"
+                    }
+                },
                 "required": []
             }
         )
@@ -95,7 +109,7 @@ async def handle_tool(name: str, arguments: dict[str, Any], client: KledoAPIClie
     if name == "sales_rep_revenue_report":
         return await _sales_rep_revenue_report(client, arguments)
     elif name == "sales_rep_list":
-        return await _sales_rep_list(client)
+        return await _sales_rep_list(client, arguments)
     else:
         return f"Unknown tool: {name}"
 
@@ -385,28 +399,73 @@ async def _find_sales_rep_id_by_name(client: KledoAPIClient, start_date, end_dat
     return None
 
 
-async def _sales_rep_list(client: KledoAPIClient) -> str:
+async def _sales_rep_list(client: KledoAPIClient, args: dict[str, Any] = None) -> str:
     """List all sales representatives."""
 
-    # Fetch recent PAID invoices to find sales reps (status_id=3)
-    response = await client.get(
-        category="invoices",
-        name="list",
-        params={"per_page": 100, "page": 1, "status_ids": "3"}
-    )
+    if args is None:
+        args = {}
 
-    if not response or "data" not in response:
-        return "No invoices found"
+    date_from = args.get("date_from")
+    date_to = args.get("date_to")
 
-    resp_data = response["data"]
-    if isinstance(resp_data, dict) and "data" in resp_data:
-        items = resp_data["data"]
-    else:
-        items = []
+    # Parse dates if provided
+    from ..utils.helpers import parse_natural_date
+    start_date = None
+    end_date = None
+    date_range_str = "last 100 PAID invoices"
+
+    if date_from and date_to:
+        start_date = parse_natural_date(date_from)
+        end_date = parse_natural_date(date_to)
+        if start_date and end_date:
+            date_range_str = f"{start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
+        else:
+            return f"❌ Error: Could not parse dates. Provided: from={date_from}, to={date_to}"
+    elif date_from or date_to:
+        return "❌ Error: Both date_from and date_to are required. Please provide both or neither."
+
+    # Fetch PAID invoices to find sales reps (status_id=3)
+    all_invoices = []
+    page = 1
+    per_page = 100
+
+    while True:
+        params = {"per_page": per_page, "page": page, "status_ids": "3"}
+
+        # Add date filtering if provided
+        if start_date and end_date:
+            params["date_from"] = start_date.strftime("%Y-%m-%d")
+            params["date_to"] = end_date.strftime("%Y-%m-%d")
+
+        response = await client.get(
+            category="invoices",
+            name="list",
+            params=params
+        )
+
+        if not response or "data" not in response:
+            break
+
+        resp_data = response["data"]
+        if isinstance(resp_data, dict) and "data" in resp_data:
+            items = resp_data["data"]
+            if not items:
+                break
+            all_invoices.extend(items)
+
+            # Check if there are more pages
+            if resp_data.get("current_page", 1) >= resp_data.get("last_page", 1):
+                break
+            page += 1
+        else:
+            break
+
+    if not all_invoices:
+        return f"No paid invoices found for the specified period"
 
     # Collect unique sales reps using domain terminology
     sales_reps = {}
-    for invoice in items:
+    for invoice in all_invoices:
         sales_person = invoice.get("sales_person") or {}
         rep_id = sales_person.get("id")
         rep_name = sales_person.get("name", "Unknown")
@@ -442,4 +501,4 @@ async def _sales_rep_list(client: KledoAPIClient) -> str:
         rows=rows
     )
 
-    return f"# Sales Representatives\n\n{table}\n\n_Based on last 100 PAID invoices (status_id=3)_\n_Net Sales (Penjualan Neto) | Gross Sales (Penjualan Bruto)_"
+    return f"# Sales Representatives\n\n**Period**: {date_range_str}\n\n{table}\n\n_Based on PAID invoices (status_id=3 / Lunas)_\n_Net Sales (Penjualan Neto) | Gross Sales (Penjualan Bruto)_"
