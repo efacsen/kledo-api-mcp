@@ -1,98 +1,67 @@
-# Roadmap: Kledo API MCP Server
+# Kledo API MCP Server - Roadmap
 
-## Overview
+## Current Milestone: v1.1 Analytics Foundation
 
-This roadmap transforms the existing Kledo MCP server (30+ tools) into a self-documenting, discoverable API layer. The journey progresses from establishing a foundational entity registry, through comprehensive documentation generation, to tool disambiguation, and finally intelligent routing - each phase building on the previous to deliver increasingly powerful AI agent capabilities.
+**Goal:** Build professional analytics platform with clear domain model and optimized tool architecture
+
+**Status:** Planning
+**Started:** 2026-01-24
+**Target:** 2-3 weeks
+
+---
 
 ## Phases
 
-**Phase Numbering:**
-- Integer phases (1, 2, 3, 4): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+### Phase 5: Domain Model & Field Mapping
 
-Decimal phases appear between their surrounding integers in numeric order.
+**Goal:** Convert confusing Kledo API field names to clear business terminology
 
-- [x] **Phase 1: Entity Registry** - Establish single source of truth for all Kledo entities and relationships
-- [x] **Phase 2: Documentation Layer** - Generate comprehensive API documentation from entity definitions
-- [x] **Phase 3: Tool Enhancement** - Create disambiguation matrix and document tool overlaps
-- [x] **Phase 4: Smart Routing** - Implement intelligent tool discovery from natural language queries
+**Depends on:** v1.0 complete
 
-## Phase Details
-
-### Phase 1: Entity Registry
-**Goal**: Establish a complete, machine-readable catalog of all Kledo entities and their relationships using Pydantic models
-**Depends on**: Nothing (first phase)
-**Requirements**: ENTY-01, ENTY-02, ENTY-03
-**Success Criteria** (what must be TRUE):
-  1. All Kledo entities (Invoice, Contact, Product, Order, Delivery, Account) are defined as Pydantic models with fields and types
-  2. Relationships between entities are explicitly mapped via Field metadata (e.g., Invoice references Contact, Order contains Products)
-  3. A visual ERD diagram can be generated from the entity definitions using erdantic
-  4. Entity definitions are loadable by Python code via `get_all_entities()` and `get_entity_class()`
-**Plans**: 3 plans in 2 waves
+**Plans:** 2 plans
 
 Plans:
-- [x] 01-01-PLAN.md - Core entity models (Contact, Product, Invoice) + package structure
-- [x] 01-02-PLAN.md - Transaction entity models (Order, Delivery, Account)
-- [x] 01-03-PLAN.md - Entity loader utilities + YAML export + ERD generation
+- [ ] 05-01-PLAN.md - Create domain model (InvoiceFinancials) + mapper + tests
+- [ ] 05-02-PLAN.md - Update tools (revenue, invoices, sales_analytics) to use domain model
 
-### Phase 2: Documentation Layer
-**Goal**: Generate comprehensive, AI-readable API documentation from entity definitions
-**Depends on**: Phase 1 (Entity Registry must exist for documentation to reference)
-**Requirements**: DOCS-01, DOCS-02, DOCS-03, DOCS-04
-**Success Criteria** (what must be TRUE):
-  1. API endpoint catalog exists mapping each endpoint to its operation and entity
-  2. Entity relationship documentation is available in Markdown format
-  3. MkDocs site generates and serves documentation locally
-  4. llms.txt file exists with AI-optimized tool discovery information
-  5. Documentation references entity definitions from Phase 1
-**Plans**: 3 plans in 2 waves
+**Details:**
 
-Plans:
-- [x] 02-01-PLAN.md - MkDocs setup + entity documentation with Mermaid ERDs
-- [x] 02-02-PLAN.md - Tool extraction script + domain-organized tool documentation
-- [x] 02-03-PLAN.md - llms.txt + getting-started guide + GitHub Pages deployment
+Implement conversion layer that maps Kledo fields to domain model:
+- `amount_after_tax` -> `gross_sales` (Penjualan Bruto)
+- `subtotal` -> `net_sales` (Penjualan Neto)
+- `total_tax` -> `tax_collected` (PPN)
 
-### Phase 3: Tool Enhancement
-**Goal**: Clarify tool selection by documenting overlaps and creating a disambiguation matrix
-**Depends on**: Phase 2 (needs documentation context to explain tool purposes)
-**Requirements**: TOOL-01, TOOL-02
-**Success Criteria** (what must be TRUE):
-  1. Tool disambiguation matrix shows which tool to use for each common use case
-  2. Tool overlap documentation explains when to use similar tools (e.g., invoice_list vs financial_sales_summary)
-  3. Each tool's unique purpose is clearly distinguished from related tools
-**Plans**: 1 plan in 1 wave
+Deliverables:
+- `src/models/invoice_financials.py` - Domain model classes
+- `src/mappers/kledo_mapper.py` - Conversion functions
+- `tests/test_kledo_mapper.py` - Validation tests
+- Updated tools: revenue, invoices, sales_analytics
 
-Plans:
-- [x] 03-01-PLAN.md - Disambiguation matrix + tool choosing guide
+**Why this matters:**
+- Field validation with 5 invoices proved: `subtotal + total_tax = amount_after_tax`
+- Kledo's naming is confusing: "after_tax" sounds like subtraction but means addition
+- 8-hour investment saves 100+ hours in developer confusion
+- Finance team can read code directly with proper terminology
 
-### Phase 4: Smart Routing
-**Goal**: Enable AI agents to find the right tool from natural language business queries
-**Depends on**: Phase 1, 2, 3 (uses entities, documentation, and disambiguation for full context)
-**Requirements**: ROUT-01, ROUT-02, ROUT-03
-**Success Criteria** (what must be TRUE):
-  1. Synonym dictionary covers common business terms (revenue/sales, vendor/supplier, bill/invoice, customer/client)
-  2. Tool search capability returns relevant tools for keyword queries
-  3. Natural language queries resolve to specific tools with suggested parameters
-  4. Indonesian business terms are supported (faktur, tagihan, piutang, saldo, kas)
-**Plans**: 3 plans in 2 waves
+**Technical debt resolved:**
+- Removes confusion from raw API field names
+- Professional code quality
+- Easier onboarding for new developers
+- Clear communication with finance team
 
-Plans:
-- [x] 04-01-PLAN.md - Routing foundation (synonyms, date parser, fuzzy matching)
-- [x] 04-02-PLAN.md - Pattern library + scoring + main router
-- [x] 04-03-PLAN.md - Gap closure: Install rapidfuzz dependency
+**Success criteria:**
+- All tests pass
+- Revenue report uses `gross_sales` not `amount_after_tax`
+- Code self-documenting with business terms
+- Zero ambiguity in field meanings
 
-## Progress
+**Time estimate:** 8 hours (2-3 days)
+**Priority:** HIGH - Foundation for all future analytics
 
-**Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4
-
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Entity Registry | 3/3 | Complete | 2026-01-22 |
-| 2. Documentation Layer | 3/3 | Complete | 2026-01-22 |
-| 3. Tool Enhancement | 1/1 | Complete | 2026-01-22 |
-| 4. Smart Routing | 3/3 | Complete | 2026-01-22 |
+**Context docs:**
+- `docs/technical/SESSION_HANDOFF.md` - Full implementation context
+- `docs/technical/FIELD_MAPPING_DECISION.md` - Architecture rationale
+- `docs/technical/QUICK_DECISIONS_SUMMARY.md` - Quick reference
+- `tests/validate_invoice_fields.py` - Field validation proof
 
 ---
-*Roadmap created: 2026-01-21*
-*Last updated: 2026-01-22*
