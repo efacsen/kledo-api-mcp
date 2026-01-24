@@ -10,6 +10,7 @@ from mcp.types import Tool
 
 from ..kledo_client import KledoAPIClient
 from ..utils.helpers import format_markdown_table, parse_natural_date
+from ..mappers.kledo_mapper import from_kledo_invoice
 
 
 def get_tools() -> list[Tool]:
@@ -17,28 +18,30 @@ def get_tools() -> list[Tool]:
     return [
         Tool(
             name="sales_rep_revenue_report",
-            description="""Calculate sales representative revenue for commission and performance analysis.
+            description="""Calculate sales representative revenue and performance analysis.
 
-**IMPORTANT:** Only counts PAID invoices (status_id=3 / Lunas) for accurate commission calculation.
+**IMPORTANT:** Only counts PAID invoices (status_id=3 / Lunas).
 
-Shows both:
-- Revenue BEFORE tax (subtotal) - USE FOR COMMISSION CALCULATION
-- Revenue AFTER tax (amount_after_tax) - Actual revenue with tax
+Shows:
+- Net Sales (Penjualan Neto) - revenue before tax
+- Gross Sales (Penjualan Bruto) - total including tax
+- PPN Collected - tax collected
 
-Includes:
-- Total revenue per sales representative (before/after tax)
-- Monthly/daily breakdown of sales
-- Customer count per sales rep
-- Average deal size
-- Top largest deals
+**IMPORTANT UPDATE:** You can now filter by sales rep using EITHER:
+- `sales_rep_id` - Direct sales rep ID (number)
+- `sales_rep_name` - Sales rep name (string) - system will auto-find the ID
+
+When using `sales_rep_name`, the system will:
+1. Fetch invoices from the date range
+2. Search for sales reps with matching names
+3. Use the found ID to filter results
 
 **Use this for:**
-- Sales commission calculation (uses PAID invoices only, before tax)
 - Performance analysis
 - Monthly/weekly revenue reports
 - Sales rep comparisons
 
-**Returns:** Detailed revenue report with both before-tax (commission) and after-tax (actual) amounts.""",
+**Returns:** Detailed revenue report with Net Sales and Gross Sales.""",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -52,7 +55,11 @@ Includes:
                     },
                     "sales_rep_id": {
                         "type": "integer",
-                        "description": "Optional: Filter by specific sales rep ID (use sales_rep_list to find IDs)"
+                        "description": "Filter by specific sales rep ID (optional)"
+                    },
+                    "sales_rep_name": {
+                        "type": "string",
+                        "description": "Filter by sales rep name (optional). System will auto-find the ID. Supports partial match and case-insensitive."
                     },
                     "group_by": {
                         "type": "string",
@@ -99,6 +106,7 @@ async def _sales_rep_revenue_report(client: KledoAPIClient, args: dict[str, Any]
     start_date = args.get("start_date", "")
     end_date = args.get("end_date", "")
     sales_rep_id = args.get("sales_rep_id")
+    sales_rep_name = args.get("sales_rep_name")
     group_by = args.get("group_by", "month")
 
     # Parse dates
@@ -107,6 +115,13 @@ async def _sales_rep_revenue_report(client: KledoAPIClient, args: dict[str, Any]
 
     if not start or not end:
         return f"❌ Error: Could not parse dates. Start: {start_date}, End: {end_date}"
+
+    # If sales_rep_name is provided, find the sales rep ID first
+    if sales_rep_name and not sales_rep_id:
+        # Fetch invoices to find sales reps with matching names
+        sales_rep_id = await _find_sales_rep_id_by_name(client, start, end, sales_rep_name)
+        if sales_rep_id is None:
+            return f"❌ Error: Could not find sales rep with name '{sales_rep_name}' in the date range. Please check the name or use 'sales_rep_list' to see available reps."
 
     # Fetch all invoices in the date range
     all_invoices = []
@@ -147,16 +162,16 @@ async def _sales_rep_revenue_report(client: KledoAPIClient, args: dict[str, Any]
     if not all_invoices:
         return f"No paid invoices found between {start.strftime('%Y-%m-%d')} and {end.strftime('%Y-%m-%d')}"
 
-    # Analyze invoices - track BOTH before and after tax
+    # Analyze invoices using domain model terminology
     sales_rep_data = defaultdict(lambda: {
-        "revenue_before_tax": Decimal(0),  # For commission calculation
-        "revenue_after_tax": Decimal(0),   # Actual revenue with tax
-        "total_tax": Decimal(0),
+        "net_sales": Decimal(0),
+        "gross_sales": Decimal(0),
+        "tax_collected": Decimal(0),
         "invoice_count": 0,
         "customer_ids": set(),
         "invoices": [],
-        "monthly_revenue_before_tax": defaultdict(Decimal),
-        "monthly_revenue_after_tax": defaultdict(Decimal)
+        "monthly_net_sales": defaultdict(Decimal),
+        "monthly_gross_sales": defaultdict(Decimal)
     })
 
     for invoice in all_invoices:
@@ -169,10 +184,12 @@ async def _sales_rep_revenue_report(client: KledoAPIClient, args: dict[str, Any]
         if sales_rep_id and rep_id != sales_rep_id:
             continue
 
-        # Parse amounts - BOTH before and after tax
-        subtotal = Decimal(str(invoice.get("subtotal", 0)))  # Before tax (commission)
-        tax_amount = Decimal(str(invoice.get("total_tax", 0)))
-        amount_after_tax = Decimal(str(invoice.get("amount_after_tax", 0)))  # With tax (actual)
+        # Convert to domain model (skip conversion failures)
+        try:
+            financials = from_kledo_invoice(invoice, include_metadata=False)
+        except (ValueError, KeyError):
+            continue  # Skip invalid invoices
+
         trans_date = invoice.get("trans_date", "")
 
         # Group by month or day
@@ -185,14 +202,14 @@ async def _sales_rep_revenue_report(client: KledoAPIClient, args: dict[str, Any]
         else:
             period_key = "Unknown"
 
-        # Aggregate data
+        # Aggregate data using domain model
         rep_key = f"{rep_id}:{rep_name}"
-        sales_rep_data[rep_key]["revenue_before_tax"] += subtotal
-        sales_rep_data[rep_key]["revenue_after_tax"] += amount_after_tax
-        sales_rep_data[rep_key]["total_tax"] += tax_amount
+        sales_rep_data[rep_key]["net_sales"] += financials.net_sales
+        sales_rep_data[rep_key]["gross_sales"] += financials.gross_sales
+        sales_rep_data[rep_key]["tax_collected"] += financials.tax_collected
         sales_rep_data[rep_key]["invoice_count"] += 1
-        sales_rep_data[rep_key]["monthly_revenue_before_tax"][period_key] += subtotal
-        sales_rep_data[rep_key]["monthly_revenue_after_tax"][period_key] += amount_after_tax
+        sales_rep_data[rep_key]["monthly_net_sales"][period_key] += financials.net_sales
+        sales_rep_data[rep_key]["monthly_gross_sales"][period_key] += financials.gross_sales
 
         # Track unique customers
         contact = invoice.get("contact") or {}
@@ -203,8 +220,8 @@ async def _sales_rep_revenue_report(client: KledoAPIClient, args: dict[str, Any]
         sales_rep_data[rep_key]["invoices"].append({
             "ref": invoice.get("ref_number"),
             "date": trans_date,
-            "amount_before_tax": float(subtotal),
-            "amount_after_tax": float(amount_after_tax),
+            "net_sales": float(financials.net_sales),
+            "gross_sales": float(financials.gross_sales),
             "customer": contact.get("name", "Unknown")
         })
 
@@ -216,32 +233,30 @@ async def _sales_rep_revenue_report(client: KledoAPIClient, args: dict[str, Any]
     report_lines.append(f"**Total Paid Invoices:** {len(all_invoices)} (status_id=3 / Lunas)")
     report_lines.append(f"**Group By:** {group_by}")
     report_lines.append(f"")
-    report_lines.append(f"**Note:** Revenue Before Tax is used for commission calculation")
-    report_lines.append(f"")
 
-    # Summary table
+    # Summary table with domain terminology
     summary_data = []
-    for rep_key, data in sorted(
+    for rep_key, rep_data in sorted(
         sales_rep_data.items(),
-        key=lambda x: x[1]["revenue_before_tax"],  # Sort by commission amount
+        key=lambda x: x[1]["net_sales"],
         reverse=True
     ):
         rep_name = rep_key.split(":", 1)[1]
-        avg_deal_before_tax = data["revenue_before_tax"] / data["invoice_count"] if data["invoice_count"] > 0 else Decimal(0)
+        avg_deal_net = rep_data["net_sales"] / rep_data["invoice_count"] if rep_data["invoice_count"] > 0 else Decimal(0)
 
         summary_data.append([
             rep_name,
-            f"Rp {data['revenue_before_tax']:,.0f}",  # Commission base
-            f"Rp {data['revenue_after_tax']:,.0f}",   # Actual revenue
-            str(data["invoice_count"]),
-            str(len(data["customer_ids"])),
-            f"Rp {avg_deal_before_tax:,.0f}"
+            f"Rp {rep_data['net_sales']:,.0f}",
+            f"Rp {rep_data['gross_sales']:,.0f}",
+            str(rep_data["invoice_count"]),
+            str(len(rep_data["customer_ids"])),
+            f"Rp {avg_deal_net:,.0f}"
         ])
 
     report_lines.append("## Summary by Sales Representative")
     report_lines.append("")
     report_lines.append(format_markdown_table(
-        headers=["Sales Rep", "Revenue Before Tax (Commission)", "Revenue After Tax (Actual)", "Invoices", "Customers", "Avg Deal"],
+        headers=["Sales Rep", "Net Sales", "Gross Sales", "Invoices", "Customers", "Avg Deal"],
         rows=summary_data
     ))
     report_lines.append("")
@@ -250,9 +265,9 @@ async def _sales_rep_revenue_report(client: KledoAPIClient, args: dict[str, Any]
     report_lines.append(f"## Breakdown by {group_by.title()}")
     report_lines.append("")
 
-    for rep_key, data in sorted(
+    for rep_key, rep_data in sorted(
         sales_rep_data.items(),
-        key=lambda x: x[1]["revenue_before_tax"],
+        key=lambda x: x[1]["net_sales"],
         reverse=True
     ):
         rep_name = rep_key.split(":", 1)[1]
@@ -260,36 +275,36 @@ async def _sales_rep_revenue_report(client: KledoAPIClient, args: dict[str, Any]
         report_lines.append("")
 
         period_data = []
-        for period in sorted(data["monthly_revenue_before_tax"].keys()):
-            before_tax = data["monthly_revenue_before_tax"][period]
-            after_tax = data["monthly_revenue_after_tax"][period]
+        for period in sorted(rep_data["monthly_net_sales"].keys()):
+            net = rep_data["monthly_net_sales"][period]
+            gross = rep_data["monthly_gross_sales"][period]
             period_data.append([
                 period,
-                f"Rp {before_tax:,.0f}",
-                f"Rp {after_tax:,.0f}"
+                f"Rp {net:,.0f}",
+                f"Rp {gross:,.0f}"
             ])
 
         if period_data:
             report_lines.append(format_markdown_table(
-                headers=["Period", "Before Tax (Commission)", "After Tax (Actual)"],
+                headers=["Period", "Net Sales", "Gross Sales"],
                 rows=period_data
             ))
             report_lines.append("")
 
-    # Top 10 largest deals (sorted by before-tax amount for commission)
+    # Top 10 largest deals (sorted by net sales)
     all_invoices_sorted = []
-    for rep_key, data in sales_rep_data.items():
+    for rep_key, rep_data in sales_rep_data.items():
         rep_name = rep_key.split(":", 1)[1]
-        for inv in data["invoices"]:
+        for inv in rep_data["invoices"]:
             all_invoices_sorted.append({
                 **inv,
                 "sales_rep": rep_name
             })
 
-    all_invoices_sorted.sort(key=lambda x: x["amount_before_tax"], reverse=True)
+    all_invoices_sorted.sort(key=lambda x: x["net_sales"], reverse=True)
 
     if all_invoices_sorted:
-        report_lines.append("## Top 10 Largest Deals (by Commission Amount)")
+        report_lines.append("## Top 10 Largest Deals")
         report_lines.append("")
 
         top_deals = []
@@ -299,16 +314,75 @@ async def _sales_rep_revenue_report(client: KledoAPIClient, args: dict[str, Any]
                 inv["date"],
                 inv["sales_rep"],
                 inv["customer"],
-                f"Rp {inv['amount_before_tax']:,.0f}",
-                f"Rp {inv['amount_after_tax']:,.0f}"
+                f"Rp {inv['net_sales']:,.0f}",
+                f"Rp {inv['gross_sales']:,.0f}"
             ])
 
         report_lines.append(format_markdown_table(
-            headers=["Invoice #", "Date", "Sales Rep", "Customer", "Before Tax", "After Tax"],
+            headers=["Invoice #", "Date", "Sales Rep", "Customer", "Net Sales", "Gross Sales"],
             rows=top_deals
         ))
 
     return "\n".join(report_lines)
+
+
+async def _find_sales_rep_id_by_name(client: KledoAPIClient, start_date, end_date, sales_rep_name: str) -> int | None:
+    """Find sales rep ID by name from invoices in the date range.
+    
+    Args:
+        client: Kledo API client
+        start_date: Start date for search
+        end_date: End date for search
+        sales_rep_name: Sales rep name to search for (case-insensitive, partial match)
+    
+    Returns:
+        Sales rep ID if found, None otherwise
+    """
+    # Fetch invoices to find sales reps
+    page = 1
+    per_page = 100
+    search_name = sales_rep_name.lower()
+    
+    while True:
+        response = await client.get(
+            category="invoices",
+            name="list",
+            params={
+                "per_page": per_page,
+                "page": page,
+                "date_from": start_date.strftime("%Y-%m-%d"),
+                "date_to": end_date.strftime("%Y-%m-%d"),
+                "status_ids": "3"  # Only paid invoices
+            }
+        )
+        
+        if not response or "data" not in response:
+            break
+        
+        data = response["data"]
+        if isinstance(data, dict) and "data" in data:
+            items = data["data"]
+            if not items:
+                break
+            
+            # Check each invoice for matching sales rep
+            for invoice in items:
+                sales_person = invoice.get("sales_person") or {}
+                rep_id = sales_person.get("id")
+                rep_name = sales_person.get("name", "")
+                
+                # Check for partial match (case-insensitive)
+                if rep_id and search_name in rep_name.lower():
+                    return rep_id
+            
+            # Check if there are more pages
+            if data.get("current_page", 1) >= data.get("last_page", 1):
+                break
+            page += 1
+        else:
+            break
+    
+    return None
 
 
 async def _sales_rep_list(client: KledoAPIClient) -> str:
@@ -324,13 +398,13 @@ async def _sales_rep_list(client: KledoAPIClient) -> str:
     if not response or "data" not in response:
         return "No invoices found"
 
-    data = response["data"]
-    if isinstance(data, dict) and "data" in data:
-        items = data["data"]
+    resp_data = response["data"]
+    if isinstance(resp_data, dict) and "data" in resp_data:
+        items = resp_data["data"]
     else:
         items = []
 
-    # Collect unique sales reps with both revenue amounts
+    # Collect unique sales reps using domain terminology
     sales_reps = {}
     for invoice in items:
         sales_person = invoice.get("sales_person") or {}
@@ -342,30 +416,30 @@ async def _sales_rep_list(client: KledoAPIClient) -> str:
                 sales_reps[rep_id] = {
                     "name": rep_name,
                     "invoice_count": 0,
-                    "revenue_before_tax": Decimal(0),
-                    "revenue_after_tax": Decimal(0)
+                    "net_sales": Decimal(0),
+                    "gross_sales": Decimal(0)
                 }
 
             sales_reps[rep_id]["invoice_count"] += 1
-            subtotal = Decimal(str(invoice.get("subtotal", 0)))
-            amount_after_tax = Decimal(str(invoice.get("amount_after_tax", 0)))
-            sales_reps[rep_id]["revenue_before_tax"] += subtotal
-            sales_reps[rep_id]["revenue_after_tax"] += amount_after_tax
+            net_sales = Decimal(str(invoice.get("subtotal", 0)))
+            gross_sales = Decimal(str(invoice.get("amount_after_tax", 0)))
+            sales_reps[rep_id]["net_sales"] += net_sales
+            sales_reps[rep_id]["gross_sales"] += gross_sales
 
-    # Build table
+    # Build table with domain terminology
     rows = []
-    for rep_id, data in sorted(sales_reps.items()):
+    for rep_id, rep_data in sorted(sales_reps.items()):
         rows.append([
             str(rep_id),
-            data["name"],
-            str(data["invoice_count"]),
-            f"Rp {data['revenue_before_tax']:,.0f}",
-            f"Rp {data['revenue_after_tax']:,.0f}"
+            rep_data["name"],
+            str(rep_data["invoice_count"]),
+            f"Rp {rep_data['net_sales']:,.0f}",
+            f"Rp {rep_data['gross_sales']:,.0f}"
         ])
 
     table = format_markdown_table(
-        headers=["ID", "Name", "Paid Invoices", "Revenue (Before Tax)", "Revenue (After Tax)"],
+        headers=["ID", "Name", "Paid Invoices", "Net Sales", "Gross Sales"],
         rows=rows
     )
 
-    return f"# Sales Representatives\n\n{table}\n\n_Based on last 100 PAID invoices (status_id=3)_\n_Before Tax = Commission Base | After Tax = Actual Revenue_"
+    return f"# Sales Representatives\n\n{table}\n\n_Based on last 100 PAID invoices (status_id=3)_\n_Net Sales (Penjualan Neto) | Gross Sales (Penjualan Bruto)_"
