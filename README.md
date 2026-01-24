@@ -93,117 +93,74 @@ All tools show BOTH revenue calculations:
 
 - Python 3.11 or higher
 - Kledo account with API access
-- Claude Code CLI or Claude Desktop
+- Claude Code CLI, Claude Desktop, or any AI IDE that supports MCP
 
-### Option 1: Install for Claude Code CLI
+### Quick Install
 
-1. **Clone the repository:**
+1. **Clone and install:**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/kledo-api-mcp.git
+   git clone https://github.com/efacsen/kledo-api-mcp.git
    cd kledo-api-mcp
-   ```
-
-2. **Install dependencies:**
-   ```bash
    pip install -e .
    ```
 
-3. **Create environment file:**
+2. **Configure environment:**
    ```bash
    cp .env.example .env
+   # Edit .env with your Kledo credentials
    ```
 
-4. **Configure your Kledo API credentials in `.env`:**
-   ```env
-   # Recommended: API Key Authentication
-   KLEDO_API_KEY=your_api_key_here
-   KLEDO_BASE_URL=https://api.kledo.com/api/v1
+3. **Your MCP server is now available as `kledo-mcp` command!**
 
-   # Optional: Legacy Email/Password Authentication
-   # KLEDO_EMAIL=your_email@example.com
-   # KLEDO_PASSWORD=your_password
+### Configuration Options
 
-   # Server Configuration
-   MCP_SERVER_NAME=kledo-crm
-   CACHE_ENABLED=true
-   LOG_LEVEL=INFO
-   ```
+**For Claude Desktop/CLI (Recommended):**
+```json
+{
+  "mcpServers": {
+    "kledo-crm": {
+      "command": "kledo-mcp",
+      "env": {
+        "KLEDO_API_KEY": "your_api_key_here",
+        "KLEDO_BASE_URL": "https://api.kledo.com/api/v1",
+        "CACHE_ENABLED": "true",
+        "LOG_LEVEL": "INFO"
+      }
+    }
+  }
+}
+```
 
-5. **Add to Claude Code CLI configuration:**
+**For Other IDEs (like VS Code Copilot, etc.):**
+Simply use `"command": "kledo-mcp"` with the environment variables above.
 
-   Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or equivalent:
+**Legacy Configuration (still works):**
+If you prefer the old approach:
+```json
+{
+  "mcpServers": {
+    "kledo-crm": {
+      "command": "python",
+      "args": ["-m", "src.server"],
+      "cwd": "/path/to/kledo-api-mcp",
+      "env": {
+        "KLEDO_API_KEY": "your_api_key_here"
+      }
+    }
+  }
+}
+```
 
-   ```json
-   {
-     "mcpServers": {
-       "kledo-crm": {
-         "command": "python",
-         "args": ["-m", "src.server"],
-         "cwd": "/FULL/PATH/TO/kledo-api-mcp",
-         "env": {
-           "KLEDO_API_KEY": "your_api_key_here",
-           "KLEDO_BASE_URL": "https://api.kledo.com/api/v1",
-           "MCP_SERVER_NAME": "kledo-crm",
-           "CACHE_ENABLED": "true",
-           "LOG_LEVEL": "INFO"
-         }
-       }
-     }
-   }
-   ```
+### Manual Testing
 
-   **Important**: Replace `/FULL/PATH/TO/kledo-api-mcp` with the absolute path to your cloned repository.
+You can test the server directly from anywhere:
+```bash
+# Start the MCP server
+kledo-mcp
 
-6. **Restart Claude Code CLI** to load the MCP server.
-
-### Option 2: Install for Claude Desktop
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/kledo-api-mcp.git
-   cd kledo-api-mcp
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   pip install -e .
-   ```
-
-3. **Create environment file:**
-   ```bash
-   cp .env.example .env
-   ```
-
-4. **Configure your Kledo API credentials in `.env`** (same as Option 1)
-
-5. **Add to Claude Desktop configuration:**
-
-   **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-
-   **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-
-   **Linux**: `~/.config/Claude/claude_desktop_config.json`
-
-   ```json
-   {
-     "mcpServers": {
-       "kledo-crm": {
-         "command": "python",
-         "args": ["-m", "src.server"],
-         "cwd": "/FULL/PATH/TO/kledo-api-mcp",
-         "env": {
-           "KLEDO_API_KEY": "your_api_key_here",
-           "KLEDO_BASE_URL": "https://api.kledo.com/api/v1",
-           "MCP_SERVER_NAME": "kledo-crm",
-           "CACHE_ENABLED": "true",
-           "LOG_LEVEL": "INFO"
-         }
-       }
-     }
-   }
-   ```
-
-6. **Restart Claude Desktop** to load the MCP server.
+# Or use the old way (still works)
+python -m src.server
+```
 
 ### Getting Your Kledo API Key
 

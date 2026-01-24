@@ -11,13 +11,22 @@ from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
 from loguru import logger
 
-from .auth import KledoAuthenticator
-from .cache import KledoCache
-from .kledo_client import KledoAPIClient
-from .utils.logger import setup_logger
+# Dynamic imports to handle both module execution and entry point execution
+import sys
+from pathlib import Path
 
+# Add src directory to Python path when running via entry point
+if not __package__:
+    src_dir = Path(__file__).parent
+    if str(src_dir) not in sys.path:
+        sys.path.insert(0, str(src_dir))
+
+from auth import KledoAuthenticator
+from cache import KledoCache
+from kledo_client import KledoAPIClient
+from utils.logger import setup_logger
 # Import tool handlers
-from .tools import financial, invoices, orders, products, contacts, deliveries, utilities, sales_analytics, revenue
+from tools import financial, invoices, orders, products, contacts, deliveries, utilities, sales_analytics, revenue
 
 
 # Load environment variables
