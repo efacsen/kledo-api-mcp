@@ -1,0 +1,2794 @@
+2026-01-22 16:01:58.331 | INFO     | src.auth:__init__:47 - Using API key authentication (recommended)
+2026-01-22 16:01:58.332 | INFO     | src.cache:_load_config:100 - Loaded cache configuration from /Users/kevinzakaria/developers/kledo-api-mcp/config/cache_config.yaml
+2026-01-22 16:01:58.332 | DEBUG    | src.cache:_load_config:101 - TTL config: {'products': 7200, 'contacts': 7200, 'accounts': 14400, 'units': 14400, 'tags': 14400, 'config': 28800, 'invoices': 1800, 'orders': 1800, 'deliveries': 900, 'bank_transactions': 1800, 'expenses': 1800, 'reports': 3600, 'totals': 1800, 'summaries': 1800, 'dashboard': 3600, 'bank_balance': 300, 'stock_levels': 600}
+2026-01-22 16:01:58.332 | INFO     | src.cache:__init__:76 - Cache initialized (enabled=True, max_size=1000)
+2026-01-22 16:01:58.334 | INFO     | src.kledo_client:_load_endpoints_config:54 - Loaded 13 endpoint categories
+2026-01-22 16:01:58.334 | INFO     | src.kledo_client:__init__:40 - Kledo API client initialized
+2026-01-22 16:02:00.454 | DEBUG    | src.kledo_client:_request:158 - Cached response for /finance/contacts
+2026-01-22 16:02:01.784 | DEBUG    | src.kledo_client:_request:158 - Cached response for /finance/contacts/1
+====================================================================================================
+KLEDO API: LIST vs DETAIL COMPARISON
+====================================================================================================
+✓ Authenticated
+
+
+====================================================================================================
+TESTING: Contacts
+Category: contacts
+====================================================================================================
+
+📋 Testing LIST endpoint: contacts.list
+✓ Got list item (ID: 1)
+
+📄 Testing DETAIL endpoint: contacts.detail (ID: 1)
+✓ Got detail item
+
+====================================================================================================
+FIELD COMPARISON RESULTS
+====================================================================================================
+
+📊 STATISTICS:
+  • Fields in LIST:   27
+  • Fields in DETAIL: 177
+  • In both:          27
+  • Only in DETAIL:   150
+  • Only in LIST:     0
+
+⭐ FIELDS ONLY IN DETAIL (missing from LIST): 150
+----------------------------------------------------------------------------------------------------
+  • address                                   = 'KOMPLEK PERKANTORAN CEMPAKA PUTIH BLOK A 19\nJL. LE'
+  • address_full                              = 'KOMPLEK PERKANTORAN CEMPAKA PUTIH BLOK A 19\nJL. LE'
+  • bank_accounts                             (array with 0 items)
+  • birthday                                  = null
+  • city.id                                   = 58
+  • city.name                                 = 'Kodya Jakarta Pusat'
+  • city_id                                   = 58
+  • closing_hour                              = null
+  • count                                     (object with 6 keys)
+  • count.payable                             = 0
+  • count.payable_due                         = 0
+  • count.payment_received                    = 8
+  • count.payment_sent                        = 0
+  • count.receivable                          = 0
+  • count.receivable_due                      = 0
+  • country.id                                = 1
+  • country.name                              = 'Indonesia'
+  • country_id                                = 1
+  • deleted_at                                = null
+  • description                               = 'CIP: Samuel Hariandya - 0823 7070 4269 (Proyek SMP'
+  • district_id                               = null
+  • email                                     = 'kartikaekayasa@hotmail.com'
+  • fax                                       = null
+  • id_card_number                            = null
+  • id_card_type                              = null
+  • id_card_type_id                           = null
+  • is_as_employee                            = False
+  • is_deletable                              = False
+  • is_type_editable                          = False
+  • latitude                                  = null
+  • longitude                                 = null
+  • max_payable                               = null
+  • max_receivable                            = null
+  • next                                      = null
+  • notes                                     = null
+  • npwp                                      = '016095440025000'
+  • opening_hour                              = null
+  • payable.current_page                      = 1
+  • payable.data                              (array with 0 items)
+  • payable.first_page_url                    = 'https://ptcepatservicestation.api.kledo.com/api/v1'
+  • payable.from                              = null
+  • payable.last_page                         = 1
+  • payable.last_page_url                     = 'https://ptcepatservicestation.api.kledo.com/api/v1'
+  • payable.links                             (array with 3 items)
+  • payable.links[0].active                   = False
+  • payable.links[0].label                    = '&laquo; Sebelumnya'
+  • payable.links[0].page                     = null
+  • payable.links[0].url                      = null
+  • payable.next_page_url                     = null
+  • payable.path                              = 'https://ptcepatservicestation.api.kledo.com/api/v1'
+  • payable.per_page                          = 15
+  • payable.prev_page_url                     = null
+  • payable.print_url_transaction             = 'eyJpdiI6Ikh5eEE1SXR4Wmc0NEo0ZjNvbmdjRXc9PSIsInZhbH'
+  • payable.to                                = null
+  • payable.total                             = 0
+  • payable_account                           (object with 8 keys)
+  • payable_account.currency_id               = null
+  • payable_account.id                        = 81
+  • payable_account.is_parent                 = 0
+  • payable_account.name                      = 'Hutang Usaha'
+  • payable_account.name_en                   = 'Trade Payable'
+  • payable_account.name_id                   = 'Hutang Usaha'
+  • payable_account.parent_id                 = null
+  • payable_account.ref_code                  = '2-20100'
+  • payable_account_editable                  = True
+  • phone                                     = '0214212288'
+  • photo                                     = null
+  • photos                                    (array with 0 items)
+  • prev                                      = 2
+  • print_url_reporting_account               = 'eyJpdiI6IlA1ZVhFY1J4cVRKRGtDQmhCOXFHbHc9PSIsInZhbH'
+  • province.country_id                       = 1
+  • province.id                               = 6
+  • province.name                             = 'DKI Jakarta'
+  • province_id                               = 6
+  • receivable.current_page                   = 1
+  • receivable.data                           (array with 0 items)
+  • receivable.first_page_url                 = 'https://ptcepatservicestation.api.kledo.com/api/v1'
+  • receivable.from                           = null
+  • receivable.last_page                      = 1
+  • receivable.last_page_url                  = 'https://ptcepatservicestation.api.kledo.com/api/v1'
+  • receivable.links                          (array with 3 items)
+  • receivable.links[0].active                = False
+  • receivable.links[0].label                 = '&laquo; Sebelumnya'
+  • receivable.links[0].page                  = null
+  • receivable.links[0].url                   = null
+  • receivable.next_page_url                  = null
+  • receivable.path                           = 'https://ptcepatservicestation.api.kledo.com/api/v1'
+  • receivable.per_page                       = 15
+  • receivable.prev_page_url                  = null
+  • receivable.print_url_transaction          = 'eyJpdiI6IkJxVUg0ZEo0QmZkSUkyMU5iS0JwM1E9PSIsInZhbH'
+  • receivable.to                             = null
+  • receivable.total                          = 0
+  • receivable_account                        (object with 8 keys)
+  • receivable_account.currency_id            = null
+  • receivable_account.id                     = 21
+  • receivable_account.is_parent              = 0
+  • receivable_account.name                   = 'Piutang Usaha'
+  • receivable_account.name_en                = 'Account Receivable'
+  • receivable_account.name_id                = 'Piutang Usaha'
+  • receivable_account.parent_id              = null
+  • receivable_account.ref_code               = '1-10100'
+  • receivable_account_editable               = False
+  • receivable_account_message                = 'Akun Piutang tidak dapat diubah, karena kontak ini'
+  • ref_number                                = null
+  • required_type_ids                         (array with 1 items)
+  • sales_id                                  = null
+  • salutation_id                             = 2
+  • secondary_phone                           = null
+  • shipping_address                          = null
+  • shipping_addresses                        (array with 0 items)
+  • taxable                                   = 1
+  • total                                     (object with 6 keys)2026-01-22 16:02:03.994 | DEBUG    | src.kledo_client:_request:158 - Cached response for /finance/invoices
+2026-01-22 16:02:05.728 | DEBUG    | src.kledo_client:_request:158 - Cached response for /finance/invoices/13335
+
+  • total.payable                             = 0
+  • total.payable_due                         = 0
+  • total.payment_received                    = 177324997.5
+  • total.payment_sent                        = 0
+  • total.receivable                          = 0
+  • total.receivable_due                      = 0
+  • transactions                              (object with 14 keys)
+  • transactions.current_page                 = 1
+  • transactions.data                         (array with 15 items)
+  • transactions.data[0].amount_after_tax     = 1700000
+  • transactions.data[0].bank_account_id      = null
+  • transactions.data[0].currency_id          = 0
+  • transactions.data[0].desc                 = ''
+  • transactions.data[0].due                  = 0
+  • transactions.data[0].due_date             = '2025-10-29'
+  • transactions.data[0].id                   = 10562
+  • transactions.data[0].memo                 = ''
+  • transactions.data[0].ref_number           = 'QU/25/OKT/00578'
+  • transactions.data[0].trans_date           = '2025-10-29'
+  • transactions.data[0].trans_type           = 'Penawaran Penjualan'
+  • transactions.data[0].trans_type_id        = 4
+  • transactions.first_page_url               = 'https://ptcepatservicestation.api.kledo.com/api/v1'
+  • transactions.from                         = 1
+  • transactions.last_page                    = 2
+  • transactions.last_page_url                = 'https://ptcepatservicestation.api.kledo.com/api/v1'
+  • transactions.links                        (array with 4 items)
+  • transactions.links[0].active              = False
+  • transactions.links[0].label               = '&laquo; Sebelumnya'
+  • transactions.links[0].page                = null
+  • transactions.links[0].url                 = null
+  • transactions.next_page_url                = 'https://ptcepatservicestation.api.kledo.com/api/v1'
+  • transactions.path                         = 'https://ptcepatservicestation.api.kledo.com/api/v1'
+  • transactions.per_page                     = 15
+  • transactions.prev_page_url                = null
+  • transactions.print_url_transaction        = 'eyJpdiI6Ijd2bUkwWXpNa0pERjJ3MDI4T3FGV2c9PSIsInZhbH'
+  • transactions.to                           = 15
+  • transactions.total                        = 29
+  • village_id                                = null
+
+📄 SAMPLE LIST OBJECT:
+----------------------------------------------------------------------------------------------------
+{
+  "company": "PT. KARTIKA EKAYASA",
+  "name": "Samuel Hariandya",
+  "payable": "0.00000",
+  "receivable": "0.00000",
+  "id": 1,
+  "local_id": "0bdb97f2-82cd-4e41-adfb-c4f2635a63a8",
+  "receivable_account_id": 21,
+  "payable_account_id": 81,
+  "is_archive": 0,
+  "type_id": 3,
+  "group_id": 1,
+  "finance_term_id": null,
+  "type_ids": [
+    3
+  ],
+  "edit_address": null,
+  "group": {
+    "id": 1,
+    "code": null,
+    "name": "Kontraktor",
+    "is_active": true,
+    "local_id": "302304a7-a034-4056-86cf-e904d8e6ca09"
+  },
+  "term": null,
+  "finance_contact_emails": [],
+  "country": null,
+  "province": null,
+  "city": null,
+  "district": null,
+  "village": null
+}...
+
+📄 SAMPLE DETAIL OBJECT:
+----------------------------------------------------------------------------------------------------
+{
+  "id": 1,
+  "name": "Samuel Hariandya",
+  "company": "PT. KARTIKA EKAYASA",
+  "address": "KOMPLEK PERKANTORAN CEMPAKA PUTIH BLOK A 19\nJL. LETJEND SUPRAPTO NO. 160",
+  "email": "kartikaekayasa@hotmail.com",
+  "phone": "0214212288",
+  "type_id": 3,
+  "deleted_at": null,
+  "shipping_address": null,
+  "receivable_account_id": 21,
+  "payable_account_id": 81,
+  "group_id": 1,
+  "npwp": "016095440025000",
+  "is_archive": 0,
+  "country_id": 1,
+  "province_id": 6,
+  "city_id": 58,
+  "district_id": null,
+  "village_id": null,
+  "secondary_phone": null,
+  "fax": null,
+  "ref_number": null,
+  "birthday": null,
+  "max_payable": null,
+  "max_receivable": null,
+  "taxable": 1,
+  "photo": null,
+  "id_card_type_id": null,
+  "id_card_number": null,
+  "description": "CIP: Samuel Hariandya - 0823 7070 4269 (Proyek SMPN 30 Depok)",
+  "salutation_id": 2,
+  "receivable": {
+    "current_page": 1,
+    "data": [],
+    "first_page_url": "https://ptcepatservicestation.api.kledo.com/api/v1/finance/contacts/1/t...
+
+====================================================================================================
+TESTING: Sales Invoices
+Category: invoices
+====================================================================================================
+
+📋 Testing LIST endpoint: invoices.list
+✓ Got list item (ID: 13335)
+
+📄 Testing DETAIL endpoint: invoices.detail (ID: 13335)
+✓ Got detail item
+
+====================================================================================================
+FIELD COMPARISON RESULTS
+====================================================================================================
+
+📊 STATISTICS:
+  • Fields in LIST:   91
+  • Fields in DETAIL: 362
+  • In both:          70
+  • Only in DETAIL:   292
+  • Only in LIST:     21
+
+⭐ FIELDS ONLY IN DETAIL (missing from LIST): 292
+----------------------------------------------------------------------------------------------------
+  • additional_discounts                      = null
+  • attachment_details                        (array with 0 items)
+  • available_memos                           (array with 0 items)
+  • contact.address                           = ''
+  • contact.bank_accounts                     (array with 0 items)
+  • contact.birthday                          = null
+  • contact.city_id                           = null
+  • contact.country_id                        = null
+  • contact.description                       = null
+  • contact.district_id                       = null
+  • contact.edit_address                      = null
+  • contact.email                             = null
+  • contact.finance_contact_emails            (array with 0 items)
+  • contact.formatted                         = '//Adil'
+  • contact.group_id                          = null
+  • contact.id_card_number                    = null
+  • contact.id_card_type_id                   = null
+  • contact.is_archive                        = 0
+  • contact.local_id                          = '4fc0e905-a413-4d82-961e-2fd2a512043e'
+  • contact.max_payable                       = null
+  • contact.max_receivable                    = null
+  • contact.phone                             = null
+  • contact.photo                             = null
+  • contact.province_id                       = null
+  • contact.ref_number                        = null
+  • contact.salutation                        = 'Pak'
+  • contact.salutation_id                     = 3
+  • contact.shipping_addresses                (array with 0 items)
+  • contact.taxable                           = 1
+  • contact.type_ids                          (array with 1 items)
+  • contact.village_id                        = null
+  • contact_shipping_address                  = null
+  • conversion_serial_numbers                 (array with 0 items)
+  • currency_editable                         = True
+  • currency_source                           = null
+  • custom                                    = null
+  • dp_transactions                           (array with 0 items)
+  • fees                                      (array with 0 items)
+  • have_proforma                             = False
+  • is_deletable                              = True
+  • is_editable                               = True
+  • is_printable                              = True
+  • is_recapped                               = False
+  • is_returnable                             = True
+  • is_shareable                              = True
+  • is_unvoidable                             = False
+  • is_voidable                               = True
+  • items                                     (array with 2 items)
+  • items[0].additional_discount_amount       = 0
+  • items[0].amount                           = 1660000
+  • items[0].amount_after_tax                 = 1660000
+  • items[0].amount_after_tax_ori             = null
+  • items[0].amount_ori                       = null
+  • items[0].currency_id                      = 0
+  • items[0].currency_rate                    = 1
+  • items[0].custom                           = null
+  • items[0].desc                             = 'Kemasan 20 Kg'
+  • items[0].discount_amount                  = 0
+  • items[0].discount_amount_input            = '0.00000'
+  • items[0].discount_percent                 = 0
+  • items[0].finance_account_id               = 44
+  • items[0].height                           = null
+  • items[0].id                               = 22585
+  • items[0].item_tax                         = null
+  • items[0].length                           = null
+  • items[0].local_id                         = null
+  • items[0].price                            = 830000
+  • items[0].price_after_tax                  = 830000
+  • items[0].product                          (object with 23 keys)
+  • items[0].product.avg_base_price           = 590000
+  • items[0].product.base_price               = 590000
+  • items[0].product.bundle_type_id           = 0
+  • items[0].product.code                     = 'SKU/CD/P/00045'
+  • items[0].product.formatted                = 'Material/NIPPON ZINC CHROMATE PRIMER/SKU/CD/P/0004'
+  • items[0].product.id                       = 44
+  • items[0].product.is_purchase              = True
+  • items[0].product.is_sell                  = True
+  • items[0].product.is_track                 = True
+  • items[0].product.last_buy_price           = 590000
+  • items[0].product.last_sell_price          = 830000
+  • items[0].product.last_sell_price_contact  = 830000
+  • items[0].product.manage_expiry            = null
+  • items[0].product.name                     = 'NIPPON ZINC CHROMATE PRIMER'
+  • items[0].product.pos_product_category_id  = 2
+  • items[0].product.price                    = 830000
+  • items[0].product.product_units            (array with 0 items)
+  • items[0].product.purchase_account_id      = 131
+  • items[0].product.sell_account_id          = 121
+  • items[0].product.sn_type                  = null
+  • items[0].product.track_start_date         = null
+  • items[0].product.unit_id                  = 2
+  • items[0].product.wholesale_price          (array with 0 items)
+  • items[0].qty                              = 2
+  • items[0].serial_numbers                   (array with 0 items)
+  • items[0].subtotal                         = 1660000
+  • items[0].tax                              = 0
+  • items[0].tax_id                           = null
+  • items[0].taxable                          = 1660000
+  • items[0].total_volume                     = null
+  • items[0].total_weight_in_gram             = null
+  • items[0].tran_id                          = 13335
+  • items[0].trans_type_id                    = 5
+  • items[0].unit_conv                        = 1
+  • items[0].unit_id                          = 2
+  • items[0].weight_in_gram                   = 0
+  • items[0].width                            = null
+  • log                                       (object with 2 keys)
+  • log.action                                (object with 10 keys)
+  • log.action.action_type_id                 = 1
+  • log.action.changes                        = null
+  • log.action.created_at                     = '2026-01-19 19:10'
+  • log.action.extra                          = '{"number":"INV\\/26\\/JAN\\/01153","amount":4410000,"'
+  • log.action.id                             = 38296
+  • log.action.remote_addr                    = '111.94.15.66'
+  • log.action.tran_id                        = 13335
+  • log.action.trans_type_id                  = 5
+  • log.action.user                           (object with 7 keys)
+  • log.action.user.email                     = 'mekanour@cepatservicestation.com'
+  • log.action.user.id                        = 218933
+  • log.action.user.is_active                 = 1
+  • log.action.user.local_id                  = 'ead6d706-80aa-48af-a973-e3998fba6e0d'
+  • log.action.user.name                      = 'Meka GN'
+  • log.action.user.phone_number              = '081312133234'
+  • log.action.user.token_website_id          = 0
+  • log.action.user_id                        = 218933
+  • log.print                                 (object with 10 keys)
+  • log.print.action_type_id                  = 24
+  • log.print.changes                         = null
+  • log.print.created_at                      = '2026-01-19 19:10'
+  • log.print.extra                           = '{"type":"Tagihan Penjualan","number":"INV\\/26\\/JAN'
+  • log.print.id                              = 38298
+  • log.print.remote_addr                     = '111.94.15.66'
+  • log.print.tran_id                         = 13335
+  • log.print.trans_type_id                   = 5
+  • log.print.user                            (object with 7 keys)
+  • log.print.user.email                      = 'mekanour@cepatservicestation.com'
+  • log.print.user.id                         = 218933
+  • log.print.user.is_active                  = 1
+  • log.print.user.local_id                   = 'ead6d706-80aa-48af-a973-e3998fba6e0d'
+  • log.print.user.name                       = 'Meka GN'
+  • log.print.user.phone_number               = '081312133234'
+  • log.print.user.token_website_id           = 0
+  • log.print.user_id                         = 218933
+  • memo_payment_transactions                 (array with 0 items)
+  • message                                   (object with 1 keys)
+  • message.message                           = '<p><span style="font-size:12px;"><strong>Transfer '
+  • next                                      = 13333
+  • order                                     (object with 5 keys)
+  • order.business_tran_id                    = null
+  • order.id                                  = 13289
+  • order.include_tax                         = True
+  • order.items                               (array with 2 items)
+  • order.items[0].additional_discount_amount  = 0
+  • order.items[0].amount                     = 1660000
+  • order.items[0].amount_after_tax           = 1660000
+  • order.items[0].discount_amount            = 0
+  • order.items[0].discount_percent           = 0
+  • order.items[0].finance_account_id         = 44
+  • order.items[0].id                         = 22567
+  • order.items[0].qty                        = 2
+  • order.ref_number                          = 'SO/26/JAN/00836'
+  • order_payment                             = 0
+  • parent_tran                               (object with 4 keys)
+  • parent_tran.id                            = 13289
+  • parent_tran.ref_number                    = 'SO/26/JAN/00836'
+  • parent_tran.trans_date                    = '2026-01-19'
+  • parent_tran.trans_type_id                 = 6
+  • payment_connect                           = null
+  • prev                                      = null
+  • print_tax_url                             = null
+  • print_url                                 = 'eyJpdiI6InE4ZjRNZ21BN3hkcTE2Ulg1QmRKL3c9PSIsInZhbH'
+  • print_url_approval                        = 'eyJpdiI6IkxrNjRJdTZkSWN3b2tacE9lSWttQ0E9PSIsInZhbH'
+  • print_url_delivery                        = 'eyJpdiI6Img0RlZTYVJqa3lTM3cxa2VKN0lHMmc9PSIsInZhbH'
+  • print_url_document_receipt                = 'eyJpdiI6Imozd3NsYkRtMVRSL2MvVDdWT2pNTmc9PSIsInZhbH'
+  • print_url_excel                           = 'eyJpdiI6InE4ZjRNZ21BN3hkcTE2Ulg1QmRKL3c9PSIsInZhbH'
+  • print_url_label                           = 'eyJpdiI6IjBHYjBMaHRqVEFwMU1GeGhlY3NxOVE9PSIsInZhbH'
+  • print_url_recap                           = 'eyJpdiI6IklrQ2hOczFzQklMOENCcFJxN0tHS1E9PSIsInZhbH'
+  • print_url_receipt                         (array with 1 items)
+  • print_url_receipt[0].amount               = 4410000
+  • print_url_receipt[0].date                 = '19/01/2026'
+  • print_url_receipt[0].id                   = 13336
+  • print_url_receipt[0].url                  = 'eyJpdiI6IjF3bUVqeUtzUVd5ZEZOa1R4MHJwcWc9PSIsInZhbH'
+  • print_url_word                            = 'eyJpdiI6InE4ZjRNZ21BN3hkcTE2Ulg1QmRKL3c9PSIsInZhbH'
+  • quote                                     = null
+  • reason                                    = null
+  • recap_id                                  = null
+  • relations                                 (array with 2 items)
+  • relations[0].additional_discount_amount   = '0.0000000'
+  • relations[0].additional_discount_percent  = '0.00'
+  • relations[0].amount                       = '4410000.0000000'
+  • relations[0].amount_after_tax             = 4410000
+  • relations[0].amount_after_tax_ori         = null
+  • relations[0].amount_ori                   = null
+  • relations[0].attachment                   = '[]'
+  • relations[0].balance                      = null
+  • relations[0].bank_account_id              = null
+  • relations[0].bank_statement_id            = null
+  • relations[0].business_tran_id             = null
+  • relations[0].contact_id                   = 430
+  • relations[0].contact_shipping_address_id  = null
+  • relations[0].created_at                   = '2026-01-19 15:24:32'
+  • relations[0].currency_id                  = 0
+  • relations[0].currency_rate                = '1.000000'
+  • relations[0].currency_source_id           = 0
+  • relations[0].delivery_ids                 = null
+  • relations[0].desc                         = ''
+  • relations[0].discount_amount              = '0.0000000'
+  • relations[0].discount_percent             = 0
+  • relations[0].due                          = '4410000.00000'
+  • relations[0].due_date                     = '2026-01-19'
+  • relations[0].id                           = 13289
+  • relations[0].include_tax                  = 1
+  • relations[0].invoice_type_id              = null
+  • relations[0].is_stamped                   = 0
+  • relations[0].local_id                     = null
+  • relations[0].memo                         = 'Villa Mas Nusa Indah - 2 - 169'
+  • relations[0].outlet_id                    = null
+  • relations[0].owner_id                     = 218933
+  • relations[0].paid_date                    = null
+  • relations[0].pay_from_finance_account_id  = null
+  • relations[0].pay_later                    = 0
+  • relations[0].payment_date                 = null
+  • relations[0].payment_id                   = null
+  • relations[0].payment_type_id              = null
+  • relations[0].pos_shift_id                 = null
+  • relations[0].position                     = null
+  • relations[0].ref_number                   = 'SO/26/JAN/00836'
+  • relations[0].related_id                   = null
+  • relations[0].related_type                 = null
+  • relations[0].sales_id                     = 352181
+  • relations[0].shipping_comp_id             = null
+  • relations[0].shipping_cost                = '0.00'
+  • relations[0].shipping_date                = null
+  • relations[0].shipping_tracking            = null
+  • relations[0].source                       = 0
+  • relations[0].source_id                    = null
+  • relations[0].stamp_serial_number          = null
+  • relations[0].status_id                    = 7
+  • relations[0].sub_business_tran_id         = null
+  • relations[0].subtotal                     = '4410000.0000000'
+  • relations[0].tags                         (array with 2 items)
+  • relations[0].tags[0].color                = '#000000'
+  • relations[0].tags[0].created_at           = '2024-03-05 15:13:43'
+  • relations[0].tags[0].id                   = 1
+  • relations[0].tags[0].is_archive           = 0
+  • relations[0].tags[0].local_id             = 'f7e9b7e8-0740-4903-9594-75a8c9ce60f6'
+  • relations[0].tags[0].name                 = 'Penjualan Material'
+  • relations[0].tags[0].owner_id             = 145707
+  • relations[0].tags[0].updated_at           = '2024-09-27 05:12:07'
+  • relations[0].tax                          = '[]'
+  • relations[0].term_id                      = 5
+  • relations[0].total_tax                    = '0.00000'
+  • relations[0].trans_date                   = '2026-01-19'
+  • relations[0].trans_type                   = 'Pemesanan Penjualan'
+  • relations[0].trans_type_id                = 6
+  • relations[0].updated_at                   = '2026-01-19 15:29:30'
+  • relations[0].warehouse_id                 = 1
+  • relations[0].witholding_account_id        = null
+  • relations[0].witholding_amount            = '0.00000'
+  • relations[0].witholding_percent           = '0.00'
+  • sales                                     (object with 2 keys)
+  • sales.id                                  = 352181
+  • sales.name                                = 'Elmo Abu Abdillah'
+  • tags[0].is_archive                        = 0
+  • tags[0].local_id                          = 'f7e9b7e8-0740-4903-9594-75a8c9ce60f6'
+  • tags[0].owner_id                          = 145707
+  • tax_number                                = null
+  • taxes                                     (array with 0 items)
+  • taxesGrouped                              (array with 0 items)
+  • total_additional_discounts                = 0
+  • tran_duty_stamp                           = null
+  • transactions                              (array with 1 items)
+  • transactions[0].amount_after_tax          = 4410000
+  • transactions[0].bank_account              (object with 8 keys)
+  • transactions[0].bank_account.currency_id  = null
+  • transactions[0].bank_account.id           = 1507
+  • transactions[0].bank_account.is_parent    = 0
+  • transactions[0].bank_account.name         = 'Mandiri Main 6667'
+  • transactions[0].bank_account.name_en      = 'Mandiri Main 6667'
+  • transactions[0].bank_account.name_id      = 'Mandiri Main 6667'
+  • transactions[0].bank_account.parent_id    = null
+  • transactions[0].bank_account.ref_code     = '1-10001'
+  • transactions[0].bank_account_id           = 1507
+  • transactions[0].business_tran_id          = 13335
+  • transactions[0].currency_rate             = '1.000000'
+  • transactions[0].id                        = 13336
+  • transactions[0].memo                      = ''
+  • transactions[0].status_id                 = 31
+  • transactions[0].trans_date                = '2026-01-19'
+  • transactions[0].trans_type_id             = 17
+  • witholding_account                        = null
+  • witholdings                               (array with 0 items)
+
+📋 FIELDS ONLY IN LIST (missing from DETAIL): 21
+----------------------------------------------------------------------------------------------------
+  • attachment_exists
+  • created_at
+  • due_days
+  • order_number
+  • payment_accounts
+  • payment_accounts[0].id
+  • payment_accounts[0].name
+  • payment_accounts[0].name_id
+  • print_status
+  • qty
+  • related
+  • sales_person
+  • sales_person.id
+  • sales_person.name
+  • termin
+  • termin.id
+  • termin.name
+  • updated_at
+  • warehouse
+  • warehouse.id
+  • warehouse.name
+
+📄 SAMPLE LIST OBJECT:
+----------------------------------------------------------------------------------------------------
+{
+  "id": 13335,
+  "business_tran_id": 13289,
+  "trans_type_id": 5,
+  "trans_date": "2026-01-19",
+  "due_date": "2026-01-19",
+  "contact_id": 430,
+  "status_id": 3,
+  "ref_number": "INV/26/JAN/01153",
+  "amount": 4410000,
+  "amount_after_tax": 4410000,
+  "due": 0,
+  "bank_statement_id": null,
+  "bank_account_id": null,
+  "balance": null,
+  "position": null,
+  "pay_later": false,
+  "pay_from_finance_account_id": null,
+  "payment_id": null,
+  "include_tax": true,
+  "term_id": 5,
+  "attachment": [],
+  "memo": "Villa Mas Nusa Indah - 2 - 169",
+  "desc": "",
+  "tax": "[]",
+  "warehouse_id": 1,
+  "discount_percent": 0,
+  "discount_amount": 0,
+  "additional_discount_percent": 0,
+  "additional_discount_amount": 0,
+  "total_tax": 0,
+  "subtotal": 4410000,
+  "shipping_cost": 0,
+  "shipping_date": null,
+  "shipping_comp_id": null,
+  "shipping_tracking": null,
+  "sub_business_tran_id": null,
+  "delivery_ids": null,
+  "witholding_percent": 0,
+  "witholding_amount": 0,
+  "witholding_account_id": nul...2026-01-22 16:02:07.665 | DEBUG    | src.kledo_client:_request:158 - Cached response for /finance/purchaseInvoices
+2026-01-22 16:02:09.458 | DEBUG    | src.kledo_client:_request:158 - Cached response for /finance/purchaseInvoices/13362
+
+
+📄 SAMPLE DETAIL OBJECT:
+----------------------------------------------------------------------------------------------------
+{
+  "id": 13335,
+  "business_tran_id": 13289,
+  "trans_type_id": 5,
+  "trans_date": "2026-01-19",
+  "due_date": "2026-01-19",
+  "contact_id": 430,
+  "status_id": 3,
+  "ref_number": "INV/26/JAN/01153",
+  "amount": 4410000,
+  "amount_after_tax": 4410000,
+  "due": 0,
+  "bank_statement_id": null,
+  "bank_account_id": null,
+  "balance": null,
+  "position": null,
+  "pay_later": false,
+  "pay_from_finance_account_id": null,
+  "payment_id": null,
+  "include_tax": true,
+  "term_id": 5,
+  "attachment": [],
+  "memo": "Villa Mas Nusa Indah - 2 - 169",
+  "desc": "",
+  "tax": [],
+  "warehouse_id": 1,
+  "discount_percent": 0,
+  "discount_amount": 0,
+  "additional_discount_percent": 0,
+  "additional_discount_amount": 0,
+  "total_tax": 0,
+  "subtotal": 4410000,
+  "shipping_cost": 0,
+  "shipping_date": null,
+  "shipping_comp_id": null,
+  "shipping_tracking": null,
+  "sub_business_tran_id": null,
+  "delivery_ids": null,
+  "witholding_percent": 0,
+  "witholding_amount": 0,
+  "witholding_account_id": null,...
+
+====================================================================================================
+TESTING: Purchase Invoices
+Category: purchase_invoices
+====================================================================================================
+
+📋 Testing LIST endpoint: purchase_invoices.list
+✓ Got list item (ID: 13362)
+
+📄 Testing DETAIL endpoint: purchase_invoices.detail (ID: 13362)
+✓ Got detail item
+
+====================================================================================================
+FIELD COMPARISON RESULTS
+====================================================================================================
+
+📊 STATISTICS:
+  • Fields in LIST:   49
+  • Fields in DETAIL: 343
+  • In both:          40
+  • Only in DETAIL:   303
+  • Only in LIST:     9
+
+⭐ FIELDS ONLY IN DETAIL (missing from LIST): 303
+----------------------------------------------------------------------------------------------------
+  • additional_discount_percent               = 0
+  • amount_after_tax_ori                      = null
+  • amount_ori                                = null
+  • attachment                                (array with 0 items)
+  • attachment_details                        (array with 0 items)
+  • available_memos                           (array with 0 items)
+  • available_proforma                        (array with 1 items)
+  • available_proforma[0].finance_account_id  = 318
+  • available_proforma[0].id                  = 22625
+  • available_proforma[0].qty                 = 3
+  • balance                                   = null
+  • bank_account_id                           = null
+  • bank_statement_id                         = null
+  • business_tran_id                          = 13037
+  • can_create_proforma                       = True
+  • contact.bank_accounts                     (array with 0 items)
+  • contact.birthday                          = null
+  • contact.description                       = null
+  • contact.formatted                         = '/PT. KANSAI PRAKARSA COATINGS/Dani Prasetyo'
+  • contact.id_card_number                    = null
+  • contact.id_card_type_id                   = null
+  • contact.is_archive                        = 0
+  • contact.local_id                          = '9b7158e4-2369-4d37-91c4-ded032f4a43a'
+  • contact.max_payable                       = null
+  • contact.max_receivable                    = null
+  • contact.photo                             = null
+  • contact.salutation                        = 'Pak'
+  • contact.shipping_addresses                (array with 0 items)
+  • contact.taxable                           = 1
+  • contact_shipping_address                  = null
+  • contact_shipping_address_id               = null
+  • conversion_serial_numbers                 (array with 0 items)
+  • currency_editable                         = True
+  • currency_source                           = null
+  • currency_source_id                        = 0
+  • custom                                    = null
+  • delivery_ids                              = null
+  • desc                                      = ''
+  • discount_amount                           = 0
+  • discount_percent                          = 0
+  • dp_transactions                           (array with 0 items)
+  • fees                                      (array with 0 items)
+  • have_proforma                             = False
+  • include_tax                               = False
+  • invoice_type_id                           = null
+  • is_deletable                              = True
+  • is_editable                               = True
+  • is_printable                              = True
+  • is_recapped                               = False
+  • is_returnable                             = True
+  • is_shareable                              = True
+  • is_stamped                                = 0
+  • is_unvoidable                             = False
+  • is_voidable                               = False
+  • items                                     (array with 1 items)
+  • items[0].additional_discount_amount       = 0
+  • items[0].amount                           = 3807150
+  • items[0].amount_after_tax                 = 4225936.5
+  • items[0].amount_after_tax_ori             = null
+  • items[0].amount_ori                       = null
+  • items[0].currency_id                      = 0
+  • items[0].currency_rate                    = 1
+  • items[0].custom                           = null
+  • items[0].desc                             = 'Kemasan 20 Kg\n115 - 143 Permanent Red'
+  • items[0].discount_amount                  = 0
+  • items[0].discount_amount_input            = '0.00000'
+  • items[0].discount_percent                 = 0
+  • items[0].finance_account_id               = 318
+  • items[0].height                           = null
+  • items[0].id                               = 22625
+  • items[0].item_tax                         (object with 11 keys)
+  • items[0].item_tax.buy_account_id          = 47
+  • items[0].item_tax.group_items             = null
+  • items[0].item_tax.id                      = 1
+  • items[0].item_tax.is_active               = True
+  • items[0].item_tax.is_allow_manual         = 0
+  • items[0].item_tax.is_group                = 0
+  • items[0].item_tax.is_witholding           = 0
+  • items[0].item_tax.local_id                = 'bc456452-547e-4252-ac90-999562e7ce3a'
+  • items[0].item_tax.name                    = 'PPN'
+  • items[0].item_tax.percent                 = 11
+  • items[0].item_tax.sell_account_id         = 910
+  • items[0].length                           = null
+  • items[0].local_id                         = null
+  • items[0].price                            = 1269050
+  • items[0].price_after_tax                  = 1408645.5
+  • items[0].product                          (object with 24 keys)
+  • items[0].product.avg_base_price           = 0
+  • items[0].product.base_price               = 1269050
+  • items[0].product.bundle_type_id           = 0
+  • items[0].product.code                     = 'SKU/CD/00308'
+  • items[0].product.formatted                = 'Material/KANSAI FTALIT PERMANENT RED/SKU/CD/00308'
+  • items[0].product.id                       = 318
+  • items[0].product.is_purchase              = True
+  • items[0].product.is_sell                  = True
+  • items[0].product.is_track                 = False
+  • items[0].product.last_buy_price           = 1269050
+  • items[0].product.last_buy_price_contact   = 1269050
+  • items[0].product.last_sell_price          = 1450000
+  • items[0].product.last_sell_price_contact  = null
+  • items[0].product.manage_expiry            = null
+  • items[0].product.name                     = 'KANSAI FTALIT PERMANENT RED'
+  • items[0].product.pos_product_category_id  = 2
+  • items[0].product.price                    = 1450000
+  • items[0].product.product_units            (array with 0 items)
+  • items[0].product.purchase_account_id      = 131
+  • items[0].product.sell_account_id          = 121
+  • items[0].product.sn_type                  = null
+  • items[0].product.track_start_date         = null
+  • items[0].product.unit_id                  = 2
+  • items[0].product.wholesale_price          (array with 0 items)
+  • items[0].qty                              = 3
+  • items[0].serial_numbers                   (array with 0 items)
+  • items[0].subtotal                         = 3807150
+  • items[0].tax                              = 418786.5
+  • items[0].tax_id                           = 1
+  • items[0].taxable                          = 3807150
+  • items[0].total_volume                     = null
+  • items[0].total_weight_in_gram             = null
+  • items[0].tran_id                          = 13362
+  • items[0].trans_type_id                    = 3
+  • items[0].unit_conv                        = 1
+  • items[0].unit_id                          = 2
+  • items[0].weight_in_gram                   = 0
+  • items[0].width                            = null
+  • local_id                                  = null
+  • log                                       (object with 2 keys)
+  • log.action                                (object with 10 keys)
+  • log.action.action_type_id                 = 1
+  • log.action.changes                        = null
+  • log.action.created_at                     = '2026-01-21 12:46'
+  • log.action.extra                          = '{"number":"PI\\/26\\/JAN\\/01174","amount":4225936.5,'
+  • log.action.id                             = 38385
+  • log.action.remote_addr                    = '182.3.42.132'
+  • log.action.tran_id                        = 13362
+  • log.action.trans_type_id                  = 3
+  • log.action.user                           (object with 7 keys)
+  • log.action.user.email                     = 'mekanour@cepatservicestation.com'
+  • log.action.user.id                        = 218933
+  • log.action.user.is_active                 = 1
+  • log.action.user.local_id                  = 'ead6d706-80aa-48af-a973-e3998fba6e0d'
+  • log.action.user.name                      = 'Meka GN'
+  • log.action.user.phone_number              = '081312133234'
+  • log.action.user.token_website_id          = 0
+  • log.action.user_id                        = 218933
+  • log.print                                 = null
+  • memo                                      = 'Hanjin Hydrant Work - 2B6 - 260001030'
+  • memo_payment_transactions                 (array with 0 items)
+  • message                                   = null
+  • next                                      = 13361
+  • order_payment                             = 0
+  • outlet_id                                 = null
+  • owner_id                                  = 218933
+  • parent_tran                               (object with 4 keys)
+  • parent_tran.id                            = 13037
+  • parent_tran.ref_number                    = 'PO/26/JAN/00889'
+  • parent_tran.trans_date                    = '2026-01-05'
+  • parent_tran.trans_type_id                 = 2
+  • pay_from_finance_account_id               = null
+  • pay_later                                 = False
+  • payment_id                                = null
+  • payment_type_id                           = null
+  • pos_shift_id                              = null
+  • position                                  = null
+  • prev                                      = null
+  • print_url                                 = 'eyJpdiI6ImhFQU13TUUvK1FpVmhWUG1FRzlxd1E9PSIsInZhbH'
+  • print_url_approval                        = 'eyJpdiI6IlBRUTNHeVVONlpZaFVJWnp3Z0lhZFE9PSIsInZhbH'
+  • print_url_delivery                        = 'eyJpdiI6ImdKQW9GR1hXaVpqcVdzWjhUYUFtdEE9PSIsInZhbH'
+  • print_url_document_receipt                = 'eyJpdiI6ImdvWnd5WFFwaDlrSWlKZEZnMkduS1E9PSIsInZhbH'
+  • print_url_excel                           = 'eyJpdiI6ImhFQU13TUUvK1FpVmhWUG1FRzlxd1E9PSIsInZhbH'
+  • print_url_label                           = 'eyJpdiI6InpLd1V3OGV1QUtsVW1pNExXLzl2ZGc9PSIsInZhbH'
+  • print_url_recap                           = 'eyJpdiI6Inl2UmUwakxENHcyYisyTEoxeWxZbEE9PSIsInZhbH'
+  • print_url_receipt                         (array with 0 items)
+  • print_url_word                            = 'eyJpdiI6ImhFQU13TUUvK1FpVmhWUG1FRzlxd1E9PSIsInZhbH'
+  • proforma_status                           (object with 2 keys)
+  • proforma_status.remaining_shipping_cost   = 0
+  • proforma_status.remaining_witholdings     (array with 0 items)
+  • purchase_order                            (object with 4 keys)
+  • purchase_order.id                         = 13037
+  • purchase_order.include_tax                = False
+  • purchase_order.items                      (array with 1 items)
+  • purchase_order.items[0].additional_discount_amount  = 0
+  • purchase_order.items[0].amount            = 3807150
+  • purchase_order.items[0].amount_after_tax  = 4225936.5
+  • purchase_order.items[0].discount_amount   = 0
+  • purchase_order.items[0].discount_percent  = 0
+  • purchase_order.items[0].finance_account_id  = 318
+  • purchase_order.items[0].id                = 22098
+  • purchase_order.items[0].qty               = 3
+  • purchase_order.ref_number                 = 'PO/26/JAN/00889'
+  • purchase_quote                            = null
+  • reason                                    = null
+  • recap_id                                  = null
+  • relations                                 (array with 1 items)
+  • relations[0].additional_discount_amount   = '0.0000000'
+  • relations[0].additional_discount_percent  = '0.00'
+  • relations[0].amount                       = '3807150.0000000'
+  • relations[0].amount_after_tax             = 4225936.5
+  • relations[0].amount_after_tax_ori         = null
+  • relations[0].amount_ori                   = null
+  • relations[0].attachment                   = '[]'
+  • relations[0].balance                      = null
+  • relations[0].bank_account_id              = null
+  • relations[0].bank_statement_id            = null
+  • relations[0].business_tran_id             = null
+  • relations[0].contact_id                   = 279
+  • relations[0].contact_shipping_address_id  = null
+  • relations[0].created_at                   = '2026-01-03 10:47:02'
+  • relations[0].currency_id                  = 0
+  • relations[0].currency_rate                = '1.000000'
+  • relations[0].currency_source_id           = 0
+  • relations[0].delivery_ids                 = null
+  • relations[0].desc                         = ''
+  • relations[0].discount_amount              = '0.0000000'
+  • relations[0].discount_percent             = 0
+  • relations[0].due                          = '4225936.50000'
+  • relations[0].due_date                     = '2026-02-04'
+  • relations[0].id                           = 13037
+  • relations[0].include_tax                  = 0
+  • relations[0].invoice_type_id              = null
+  • relations[0].is_stamped                   = 0
+  • relations[0].local_id                     = null
+  • relations[0].memo                         = 'Hanjin Hydrant Work - 2B6'
+  • relations[0].outlet_id                    = null
+  • relations[0].owner_id                     = 218933
+  • relations[0].paid_date                    = null
+  • relations[0].pay_from_finance_account_id  = null
+  • relations[0].pay_later                    = 0
+  • relations[0].payment_date                 = null
+  • relations[0].payment_id                   = null
+  • relations[0].payment_type_id              = null
+  • relations[0].pos_shift_id                 = null
+  • relations[0].position                     = null
+  • relations[0].ref_number                   = 'PO/26/JAN/00889'
+  • relations[0].related_id                   = null
+  • relations[0].related_type                 = null
+  • relations[0].sales_id                     = null
+  • relations[0].shipping_comp_id             = null
+  • relations[0].shipping_cost                = '0.00'2026-01-22 16:02:12.511 | DEBUG    | src.kledo_client:_request:158 - Cached response for /finance/products
+2026-01-22 16:02:13.844 | DEBUG    | src.kledo_client:_request:158 - Cached response for /finance/products/213
+
+  • relations[0].shipping_date                = null
+  • relations[0].shipping_tracking            = null
+  • relations[0].source                       = 0
+  • relations[0].source_id                    = null
+  • relations[0].stamp_serial_number          = null
+  • relations[0].status_id                    = 14
+  • relations[0].sub_business_tran_id         = null
+  • relations[0].subtotal                     = '3807150.0000000'
+  • relations[0].tags                         (array with 1 items)
+  • relations[0].tags[0].color                = '#e5ffff'
+  • relations[0].tags[0].created_at           = '2024-10-03 14:10:10'
+  • relations[0].tags[0].id                   = 18
+  • relations[0].tags[0].is_archive           = 0
+  • relations[0].tags[0].local_id             = '7e2b79f5-c28b-4bab-af67-150b7f9f62a8'
+  • relations[0].tags[0].name                 = 'Pembelian Material'
+  • relations[0].tags[0].owner_id             = 218933
+  • relations[0].tags[0].updated_at           = '2025-12-31 07:40:20'
+  • relations[0].tax                          = '{"1":418786.5}'
+  • relations[0].term_id                      = 1
+  • relations[0].total_tax                    = '418786.50000'
+  • relations[0].trans_date                   = '2026-01-05'
+  • relations[0].trans_type                   = 'Pesanan Pembelian'
+  • relations[0].trans_type_id                = 2
+  • relations[0].updated_at                   = '2026-01-05 11:40:47'
+  • relations[0].warehouse_id                 = 1
+  • relations[0].witholding_account_id        = null
+  • relations[0].witholding_amount            = '0.00000'
+  • relations[0].witholding_percent           = '0.00'
+  • sales_id                                  = null
+  • shipping_comp_id                          = null
+  • shipping_tracking                         = null
+  • source                                    = 0
+  • source_id                                 = null
+  • stamp_serial_number                       = null
+  • sub_business_tran_id                      = null
+  • subtotal                                  = 3807150
+  • tags                                      (array with 1 items)
+  • tags[0].color                             = '#e5ffff'
+  • tags[0].id                                = 18
+  • tags[0].is_archive                        = 0
+  • tags[0].local_id                          = '7e2b79f5-c28b-4bab-af67-150b7f9f62a8'
+  • tags[0].name                              = 'Pembelian Material'
+  • tags[0].owner_id                          = 218933
+  • tax                                       (object with 1 keys)
+  • tax.1                                     = 418786.5
+  • tax_number                                = null
+  • taxes                                     (object with 1 keys)
+  • taxes.PPN                                 (object with 2 keys)
+  • taxes.PPN.percent                         = 11
+  • taxes.PPN.value                           = 418786.5
+  • taxesGrouped                              (object with 1 keys)
+  • taxesGrouped.1                            (object with 3 keys)
+  • taxesGrouped.1.name                       = 'PPN'
+  • taxesGrouped.1.percent                    = 11
+  • taxesGrouped.1.value                      = 418786.5
+  • term_id                                   = 1
+  • total_tax                                 = 418786.5
+  • transactions                              (array with 0 items)
+  • warehouse_id                              = 1
+  • witholding_account                        = null
+  • witholding_account_id                     = null
+  • witholding_amount                         = 0
+  • witholding_percent                        = 0
+  • witholdings                               (array with 0 items)
+
+📋 FIELDS ONLY IN LIST (missing from DETAIL): 9
+----------------------------------------------------------------------------------------------------
+  • contact.closing_hour
+  • contact.opening_hour
+  • products
+  • products[0].id
+  • products[0].is_purchase
+  • products[0].is_sell
+  • products[0].name
+  • products[0].qty
+  • products[0].unit
+
+📄 SAMPLE LIST OBJECT:
+----------------------------------------------------------------------------------------------------
+{
+  "ref_number": "PI/26/JAN/01174",
+  "contact_id": 279,
+  "trans_date": "2026-01-21",
+  "due_date": "2026-02-20",
+  "status_id": 1,
+  "due": 4225936.5,
+  "amount_after_tax": 4225936.5,
+  "id": 13362,
+  "additional_discount_amount": 0,
+  "currency_rate": 1,
+  "currency_id": 0,
+  "shipping_cost": 0,
+  "shipping_date": null,
+  "payment_date": null,
+  "paid_date": null,
+  "trans_type_id": 3,
+  "related_id": null,
+  "related_type": null,
+  "contact": {
+    "id": 279,
+    "name": "Dani Prasetyo",
+    "email": null,
+    "phone": "08568561407",
+    "company": "PT. KANSAI PRAKARSA COATINGS",
+    "address": "SAHID SUDIRMAN CENTER LANTAI 45 SUITE EF, JL. JEND. SUDIRMAN NO. 86, KARET TENGSIN, TANAH ABANG, RT.10/RW.11, KARET TENGSIN, TANAH ABANG, SOUTH JAKARTA CITY, JAKARTA 10220",
+    "country_id": 1,
+    "province_id": null,
+    "city_id": null,
+    "district_id": null,
+    "village_id": null,
+    "group_id": null,
+    "salutation_id": 3,
+    "ref_number": null,
+    "npwp": null,
+    "opening_h...
+
+📄 SAMPLE DETAIL OBJECT:
+----------------------------------------------------------------------------------------------------
+{
+  "id": 13362,
+  "business_tran_id": 13037,
+  "trans_type_id": 3,
+  "trans_date": "2026-01-21",
+  "due_date": "2026-02-20",
+  "contact_id": 279,
+  "status_id": 1,
+  "ref_number": "PI/26/JAN/01174",
+  "amount": 3807150,
+  "amount_after_tax": 4225936.5,
+  "due": 4225936.5,
+  "bank_statement_id": null,
+  "bank_account_id": null,
+  "balance": null,
+  "position": null,
+  "pay_later": false,
+  "pay_from_finance_account_id": null,
+  "payment_id": null,
+  "include_tax": false,
+  "term_id": 1,
+  "attachment": [],
+  "memo": "Hanjin Hydrant Work - 2B6 - 260001030",
+  "desc": "",
+  "tax": {
+    "1": 418786.5
+  },
+  "warehouse_id": 1,
+  "discount_percent": 0,
+  "discount_amount": 0,
+  "additional_discount_percent": 0,
+  "additional_discount_amount": 0,
+  "total_tax": 418786.5,
+  "subtotal": 3807150,
+  "shipping_cost": 0,
+  "shipping_date": null,
+  "shipping_comp_id": null,
+  "shipping_tracking": null,
+  "sub_business_tran_id": null,
+  "delivery_ids": null,
+  "witholding_percent": 0,
+  "witholding...
+
+====================================================================================================
+TESTING: Products
+Category: products
+====================================================================================================
+
+📋 Testing LIST endpoint: products.list
+✓ Got list item (ID: 213)
+
+📄 Testing DETAIL endpoint: products.detail (ID: 213)
+✓ Got detail item
+
+====================================================================================================
+FIELD COMPARISON RESULTS
+====================================================================================================
+
+📊 STATISTICS:
+  • Fields in LIST:   18
+  • Fields in DETAIL: 79
+  • In both:          17
+  • Only in DETAIL:   62
+  • Only in LIST:     1
+
+⭐ FIELDS ONLY IN DETAIL (missing from LIST): 62
+----------------------------------------------------------------------------------------------------
+  • buffer_qty                                = 0
+  • bundle_accounts                           (array with 0 items)
+  • bundle_items                              (array with 0 items)
+  • bundles                                   (array with 0 items)
+  • custom_buffer_qty                         = 0
+  • description                               = null
+  • formatted                                 = 'Jasa/Alat Bantu - Bongkar/Pasang Scaffolding/SKU/C'
+  • height                                    = null
+  • is_active                                 = True
+  • is_deletable                              = False
+  • is_not_purchase_allowed                   = True
+  • is_not_sale_allowed                       = False
+  • is_pos                                    = 02026-01-22 16:02:15.922 | DEBUG    | src.kledo_client:_request:158 - Cached response for /finance/orders
+2026-01-22 16:02:17.444 | DEBUG    | src.kledo_client:_request:158 - Cached response for /finance/orders/13339
+
+  • is_purchase                               = False
+  • is_sell                                   = True
+  • is_serial_editable                        = False
+  • length                                    = null
+  • local_id                                  = '822a4117-a83f-4192-be97-8980e20e6adc'
+  • manage_expiry                             = null
+  • manufactures                              (array with 0 items)
+  • next                                      = 212
+  • photo                                     = null
+  • photos                                    (array with 0 items)
+  • prev                                      = 214
+  • product_category                          (object with 5 keys)
+  • product_category.id                       = 9
+  • product_category.is_active                = True
+  • product_category.local_id                 = 'e548fca8-b45c-485b-8ef9-dc0b08a65464'
+  • product_category.name                     = 'Jasa'
+  • product_category.pos_id                   = null
+  • product_units                             (array with 0 items)
+  • product_val                               = '0.0000000'
+  • purchase_account                          (object with 8 keys)
+  • purchase_account.currency_id              = null
+  • purchase_account.id                       = 131
+  • purchase_account.is_parent                = 0
+  • purchase_account.name                     = 'Beban Pokok Pendapatan'
+  • purchase_account.name_en                  = 'Cost of Sales'
+  • purchase_account.name_id                  = 'Beban Pokok Pendapatan'
+  • purchase_account.parent_id                = null
+  • purchase_account.ref_code                 = '5-50000'
+  • purchase_account_id                       = 131
+  • purchase_tax_id                           = null
+  • sell_account                              (object with 8 keys)
+  • sell_account.currency_id                  = null
+  • sell_account.id                           = 121
+  • sell_account.is_parent                    = 0
+  • sell_account.name                         = 'Pendapatan'
+  • sell_account.name_en                      = 'Revenues'
+  • sell_account.name_id                      = 'Pendapatan'
+  • sell_account.parent_id                    = null
+  • sell_account.ref_code                     = '4-40000'
+  • sell_account_id                           = 121
+  • sell_account_update_future_allowed        = True
+  • sell_account_update_past_allowed          = True
+  • sell_tax_id                               = null
+  • track_account                             = null
+  • track_account_id                          = null
+  • track_start_date                          = null
+  • weight_in_gram                            = 0
+  • wholesale_price                           (array with 0 items)
+  • width                                     = null
+
+📋 FIELDS ONLY IN LIST (missing from DETAIL): 1
+----------------------------------------------------------------------------------------------------
+  • warehouse_qty
+
+📄 SAMPLE LIST OBJECT:
+----------------------------------------------------------------------------------------------------
+{
+  "id": 213,
+  "name": "Alat Bantu - Bongkar/Pasang Scaffolding",
+  "code": "SKU/CD/00208",
+  "base_price": 0,
+  "price": 85000000,
+  "qty": 0,
+  "is_track": false,
+  "unit_id": 10,
+  "bundle_type_id": 0,
+  "variant_type_id": 0,
+  "sn_type": null,
+  "pos_product_category_id": 9,
+  "avg_base_price": 0,
+  "is_archive": 0,
+  "unit": {
+    "id": 10,
+    "name": "LS"
+  },
+  "warehouse_qty": []
+}...
+
+📄 SAMPLE DETAIL OBJECT:
+----------------------------------------------------------------------------------------------------
+{
+  "id": 213,
+  "pos_product_category_id": 9,
+  "name": "Alat Bantu - Bongkar/Pasang Scaffolding",
+  "code": "SKU/CD/00208",
+  "description": null,
+  "photo": null,
+  "is_active": true,
+  "is_pos": 0,
+  "is_purchase": false,
+  "price": 85000000,
+  "purchase_account_id": 131,
+  "purchase_tax_id": null,
+  "is_sell": true,
+  "sell_account_id": 121,
+  "base_price": 0,
+  "sell_tax_id": null,
+  "is_track": false,
+  "track_account_id": null,
+  "qty": 0,
+  "avg_base_price": 0,
+  "product_val": "0.0000000",
+  "unit_id": 10,
+  "bundle_type_id": 0,
+  "is_archive": 0,
+  "wholesale_price": [],
+  "custom_buffer_qty": 0,
+  "buffer_qty": 0,
+  "local_id": "822a4117-a83f-4192-be97-8980e20e6adc",
+  "sn_type": null,
+  "manage_expiry": null,
+  "track_start_date": null,
+  "weight_in_gram": 0,
+  "length": null,
+  "width": null,
+  "height": null,
+  "variant_type_id": 0,
+  "is_deletable": false,
+  "is_not_sale_allowed": false,
+  "is_not_purchase_allowed": true,
+  "is_serial_editable": false,
+  "sell_account_u...
+
+====================================================================================================
+TESTING: Sales Orders
+Category: orders
+====================================================================================================
+
+📋 Testing LIST endpoint: orders.list
+✓ Got list item (ID: 13339)
+
+📄 Testing DETAIL endpoint: orders.detail (ID: 13339)
+✓ Got detail item
+
+====================================================================================================
+FIELD COMPARISON RESULTS
+====================================================================================================
+
+📊 STATISTICS:
+  • Fields in LIST:   51
+  • Fields in DETAIL: 304
+  • In both:          43
+  • Only in DETAIL:   261
+  • Only in LIST:     8
+
+⭐ FIELDS ONLY IN DETAIL (missing from LIST): 261
+----------------------------------------------------------------------------------------------------
+  • additional_discount_percent               = 0
+  • amount_after_tax_ori                      = null
+  • amount_ori                                = null
+  • approval_level                            = 1
+  • approval_log                              (array with 2 items)
+  • approval_log[0].created_at                = '2026-01-20 10:40:25'
+  • approval_log[0].event_type                = 'TRAN_APPROVED'
+  • approval_log[0].event_type_id             = 3
+  • approval_log[0].extra                     = '{"level":1}'
+  • approval_log[0].id                        = 3668
+  • approval_log[0].raw_params                = '{"status_id":5}'
+  • approval_log[0].remote_addr               = '103.136.58.50'
+  • approval_log[0].tran_id                   = 13339
+  • approval_log[0].trans_type_id             = 6
+  • approval_log[0].updated_at                = '2026-01-20 10:40:25'
+  • approval_log[0].user                      (object with 13 keys)
+  • approval_log[0].user.apple_id             = null
+  • approval_log[0].user.email                = 'elmo@cepatservicestation.com'
+  • approval_log[0].user.id                   = 352181
+  • approval_log[0].user.is_2fa_active        = 0
+  • approval_log[0].user.is_active            = True
+  • approval_log[0].user.is_show_news         = 1
+  • approval_log[0].user.lang                 = null
+  • approval_log[0].user.local_id             = '41be39c4-b96a-4d6e-9016-2adb842c934f'
+  • approval_log[0].user.max_receivable       = null
+  • approval_log[0].user.name                 = 'Elmo Abu Abdillah'
+  • approval_log[0].user.phone_number         = '81282002422'
+  • approval_log[0].user.roles                (array with 2 items)
+  • approval_log[0].user.roles[0].created_at  = '2023-09-06T14:20:15.000000Z'
+  • approval_log[0].user.roles[0].guard_name  = 'web'
+  • approval_log[0].user.roles[0].id          = 1
+  • approval_log[0].user.roles[0].name        = 'Administrator'
+  • approval_log[0].user.roles[0].pivot       (object with 3 keys)
+  • approval_log[0].user.roles[0].pivot.model_id  = 352181
+  • approval_log[0].user.roles[0].pivot.model_type  = 'App\\User'
+  • approval_log[0].user.roles[0].pivot.role_id  = 1
+  • approval_log[0].user.roles[0].position    = 1
+  • approval_log[0].user.roles[0].superuser   = 1
+  • approval_log[0].user.roles[0].updated_at  = '2023-09-06T14:20:16.000000Z'
+  • approval_log[0].user.token_website_id     = 0
+  • approval_log[0].user_id                   = 352181
+  • approval_progress                         (array with 1 items)
+  • approval_progress[0].level                = 1
+  • approval_progress[0].role_on_level        (array with 1 items)
+  • approval_progress[0].role_on_level[0].id  = 4
+  • approval_progress[0].role_on_level[0].name  = 'Direktur Operasional'
+  • approval_progress[0].status               = 'Disetujui'
+  • approval_progress[0].status_by            (object with 3 keys)
+  • approval_progress[0].status_by.at         = '2026-01-20 10:40:25'
+  • approval_progress[0].status_by.event_type_id  = 3
+  • approval_progress[0].status_by.user       (object with 13 keys)
+  • approval_progress[0].status_by.user.apple_id  = null
+  • approval_progress[0].status_by.user.email  = 'elmo@cepatservicestation.com'
+  • approval_progress[0].status_by.user.id    = 352181
+  • approval_progress[0].status_by.user.is_2fa_active  = 0
+  • approval_progress[0].status_by.user.is_active  = True
+  • approval_progress[0].status_by.user.is_show_news  = 1
+  • approval_progress[0].status_by.user.lang  = null
+  • approval_progress[0].status_by.user.local_id  = '41be39c4-b96a-4d6e-9016-2adb842c934f'
+  • approval_progress[0].status_by.user.max_receivable  = null
+  • approval_progress[0].status_by.user.name  = 'Elmo Abu Abdillah'
+  • approval_progress[0].status_by.user.phone_number  = '81282002422'
+  • approval_progress[0].status_by.user.roles  (array with 2 items)
+  • approval_progress[0].status_by.user.roles[0].created_at  = '2023-09-06T14:20:15.000000Z'
+  • approval_progress[0].status_by.user.roles[0].guard_name  = 'web'
+  • approval_progress[0].status_by.user.roles[0].id  = 1
+  • approval_progress[0].status_by.user.roles[0].name  = 'Administrator'
+  • approval_progress[0].status_by.user.roles[0].pivot  (object with 3 keys)
+  • approval_progress[0].status_by.user.roles[0].pivot.model_id  = 352181
+  • approval_progress[0].status_by.user.roles[0].pivot.model_type  = 'App\\User'
+  • approval_progress[0].status_by.user.roles[0].pivot.role_id  = 1
+  • approval_progress[0].status_by.user.roles[0].position  = 1
+  • approval_progress[0].status_by.user.roles[0].superuser  = 1
+  • approval_progress[0].status_by.user.roles[0].updated_at  = '2023-09-06T14:20:16.000000Z'
+  • approval_progress[0].status_by.user.token_website_id  = 0
+  • approval_progress[0].status_id            = 3
+  • approval_roles_on_level                   (array with 1 items)
+  • approval_status                           (object with 6 keys)
+  • approval_status.id                        = 1659
+  • approval_status.is_complete               = 1
+  • approval_status.is_rejected               = 0
+  • approval_status.level                     = 1
+  • approval_status.tran_id                   = 13339
+  • approval_status.trans_type_id             = 6
+  • balance                                   = null
+  • bank_account_id                           = null
+  • bank_statement_id                         = null
+  • business_tran_id                          = null
+  • contact.bank_accounts                     (array with 0 items)
+  • contact.formatted                         = 'Owner/SAVERO STYLE BOGOR/Dwi Septian Buslihah'
+  • contact.salutation                        = 'Bapak'
+  • contact.shipping_addresses                (array with 0 items)
+  • contact_shipping_address                  = null
+  • contact_shipping_address_id               = null
+  • currency_editable                         = True
+  • currency_source                           = null
+  • currency_source_id                        = 0
+  • custom                                    (object with 4 keys)
+  • custom.custom_column_alamat_kirim         = null
+  • custom.custom_column_customer_p_o         = 'P260120001'
+  • custom.custom_column_tanggal_kirim        = null
+  • custom.id                                 = 4190
+  • delivery_ids                              = null
+  • desc                                      = ''
+  • discount_amount                           = 0
+  • discount_percent                          = 0
+  • due                                       = 1509600
+  • fees                                      (array with 0 items)
+  • have_proforma                             = False
+  • include_tax                               = False
+  • invoice_type_id                           = null
+  • is_approveable                            = False
+  • is_closeable                              = True
+  • is_deletable                              = True
+  • is_editable                               = True
+  • is_revertable                             = False
+  • is_stamped                                = 0
+  • is_uncloseable                            = False
+  • items                                     (array with 1 items)
+  • items[0].additional_discount_amount       = 0
+  • items[0].amount                           = 1360000
+  • items[0].amount_after_tax                 = 1509600
+  • items[0].amount_after_tax_ori             = null
+  • items[0].amount_ori                       = null
+  • items[0].currency_id                      = 0
+  • items[0].currency_rate                    = 1
+  • items[0].custom                           = null
+  • items[0].desc                             = 'Kemasan 25 Kg\nLight Gray SVR'
+  • items[0].discount_amount                  = 0
+  • items[0].discount_amount_input            = '0.00000'
+  • items[0].discount_percent                 = 0
+  • items[0].finance_account_id               = 15
+  • items[0].height                           = null
+  • items[0].id                               = 22590
+  • items[0].item_tax                         (object with 11 keys)
+  • items[0].item_tax.buy_account_id          = 47
+  • items[0].item_tax.group_items             = null
+  • items[0].item_tax.id                      = 1
+  • items[0].item_tax.is_active               = True
+  • items[0].item_tax.is_allow_manual         = 0
+  • items[0].item_tax.is_group                = 0
+  • items[0].item_tax.is_witholding           = 0
+  • items[0].item_tax.local_id                = 'bc456452-547e-4252-ac90-999562e7ce3a'
+  • items[0].item_tax.name                    = 'PPN'
+  • items[0].item_tax.percent                 = 11
+  • items[0].item_tax.sell_account_id         = 910
+  • items[0].length                           = null
+  • items[0].local_id                         = null
+  • items[0].price                            = 680000
+  • items[0].price_after_tax                  = 754800
+  • items[0].product                          (object with 23 keys)
+  • items[0].product.avg_base_price           = 522500
+  • items[0].product.base_price               = 522500
+  • items[0].product.bundle_type_id           = 0
+  • items[0].product.code                     = 'SKU/CD/00015'
+  • items[0].product.formatted                = 'Material/NIPPON VINILEX (PASTEL)/SKU/CD/00015'
+  • items[0].product.id                       = 15
+  • items[0].product.is_purchase              = True
+  • items[0].product.is_sell                  = True
+  • items[0].product.is_track                 = True
+  • items[0].product.last_buy_price           = 522500
+  • items[0].product.last_sell_price          = 630000
+  • items[0].product.last_sell_price_contact  = 680000
+  • items[0].product.manage_expiry            = null
+  • items[0].product.name                     = 'NIPPON VINILEX (PASTEL)'
+  • items[0].product.pos_product_category_id  = 2
+  • items[0].product.price                    = 630000
+  • items[0].product.product_units            (array with 0 items)
+  • items[0].product.purchase_account_id      = 131
+  • items[0].product.sell_account_id          = 121
+  • items[0].product.sn_type                  = null
+  • items[0].product.track_start_date         = null
+  • items[0].product.unit_id                  = 2
+  • items[0].product.wholesale_price          (array with 0 items)
+  • items[0].qty                              = 2
+  • items[0].subtotal                         = 13600002026-01-22 16:02:19.724 | DEBUG    | src.kledo_client:_request:158 - Cached response for /finance/purchaseOrders
+
+  • items[0].tax                              = 149600
+  • items[0].tax_id                           = 1
+  • items[0].taxable                          = 1360000
+  • items[0].total_volume                     = null
+  • items[0].total_weight_in_gram             = null
+  • items[0].tran_id                          = 13339
+  • items[0].trans_type_id                    = 6
+  • items[0].unit_conv                        = 1
+  • items[0].unit_id                          = 2
+  • items[0].weight_in_gram                   = 0
+  • items[0].width                            = null
+  • local_id                                  = null
+  • log                                       (object with 2 keys)
+  • log.action                                (object with 10 keys)
+  • log.action.action_type_id                 = 2
+  • log.action.changes                        = '{"memo":{"before":"Maintenance Hotel Savero - 8","'
+  • log.action.created_at                     = '2026-01-22 13:36'
+  • log.action.extra                          = '{"number":"SO\\/26\\/JAN\\/00837","amount":1509600,"i'
+  • log.action.id                             = 38440
+  • log.action.remote_addr                    = '182.3.45.43'
+  • log.action.tran_id                        = 13339
+  • log.action.trans_type_id                  = 6
+  • log.action.user                           (object with 7 keys)
+  • log.action.user.email                     = 'mekanour@cepatservicestation.com'
+  • log.action.user.id                        = 218933
+  • log.action.user.is_active                 = 1
+  • log.action.user.local_id                  = 'ead6d706-80aa-48af-a973-e3998fba6e0d'
+  • log.action.user.name                      = 'Meka GN'
+  • log.action.user.phone_number              = '081312133234'
+  • log.action.user.token_website_id          = 0
+  • log.action.user_id                        = 218933
+  • log.print                                 = null
+  • message                                   (object with 1 keys)
+  • message.message                           = '<p><span style="font-size:14px;"><strong>PT. CEPAT'
+  • next                                      = 13289
+  • outlet_id                                 = null
+  • owner_id                                  = 218933
+  • parent_tran                               = null
+  • pay_from_finance_account_id               = null
+  • pay_later                                 = False
+  • payment_connect                           = null
+  • payment_id                                = null
+  • payment_type_id                           = null
+  • pos_shift_id                              = null
+  • position                                  = null
+  • prev                                      = null
+  • print_tax_url                             = null
+  • print_url                                 = 'eyJpdiI6IjhzY2ZPSTh2SU4rNHBTN2xRRjhMN2c9PSIsInZhbH'
+  • print_url_approval                        = 'eyJpdiI6ImVDRjgreTNhNiszQWFiZHgyT1BmeWc9PSIsInZhbH'
+  • print_url_word                            = 'eyJpdiI6ImZwZkdOSkE0ZDV2V09KZStvellkcHc9PSIsInZhbH'
+  • quote                                     = null
+  • reason                                    = null
+  • relations                                 (array with 0 items)
+  • sales                                     (object with 3 keys)
+  • sales.email                               = 'elmo@cepatservicestation.com'
+  • sales.id                                  = 352181
+  • sales.name                                = 'Elmo Abu Abdillah'
+  • sales_id                                  = 352181
+  • shipping_comp_id                          = null
+  • shipping_tracking                         = null
+  • source                                    = 0
+  • source_id                                 = null
+  • stamp_serial_number                       = null
+  • sub_business_tran_id                      = null
+  • subtotal                                  = 1360000
+  • tags                                      (array with 1 items)
+  • tags[0].color                             = '#000000'
+  • tags[0].id                                = 1
+  • tags[0].is_archive                        = 0
+  • tags[0].local_id                          = 'f7e9b7e8-0740-4903-9594-75a8c9ce60f6'
+  • tags[0].name                              = 'Penjualan Material'
+  • tags[0].owner_id                          = 145707
+  • tax                                       (object with 1 keys)
+  • tax.1                                     = 149600
+  • taxes                                     (object with 1 keys)
+  • taxes.PPN                                 (object with 2 keys)
+  • taxes.PPN.percent                         = 11
+  • taxes.PPN.value                           = 149600
+  • term_id                                   = 1
+  • total_tax                                 = 149600
+  • transactions                              (array with 0 items)
+  • warehouse_id                              = 1
+  • witholding_account_id                     = null
+  • witholding_amount                         = 0
+  • witholding_percent                        = 0
+
+📋 FIELDS ONLY IN LIST (missing from DETAIL): 8
+----------------------------------------------------------------------------------------------------
+  • dp
+  • products
+  • products[0].id
+  • products[0].is_purchase
+  • products[0].is_sell
+  • products[0].name
+  • products[0].qty
+  • products[0].unit
+
+📄 SAMPLE LIST OBJECT:
+----------------------------------------------------------------------------------------------------
+{
+  "ref_number": "SO/26/JAN/00837",
+  "memo": "Maintenance Hotel Savero - 9 - C7C",
+  "contact_id": 37,
+  "trans_date": "2026-01-20",
+  "due_date": "2026-02-19",
+  "status_id": 5,
+  "amount_after_tax": 1509600,
+  "id": 13339,
+  "additional_discount_amount": 0,
+  "currency_rate": 1,
+  "currency_id": 0,
+  "shipping_cost": 0,
+  "shipping_date": null,
+  "payment_date": null,
+  "paid_date": null,
+  "trans_type_id": 6,
+  "related_id": null,
+  "related_type": null,
+  "attachment": [
+    "https://kledo-live-user.s3.ap-southeast-1.amazonaws.com/ptcepatservicestation.api.kledo.com/finance/order/attachment/temp/260120/102719/po%20cust.jpeg"
+  ],
+  "contact": {
+    "id": 37,
+    "name": "Dwi Septian Buslihah",
+    "email": null,
+    "phone": null,
+    "company": "SAVERO STYLE BOGOR",
+    "address": "JL. RAYA PAJAJARAN NO.27,BABAKAN, KECAMATAN BOGOR TENGAH, KOTA BOGOR, JAWA BARAT 16128, Bogor, Jawa Barat",
+    "country_id": 1,
+    "province_id": 9,
+    "city_id": 82,
+    "district_id": null,
+    "...
+
+📄 SAMPLE DETAIL OBJECT:
+----------------------------------------------------------------------------------------------------
+{
+  "id": 13339,
+  "business_tran_id": null,
+  "trans_type_id": 6,
+  "trans_date": "2026-01-20",
+  "due_date": "2026-02-19",
+  "contact_id": 37,
+  "status_id": 5,
+  "ref_number": "SO/26/JAN/00837",
+  "amount": 1360000,
+  "amount_after_tax": 1509600,
+  "due": 1509600,
+  "bank_statement_id": null,
+  "bank_account_id": null,
+  "balance": null,
+  "position": null,
+  "pay_later": false,
+  "pay_from_finance_account_id": null,
+  "payment_id": null,
+  "include_tax": false,
+  "term_id": 1,
+  "attachment": [
+    "https://kledo-live-user.s3.ap-southeast-1.amazonaws.com/ptcepatservicestation.api.kledo.com/finance/order/attachment/temp/260120/102719/po%20cust.jpeg"
+  ],
+  "memo": "Maintenance Hotel Savero - 9 - C7C",
+  "desc": "",
+  "tax": {
+    "1": 149600
+  },
+  "warehouse_id": 1,
+  "discount_percent": 0,
+  "discount_amount": 0,
+  "additional_discount_percent": 0,
+  "additional_discount_amount": 0,
+  "total_tax": 149600,
+  "subtotal": 1360000,
+  "shipping_cost": 0,
+  "shipping_date": null,
+  "shi...
+
+====================================================================================================
+TESTING: Purchase Orders
+Category: purchase_orders
+====================================================================================================
+
+📋 Testing LIST endpoint: purchase_orders.list
+✓ Got list item (ID: 13340)
+2026-01-22 16:02:21.114 | DEBUG    | src.kledo_client:_request:158 - Cached response for /finance/purchaseOrders/13340
+
+📄 Testing DETAIL endpoint: purchase_orders.detail (ID: 13340)
+✓ Got detail item
+
+====================================================================================================
+FIELD COMPARISON RESULTS
+====================================================================================================
+
+📊 STATISTICS:
+  • Fields in LIST:   49
+  • Fields in DETAIL: 308
+  • In both:          42
+  • Only in DETAIL:   266
+  • Only in LIST:     7
+
+⭐ FIELDS ONLY IN DETAIL (missing from LIST): 266
+----------------------------------------------------------------------------------------------------
+  • additional_discount_percent               = 0
+  • amount_after_tax_ori                      = null
+  • amount_ori                                = null
+  • approval_level                            = 1
+  • approval_log                              (array with 2 items)
+  • approval_log[0].created_at                = '2026-01-20 10:40:19'
+  • approval_log[0].event_type                = 'TRAN_APPROVED'
+  • approval_log[0].event_type_id             = 3
+  • approval_log[0].extra                     = '{"level":1}'
+  • approval_log[0].id                        = 3667
+  • approval_log[0].raw_params                = '{"status_id":13}'
+  • approval_log[0].remote_addr               = '103.136.58.50'
+  • approval_log[0].tran_id                   = 13340
+  • approval_log[0].trans_type_id             = 2
+  • approval_log[0].updated_at                = '2026-01-20 10:40:19'
+  • approval_log[0].user                      (object with 13 keys)
+  • approval_log[0].user.apple_id             = null
+  • approval_log[0].user.email                = 'elmo@cepatservicestation.com'
+  • approval_log[0].user.id                   = 352181
+  • approval_log[0].user.is_2fa_active        = 0
+  • approval_log[0].user.is_active            = True
+  • approval_log[0].user.is_show_news         = 1
+  • approval_log[0].user.lang                 = null
+  • approval_log[0].user.local_id             = '41be39c4-b96a-4d6e-9016-2adb842c934f'
+  • approval_log[0].user.max_receivable       = null
+  • approval_log[0].user.name                 = 'Elmo Abu Abdillah'
+  • approval_log[0].user.phone_number         = '81282002422'
+  • approval_log[0].user.roles                (array with 2 items)
+  • approval_log[0].user.roles[0].created_at  = '2023-09-06T14:20:15.000000Z'
+  • approval_log[0].user.roles[0].guard_name  = 'web'
+  • approval_log[0].user.roles[0].id          = 1
+  • approval_log[0].user.roles[0].name        = 'Administrator'
+  • approval_log[0].user.roles[0].pivot       (object with 3 keys)
+  • approval_log[0].user.roles[0].pivot.model_id  = 352181
+  • approval_log[0].user.roles[0].pivot.model_type  = 'App\\User'
+  • approval_log[0].user.roles[0].pivot.role_id  = 1
+  • approval_log[0].user.roles[0].position    = 1
+  • approval_log[0].user.roles[0].superuser   = 1
+  • approval_log[0].user.roles[0].updated_at  = '2023-09-06T14:20:16.000000Z'
+  • approval_log[0].user.token_website_id     = 0
+  • approval_log[0].user_id                   = 352181
+  • approval_progress                         (array with 1 items)
+  • approval_progress[0].level                = 1
+  • approval_progress[0].role_on_level        (array with 1 items)
+  • approval_progress[0].role_on_level[0].id  = 4
+  • approval_progress[0].role_on_level[0].name  = 'Direktur Operasional'
+  • approval_progress[0].status               = 'Disetujui'
+  • approval_progress[0].status_by            (object with 3 keys)
+  • approval_progress[0].status_by.at         = '2026-01-20 10:40:19'
+  • approval_progress[0].status_by.event_type_id  = 3
+  • approval_progress[0].status_by.user       (object with 13 keys)
+  • approval_progress[0].status_by.user.apple_id  = null
+  • approval_progress[0].status_by.user.email  = 'elmo@cepatservicestation.com'
+  • approval_progress[0].status_by.user.id    = 352181
+  • approval_progress[0].status_by.user.is_2fa_active  = 0
+  • approval_progress[0].status_by.user.is_active  = True
+  • approval_progress[0].status_by.user.is_show_news  = 1
+  • approval_progress[0].status_by.user.lang  = null
+  • approval_progress[0].status_by.user.local_id  = '41be39c4-b96a-4d6e-9016-2adb842c934f'
+  • approval_progress[0].status_by.user.max_receivable  = null
+  • approval_progress[0].status_by.user.name  = 'Elmo Abu Abdillah'
+  • approval_progress[0].status_by.user.phone_number  = '81282002422'
+  • approval_progress[0].status_by.user.roles  (array with 2 items)
+  • approval_progress[0].status_by.user.roles[0].created_at  = '2023-09-06T14:20:15.000000Z'
+  • approval_progress[0].status_by.user.roles[0].guard_name  = 'web'
+  • approval_progress[0].status_by.user.roles[0].id  = 1
+  • approval_progress[0].status_by.user.roles[0].name  = 'Administrator'
+  • approval_progress[0].status_by.user.roles[0].pivot  (object with 3 keys)
+  • approval_progress[0].status_by.user.roles[0].pivot.model_id  = 352181
+  • approval_progress[0].status_by.user.roles[0].pivot.model_type  = 'App\\User'
+  • approval_progress[0].status_by.user.roles[0].pivot.role_id  = 1
+  • approval_progress[0].status_by.user.roles[0].position  = 1
+  • approval_progress[0].status_by.user.roles[0].superuser  = 1
+  • approval_progress[0].status_by.user.roles[0].updated_at  = '2023-09-06T14:20:16.000000Z'
+  • approval_progress[0].status_by.user.token_website_id  = 0
+  • approval_progress[0].status_id            = 3
+  • approval_roles_on_level                   (array with 1 items)
+  • approval_status                           (object with 6 keys)
+  • approval_status.id                        = 1660
+  • approval_status.is_complete               = 1
+  • approval_status.is_rejected               = 0
+  • approval_status.level                     = 1
+  • approval_status.tran_id                   = 13340
+  • approval_status.trans_type_id             = 2
+  • attachment                                (array with 0 items)
+  • attachment_details                        (array with 0 items)
+  • balance                                   = null
+  • bank_account_id                           = null
+  • bank_statement_id                         = null
+  • business_tran_id                          = null
+  • contact.bank_accounts                     (array with 0 items)
+  • contact.formatted                         = 'Suplier/PT. NIPSEA PAINT AND CHEMICALS/Vania'
+  • contact.salutation                        = 'Ibu'
+  • contact_shipping_address_id               = null
+  • currency_editable                         = True
+  • currency_source                           = null
+  • currency_source_id                        = 0
+  • custom                                    (object with 4 keys)
+  • custom.custom_column_alamat_kirim         = 'Savero Style Hotle Bogor | Jalan Raya Pajajaran No'
+  • custom.custom_column_customer_p_o         = null
+  • custom.custom_column_tanggal_kirim        = '2026-01-21'
+  • custom.id                                 = 4191
+  • delivery_ids                              = null
+  • desc                                      = ''
+  • discount_amount                           = 0
+  • discount_percent                          = 0
+  • due                                       = 1221000
+  • fees                                      (array with 0 items)
+  • include_tax                               = False
+  • invoice_type_id                           = null
+  • is_approveable                            = False
+  • is_deletable                              = True
+  • is_editable                               = True
+  • is_revertable                             = False
+  • is_stamped                                = 0
+  • items                                     (array with 1 items)
+  • items[0].additional_discount_amount       = 0
+  • items[0].amount                           = 1100000
+  • items[0].amount_after_tax                 = 1221000
+  • items[0].amount_after_tax_ori             = null
+  • items[0].amount_ori                       = null
+  • items[0].currency_id                      = 0
+  • items[0].currency_rate                    = 1
+  • items[0].custom                           = null
+  • items[0].desc                             = 'Kemasan 25 Kg\nCC Light Gray SVR\nTinting Base Proje'
+  • items[0].discount_amount                  = 0
+  • items[0].discount_amount_input            = '0.00000'
+  • items[0].discount_percent                 = 0
+  • items[0].finance_account_id               = 15
+  • items[0].height                           = null
+  • items[0].id                               = 22591
+  • items[0].item_tax                         (object with 11 keys)
+  • items[0].item_tax.buy_account_id          = 47
+  • items[0].item_tax.group_items             = null
+  • items[0].item_tax.id                      = 1
+  • items[0].item_tax.is_active               = True
+  • items[0].item_tax.is_allow_manual         = 0
+  • items[0].item_tax.is_group                = 0
+  • items[0].item_tax.is_witholding           = 0
+  • items[0].item_tax.local_id                = 'bc456452-547e-4252-ac90-999562e7ce3a'
+  • items[0].item_tax.name                    = 'PPN'
+  • items[0].item_tax.percent                 = 11
+  • items[0].item_tax.sell_account_id         = 910
+  • items[0].length                           = null
+  • items[0].local_id                         = null
+  • items[0].price                            = 550000
+  • items[0].price_after_tax                  = 610500
+  • items[0].product                          (object with 20 keys)
+  • items[0].product.avg_base_price           = 522500
+  • items[0].product.base_price               = 522500
+  • items[0].product.bundle_type_id           = 0
+  • items[0].product.code                     = 'SKU/CD/00015'
+  • items[0].product.formatted                = 'Material/NIPPON VINILEX (PASTEL)/SKU/CD/00015'
+  • items[0].product.id                       = 15
+  • items[0].product.is_purchase              = True
+  • items[0].product.is_sell                  = True
+  • items[0].product.is_track                 = True
+  • items[0].product.manage_expiry            = null
+  • items[0].product.name                     = 'NIPPON VINILEX (PASTEL)'
+  • items[0].product.pos_product_category_id  = 2
+  • items[0].product.price                    = 630000
+  • items[0].product.product_units            (array with 0 items)
+  • items[0].product.purchase_account_id      = 131
+  • items[0].product.sell_account_id          = 121
+  • items[0].product.sn_type                  = null
+  • items[0].product.track_start_date         = null
+  • items[0].product.unit_id                  = 2
+  • items[0].product.wholesale_price          (array with 0 items)
+  • items[0].qty                              = 2
+  • items[0].subtotal                         = 1100000
+  • items[0].tax                              = 121000
+  • items[0].tax_id                           = 1
+  • items[0].taxable                          = 1100000
+  • items[0].total_volume                     = null
+  • items[0].total_weight_in_gram             = null
+  • items[0].tran_id                          = 13340
+  • items[0].trans_type_id                    = 2
+  • items[0].unit_conv                        = 1
+  • items[0].unit_id                          = 2
+  • items[0].weight_in_gram                   = 0
+  • items[0].width                            = null
+  • local_id                                  = null
+  • log                                       (object with 2 keys)
+  • log.action                                (object with 10 keys)
+  • log.action.action_type_id                 = 2
+  • log.action.changes                        = '{"amount":{"before":1650000,"after":1100000},"amou'
+  • log.action.created_at                     = '2026-01-20 10:50'
+  • log.action.extra                          = '{"number":"PO\\/26\\/JAN\\/00912","amount":1221000,"i'
+  • log.action.id                             = 38329
+  • log.action.remote_addr                    = '182.3.45.99'
+  • log.action.tran_id                        = 13340
+  • log.action.trans_type_id                  = 2
+  • log.action.user                           (object with 7 keys)
+  • log.action.user.email                     = 'mekanour@cepatservicestation.com'
+  • log.action.user.id                        = 218933
+  • log.action.user.is_active                 = 1
+  • log.action.user.local_id                  = 'ead6d706-80aa-48af-a973-e3998fba6e0d'
+  • log.action.user.name                      = 'Meka GN'
+  • log.action.user.phone_number              = '081312133234'
+  • log.action.user.token_website_id          = 0
+  • log.action.user_id                        = 218933
+  • log.print                                 (object with 10 keys)
+  • log.print.action_type_id                  = 24
+  • log.print.changes                         = null
+  • log.print.created_at                      = '2026-01-20 11:44'
+  • log.print.extra                           = '{"type":"Pesanan Pembelian","number":"PO\\/26\\/JAN\\'
+  • log.print.id                              = 38330
+  • log.print.remote_addr                     = '182.3.45.99'
+  • log.print.tran_id                         = 13340
+  • log.print.trans_type_id                   = 2
+  • log.print.user                            (object with 7 keys)
+  • log.print.user.email                      = 'mekanour@cepatservicestation.com'
+  • log.print.user.id                         = 218933
+  • log.print.user.is_active                  = 1
+  • log.print.user.local_id                   = 'ead6d706-80aa-48af-a973-e3998fba6e0d'
+  • log.print.user.name                       = 'Meka GN'
+  • log.print.user.phone_number               = '081312133234'
+  • log.print.user.token_website_id           = 0
+  • log.print.user_id                         = 218933
+  • message                                   = null
+  • next                                      = 13290
+  • outlet_id                                 = null
+  • owner_id                                  = 218933
+  • parent_tran                               = null
+  • pay_from_finance_account_id               = null
+  • pay_later                                 = False
+  • payment_id                                = null
+  • payment_type_id                           = null
+  • pos_shift_id                              = null
+  • position                                  = null
+  • prev                                      = null
+  • print_tax_url                             = null
+  • print_url                                 = 'eyJpdiI6ImdLeGRhUnhiUHFEeWg3Mnd0UFE0aHc9PSIsInZhbH'
+  • print_url_approval                        = 'eyJpdiI6Ikh3c2ZHTWJYeGRoMXR4NzJlTklYNGc9PSIsInZhbH'
+  • print_url_word                            = 'eyJpdiI6Ik4xUW1Nd2M1cjUxRldXMzFQY2JJZkE9PSIsInZhbH'
+  • purchase_quote                            = null
+  • reason                                    = null
+  • relations                                 (array with 0 items)
+  • sales_id                                  = null
+  • shipping_comp_id                          = null
+  • shipping_tracking                         = null
+  • source                                    = 0
+  • source_id                                 = null
+  • stamp_serial_number                       = null
+  • sub_business_tran_id                      = null
+  • subtotal                                  = 1100000
+  • tags                                      (array with 1 items)
+  • tags[0].color                             = '#e5ffff'
+  • tags[0].id                                = 18
+  • tags[0].is_archive                        = 0
+  • tags[0].local_id                          = '7e2b79f5-c28b-4bab-af67-150b7f9f62a8'
+  • tags[0].name                              = 'Pembelian Material'
+  • tags[0].owner_id                          = 218933
+  • tax                                       (object with 1 keys)
+  • tax.1                                     = 1210002026-01-22 16:02:23.070 | DEBUG    | src.kledo_client:_request:158 - Cached response for /finance/deliveries
+2026-01-22 16:02:25.072 | DEBUG    | src.kledo_client:_request:158 - Cached response for /finance/deliveries/13352
+
+  • taxes                                     (object with 1 keys)
+  • taxes.PPN                                 (object with 2 keys)
+  • taxes.PPN.percent                         = 11
+  • taxes.PPN.value                           = 121000
+  • term_id                                   = 4
+  • total_tax                                 = 121000
+  • transactions                              (array with 0 items)
+  • warehouse_id                              = 1
+  • witholding_account_id                     = null
+  • witholding_amount                         = 0
+  • witholding_percent                        = 0
+
+📋 FIELDS ONLY IN LIST (missing from DETAIL): 7
+----------------------------------------------------------------------------------------------------
+  • products
+  • products[0].id
+  • products[0].is_purchase
+  • products[0].is_sell
+  • products[0].name
+  • products[0].qty
+  • products[0].unit
+
+📄 SAMPLE LIST OBJECT:
+----------------------------------------------------------------------------------------------------
+{
+  "ref_number": "PO/26/JAN/00912",
+  "memo": "Maintenance Hotel Savero - 9 - C7C",
+  "contact_id": 31,
+  "trans_date": "2026-01-20",
+  "due_date": "2026-03-21",
+  "status_id": 13,
+  "amount_after_tax": 1221000,
+  "id": 13340,
+  "additional_discount_amount": 0,
+  "currency_rate": 1,
+  "currency_id": 0,
+  "shipping_cost": 0,
+  "shipping_date": null,
+  "payment_date": null,
+  "paid_date": null,
+  "trans_type_id": 2,
+  "related_id": null,
+  "related_type": null,
+  "contact": {
+    "id": 31,
+    "name": "Vania",
+    "email": "iu_billing@nipponpaint-indonesia.com",
+    "phone": "0216900546",
+    "company": "PT. NIPSEA PAINT AND CHEMICALS",
+    "address": "JL. ANCOL BARAT I/A5/C NO. 12 ANCOL, PADEMANGAN, Kodya Jakarta Utara, DKI Jakarta",
+    "country_id": 1,
+    "province_id": 6,
+    "city_id": 61,
+    "district_id": null,
+    "village_id": null,
+    "group_id": 3,
+    "salutation_id": 1,
+    "ref_number": null,
+    "npwp": null,
+    "opening_hour": null,
+    "closing_hour": null,
+    "typ...
+
+📄 SAMPLE DETAIL OBJECT:
+----------------------------------------------------------------------------------------------------
+{
+  "id": 13340,
+  "business_tran_id": null,
+  "trans_type_id": 2,
+  "trans_date": "2026-01-20",
+  "due_date": "2026-03-21",
+  "contact_id": 31,
+  "status_id": 13,
+  "ref_number": "PO/26/JAN/00912",
+  "amount": 1100000,
+  "amount_after_tax": 1221000,
+  "due": 1221000,
+  "bank_statement_id": null,
+  "bank_account_id": null,
+  "balance": null,
+  "position": null,
+  "pay_later": false,
+  "pay_from_finance_account_id": null,
+  "payment_id": null,
+  "include_tax": false,
+  "term_id": 4,
+  "attachment": [],
+  "memo": "Maintenance Hotel Savero - 9 - C7C",
+  "desc": "",
+  "tax": {
+    "1": 121000
+  },
+  "warehouse_id": 1,
+  "discount_percent": 0,
+  "discount_amount": 0,
+  "additional_discount_percent": 0,
+  "additional_discount_amount": 0,
+  "total_tax": 121000,
+  "subtotal": 1100000,
+  "shipping_cost": 0,
+  "shipping_date": null,
+  "shipping_comp_id": null,
+  "shipping_tracking": null,
+  "sub_business_tran_id": null,
+  "delivery_ids": null,
+  "witholding_percent": 0,
+  "witholding_amount": 0,...
+
+====================================================================================================
+TESTING: Deliveries
+Category: deliveries
+====================================================================================================
+
+📋 Testing LIST endpoint: deliveries.list
+✓ Got list item (ID: 13352)
+
+📄 Testing DETAIL endpoint: deliveries.detail (ID: 13352)
+✓ Got detail item
+
+====================================================================================================
+FIELD COMPARISON RESULTS
+====================================================================================================
+
+📊 STATISTICS:
+  • Fields in LIST:   46
+  • Fields in DETAIL: 302
+  • In both:          39
+  • Only in DETAIL:   263
+  • Only in LIST:     7
+
+⭐ FIELDS ONLY IN DETAIL (missing from LIST): 263
+----------------------------------------------------------------------------------------------------
+  • additional_discount_percent               = 0
+  • amount                                    = 2520000
+  • amount_after_tax                          = 2797200
+  • amount_after_tax_ori                      = null
+  • amount_ori                                = null
+  • attachment                                (array with 0 items)
+  • attachment_details                        (array with 0 items)
+  • balance                                   = null
+  • bank_account_id                           = null
+  • bank_statement_id                         = null
+  • business_tran_id                          = 13120
+  • contact.bank_accounts                     (array with 0 items)
+  • contact.salutation                        = 'Pak'
+  • contact.shipping_addresses                (array with 0 items)
+  • contact_shipping_address                  = null
+  • contact_shipping_address_id               = null
+  • conversion_serial_numbers                 (array with 0 items)
+  • currency_source                           = null
+  • currency_source_id                        = 0
+  • custom                                    = null
+  • delivery_ids                              = null
+  • desc                                      = ''
+  • discount_amount                           = 0
+  • discount_percent                          = 0
+  • due                                       = 0
+  • due_date                                  = '2026-02-14'
+  • fees                                      (array with 0 items)
+  • include_tax                               = False
+  • invoice_type_id                           = null
+  • is_deletable                              = False
+  • is_editable                               = False
+  • is_recapped                               = False
+  • is_stamped                                = 0
+  • items                                     (array with 1 items)
+  • items[0].additional_discount_amount       = 0
+  • items[0].amount                           = 2520000
+  • items[0].amount_after_tax                 = 2797200
+  • items[0].amount_after_tax_ori             = null
+  • items[0].amount_ori                       = null
+  • items[0].currency_id                      = 0
+  • items[0].currency_rate                    = 1
+  • items[0].custom                           = null
+  • items[0].desc                             = 'Kemasan 20 Liter\nWhite'
+  • items[0].discount_amount                  = 0
+  • items[0].discount_amount_input            = '0.00000'
+  • items[0].discount_percent                 = 0
+  • items[0].finance_account_id               = 207
+  • items[0].height                           = null
+  • items[0].id                               = 22611
+  • items[0].length                           = null
+  • items[0].local_id                         = null
+  • items[0].price                            = 630000
+  • items[0].price_after_tax                  = 699300
+  • items[0].product                          (object with 21 keys)
+  • items[0].product.avg_base_price           = 0
+  • items[0].product.base_price               = 552886
+  • items[0].product.bundle_items             (array with 0 items)
+  • items[0].product.bundle_type_id           = 0
+  • items[0].product.code                     = 'SKU/CD/00202'
+  • items[0].product.id                       = 207
+  • items[0].product.is_purchase              = True
+  • items[0].product.is_sell                  = True
+  • items[0].product.is_track                 = False
+  • items[0].product.manage_expiry            = null
+  • items[0].product.name                     = 'DULUX PROFESSIONAL SEALER A700'
+  • items[0].product.pos_product_category_id  = 2
+  • items[0].product.price                    = 530000
+  • items[0].product.product_category         (object with 5 keys)
+  • items[0].product.product_category.id      = 2
+  • items[0].product.product_category.is_active  = True
+  • items[0].product.product_category.local_id  = 'd4ea292f-9c77-4e70-97b8-f3c1e0b3b2a3'
+  • items[0].product.product_category.name    = 'Material'
+  • items[0].product.product_category.pos_id  = null
+  • items[0].product.product_units            (array with 0 items)
+  • items[0].product.purchase_account_id      = 131
+  • items[0].product.sell_account_id          = 121
+  • items[0].product.sn_type                  = null
+  • items[0].product.track_start_date         = null
+  • items[0].product.unit_id                  = 2
+  • items[0].product.wholesale_price          (array with 0 items)
+  • items[0].qty                              = 4
+  • items[0].serial_numbers                   (array with 0 items)
+  • items[0].subtotal                         = 2520000
+  • items[0].tax                              = 277200
+  • items[0].tax_id                           = 1
+  • items[0].taxable                          = 2520000
+  • items[0].total_volume                     = null
+  • items[0].total_weight_in_gram             = null
+  • items[0].tran_id                          = 13352
+  • items[0].trans_type_id                    = 7
+  • items[0].unit_conv                        = 1
+  • items[0].unit_id                          = 2
+  • items[0].weight_in_gram                   = 0
+  • items[0].width                            = null
+  • local_id                                  = null
+  • log                                       (object with 2 keys)
+  • log.action                                (object with 10 keys)
+  • log.action.action_type_id                 = 1
+  • log.action.changes                        = null
+  • log.action.created_at                     = '2026-01-20 13:07'
+  • log.action.extra                          = '{"number":"DO\\/26\\/JAN\\/00531","amount":2797200,"i'
+  • log.action.id                             = 38352
+  • log.action.remote_addr                    = '182.3.45.99'
+  • log.action.tran_id                        = 13352
+  • log.action.trans_type_id                  = 7
+  • log.action.user                           (object with 7 keys)
+  • log.action.user.email                     = 'mekanour@cepatservicestation.com'
+  • log.action.user.id                        = 218933
+  • log.action.user.is_active                 = 1
+  • log.action.user.local_id                  = 'ead6d706-80aa-48af-a973-e3998fba6e0d'
+  • log.action.user.name                      = 'Meka GN'
+  • log.action.user.phone_number              = '081312133234'
+  • log.action.user.token_website_id          = 0
+  • log.action.user_id                        = 218933
+  • log.print                                 (object with 10 keys)
+  • log.print.action_type_id                  = 24
+  • log.print.changes                         = null
+  • log.print.created_at                      = '2026-01-20 13:08'
+  • log.print.extra                           = '{"type":"Pengiriman Penjualan","number":"DO\\/26\\/J'
+  • log.print.id                              = 38353
+  • log.print.remote_addr                     = '182.3.45.99'
+  • log.print.tran_id                         = 13352
+  • log.print.trans_type_id                   = 7
+  • log.print.user                            (object with 7 keys)
+  • log.print.user.email                      = 'mekanour@cepatservicestation.com'
+  • log.print.user.id                         = 218933
+  • log.print.user.is_active                  = 1
+  • log.print.user.local_id                   = 'ead6d706-80aa-48af-a973-e3998fba6e0d'
+  • log.print.user.name                       = 'Meka GN'
+  • log.print.user.phone_number               = '081312133234'
+  • log.print.user.token_website_id           = 0
+  • log.print.user_id                         = 218933
+  • maps_available                            = False
+  • message                                   (object with 1 keys)
+  • message.message                           = '<p><span style="font-size:14px;">Pengiriman dengan'
+  • next                                      = 13343
+  • order                                     (object with 8 keys)
+  • order.attachment                          (array with 1 items)
+  • order.business_tran_id                    = null
+  • order.due                                 = 2797200
+  • order.id                                  = 13120
+  • order.include_tax                         = False
+  • order.ref_number                          = 'SO/26/JAN/00829'
+  • order.status_id                           = 7
+  • order.trans_date                          = '2026-01-13'
+  • outlet_id                                 = null
+  • owner_id                                  = 218933
+  • parent_tran                               (object with 4 keys)
+  • parent_tran.id                            = 13120
+  • parent_tran.ref_number                    = 'SO/26/JAN/00829'
+  • parent_tran.trans_date                    = '2026-01-13'
+  • parent_tran.trans_type_id                 = 6
+  • pay_from_finance_account_id               = null
+  • pay_later                                 = False
+  • payment_id                                = null
+  • payment_type_id                           = null
+  • pos_shift_id                              = null
+  • position                                  = null
+  • prev                                      = null
+  • print_url                                 = 'eyJpdiI6ImtaVFlHK0x3NHBXLzhmQnRvbEVyb3c9PSIsInZhbH'
+  • print_url_label                           = 'eyJpdiI6IlRvMURmQmhpMEFLZ20vbUV5SzhJL1E9PSIsInZhbH'
+  • print_url_word                            = 'eyJpdiI6IlZGdmpxK3FwTTBJbUNsblh6T1ArMFE9PSIsInZhbH'
+  • recap_id                                  = null
+  • relations                                 (array with 2 items)
+  • relations[0].additional_discount_amount   = '0.0000000'
+  • relations[0].additional_discount_percent  = '0.00'
+  • relations[0].amount                       = 2520000
+  • relations[0].amount_after_tax             = 2797200
+  • relations[0].amount_after_tax_ori         = null
+  • relations[0].amount_ori                   = null
+  • relations[0].attachment                   (array with 0 items)
+  • relations[0].balance                      = null
+  • relations[0].bank_account_id              = null
+  • relations[0].bank_statement_id            = null
+  • relations[0].business_tran_id             = 13352
+  • relations[0].contact_id                   = 249
+  • relations[0].contact_shipping_address_id  = null
+  • relations[0].created_at                   = '2026-01-20'
+  • relations[0].currency_id                  = 0
+  • relations[0].currency_rate                = '1.000000'
+  • relations[0].currency_source_id           = 0
+  • relations[0].delivery_ids                 = '[13352]'
+  • relations[0].desc                         = ''
+  • relations[0].discount_amount              = '0.0000000'
+  • relations[0].discount_percent             = 0
+  • relations[0].due                          = 2797200
+  • relations[0].due_date                     = '2026-02-14'
+  • relations[0].id                           = 13353
+  • relations[0].include_tax                  = False
+  • relations[0].invoice_type_id              = null
+  • relations[0].is_stamped                   = 0
+  • relations[0].local_id                     = null
+  • relations[0].memo                         = 'Klinik PIK - 98B'
+  • relations[0].outlet_id                    = null
+  • relations[0].owner_id                     = 218933
+  • relations[0].paid_date                    = null
+  • relations[0].pay_from_finance_account_id  = null
+  • relations[0].pay_later                    = False
+  • relations[0].payment_date                 = null
+  • relations[0].payment_id                   = null
+  • relations[0].payment_type_id              = null
+  • relations[0].pos_shift_id                 = null
+  • relations[0].position                     = null
+  • relations[0].ref_number                   = 'INV/26/JAN/01158'2026-01-22 16:02:27.233 | DEBUG    | src.kledo_client:_request:158 - Cached response for /finance/purchaseDeliveries
+2026-01-22 16:02:29.045 | DEBUG    | src.kledo_client:_request:158 - Cached response for /finance/purchaseDeliveries/13222
+
+  • relations[0].related_id                   = null
+  • relations[0].related_type                 = null
+  • relations[0].sales_id                     = 352181
+  • relations[0].shipping_comp_id             = null
+  • relations[0].shipping_cost                = '0.00'
+  • relations[0].shipping_date                = null
+  • relations[0].shipping_tracking            = null
+  • relations[0].source                       = 0
+  • relations[0].source_id                    = null
+  • relations[0].stamp_serial_number          = null
+  • relations[0].status_id                    = 1
+  • relations[0].sub_business_tran_id         = null
+  • relations[0].subtotal                     = '2520000.0000000'
+  • relations[0].tags                         (array with 1 items)
+  • relations[0].tags[0].color                = '#000000'
+  • relations[0].tags[0].id                   = 1
+  • relations[0].tags[0].is_archive           = 0
+  • relations[0].tags[0].local_id             = 'f7e9b7e8-0740-4903-9594-75a8c9ce60f6'
+  • relations[0].tags[0].name                 = 'Penjualan Material'
+  • relations[0].tags[0].owner_id             = 145707
+  • relations[0].tax                          (object with 1 keys)
+  • relations[0].tax.1                        = 277200
+  • relations[0].term_id                      = 1
+  • relations[0].total_tax                    = '277200.00000'
+  • relations[0].trans_date                   = '2026-01-15'
+  • relations[0].trans_type                   = 'Tagihan Penjualan'
+  • relations[0].trans_type_id                = 5
+  • relations[0].warehouse_id                 = 1
+  • relations[0].witholding_account_id        = null
+  • relations[0].witholding_amount            = '0.00000'
+  • relations[0].witholding_percent           = '0.00'
+  • sales                                     (object with 3 keys)
+  • sales.email                               = 'elmo@cepatservicestation.com'
+  • sales.id                                  = 352181
+  • sales.name                                = 'Elmo Abu Abdillah'
+  • sales_id                                  = 352181
+  • shipping_comp_id                          = null
+  • shipping_tracking                         = null
+  • source                                    = 0
+  • source_id                                 = null
+  • stamp_serial_number                       = null
+  • sub_business_tran_id                      = 13353
+  • subtotal                                  = 2520000
+  • tags                                      (array with 1 items)
+  • tags[0].color                             = '#000000'
+  • tags[0].id                                = 1
+  • tags[0].is_archive                        = 0
+  • tags[0].local_id                          = 'f7e9b7e8-0740-4903-9594-75a8c9ce60f6'
+  • tags[0].name                              = 'Penjualan Material'
+  • tags[0].owner_id                          = 145707
+  • tax                                       (object with 1 keys)
+  • tax.1                                     = 277200
+  • term_id                                   = 1
+  • total_tax                                 = 277200
+  • transactions                              (array with 0 items)
+  • warehouse_id                              = 1
+  • witholding_account_id                     = null
+  • witholding_amount                         = 0
+  • witholding_percent                        = 0
+
+📋 FIELDS ONLY IN LIST (missing from DETAIL): 7
+----------------------------------------------------------------------------------------------------
+  • products
+  • products[0].id
+  • products[0].is_purchase
+  • products[0].is_sell
+  • products[0].name
+  • products[0].qty
+  • products[0].unit
+
+📄 SAMPLE LIST OBJECT:
+----------------------------------------------------------------------------------------------------
+{
+  "ref_number": "DO/26/JAN/00531",
+  "memo": "Klinik PIK - 98B",
+  "contact_id": 249,
+  "trans_date": "2026-01-15",
+  "status_id": 7,
+  "id": 13352,
+  "additional_discount_amount": 0,
+  "currency_rate": 1,
+  "currency_id": 0,
+  "shipping_cost": 0,
+  "shipping_date": "2026-01-15",
+  "payment_date": null,
+  "paid_date": null,
+  "trans_type_id": 7,
+  "related_id": null,
+  "related_type": null,
+  "contact": {
+    "id": 249,
+    "name": "Jhoni",
+    "email": "1katakonstruksi@gmail.com",
+    "phone": "08119334168",
+    "company": "PT. SATU KATA KONSTRUKSI",
+    "address": "RUKO MUTIARA TAMAN PALEM BLOK C 10 NO. 82, RT.7/RW.12, DURI KOSAMBI, KECAMATAN CENGKARENG, KOTA JAKARTA BARAT, DAERAH KHUSUS IBUKOTA JAKARTA 11730",
+    "country_id": 1,
+    "province_id": null,
+    "city_id": null,
+    "district_id": null,
+    "village_id": null,
+    "group_id": null,
+    "salutation_id": 3,
+    "ref_number": null,
+    "npwp": "439269606036000",
+    "opening_hour": null,
+    "closing_hour": null,
+    "t...
+
+📄 SAMPLE DETAIL OBJECT:
+----------------------------------------------------------------------------------------------------
+{
+  "id": 13352,
+  "business_tran_id": 13120,
+  "trans_type_id": 7,
+  "trans_date": "2026-01-15",
+  "due_date": "2026-02-14",
+  "contact_id": 249,
+  "status_id": 7,
+  "ref_number": "DO/26/JAN/00531",
+  "amount": 2520000,
+  "amount_after_tax": 2797200,
+  "due": 0,
+  "bank_statement_id": null,
+  "bank_account_id": null,
+  "balance": null,
+  "position": null,
+  "pay_later": false,
+  "pay_from_finance_account_id": null,
+  "payment_id": null,
+  "include_tax": false,
+  "term_id": 1,
+  "attachment": [],
+  "memo": "Klinik PIK - 98B",
+  "desc": "",
+  "tax": {
+    "1": 277200
+  },
+  "warehouse_id": 1,
+  "discount_percent": 0,
+  "discount_amount": 0,
+  "additional_discount_percent": 0,
+  "additional_discount_amount": 0,
+  "total_tax": 277200,
+  "subtotal": 2520000,
+  "shipping_cost": 0,
+  "shipping_date": "2026-01-15",
+  "shipping_comp_id": null,
+  "shipping_tracking": null,
+  "sub_business_tran_id": 13353,
+  "delivery_ids": null,
+  "witholding_percent": 0,
+  "witholding_amount": 0,
+  "witholding...
+
+====================================================================================================
+TESTING: Purchase Deliveries
+Category: purchase_deliveries
+====================================================================================================
+
+📋 Testing LIST endpoint: purchase_deliveries.list
+✓ Got list item (ID: 13222)
+
+📄 Testing DETAIL endpoint: purchase_deliveries.detail (ID: 13222)
+✓ Got detail item
+
+====================================================================================================
+FIELD COMPARISON RESULTS
+====================================================================================================
+
+📊 STATISTICS:
+  • Fields in LIST:   46
+  • Fields in DETAIL: 273
+  • In both:          39
+  • Only in DETAIL:   234
+  • Only in LIST:     7
+
+⭐ FIELDS ONLY IN DETAIL (missing from LIST): 234
+----------------------------------------------------------------------------------------------------
+  • additional_discount_percent               = 0
+  • amount                                    = 6500000
+  • amount_after_tax                          = 7215000
+  • amount_after_tax_ori                      = null
+  • amount_ori                                = null
+  • attachment                                (array with 0 items)
+  • attachment_details                        (array with 0 items)
+  • balance                                   = null
+  • bank_account_id                           = null
+  • bank_statement_id                         = null
+  • business_tran_id                          = 12954
+  • contact.bank_accounts                     (array with 0 items)
+  • contact.salutation                        = 'Ibu'
+  • contact.shipping_addresses                (array with 0 items)
+  • contact_shipping_address                  = null
+  • contact_shipping_address_id               = null
+  • conversion_serial_numbers                 (array with 0 items)
+  • currency_source                           = null
+  • currency_source_id                        = 0
+  • custom                                    = null
+  • delivery_ids                              = null
+  • desc                                      = ''
+  • discount_amount                           = 0
+  • discount_percent                          = 0
+  • due                                       = 0
+  • due_date                                  = null
+  • fees                                      (array with 0 items)
+  • include_tax                               = False
+  • invoice_type_id                           = null
+  • is_deletable                              = False
+  • is_editable                               = False
+  • is_stamped                                = 0
+  • items                                     (array with 3 items)
+  • items[0].additional_discount_amount       = 0
+  • items[0].amount                           = 3750000
+  • items[0].amount_after_tax                 = 4162500
+  • items[0].amount_after_tax_ori             = null
+  • items[0].amount_ori                       = null
+  • items[0].currency_id                      = 0
+  • items[0].currency_rate                    = 1
+  • items[0].custom                           = null
+  • items[0].desc                             = 'Kemasan 20 Liter\nButtertoast'
+  • items[0].discount_amount                  = 0
+  • items[0].discount_amount_input            = '0.00000'
+  • items[0].discount_percent                 = 0
+  • items[0].finance_account_id               = 3
+  • items[0].height                           = null
+  • items[0].id                               = 22451
+  • items[0].length                           = null
+  • items[0].local_id                         = null
+  • items[0].price                            = 1250000
+  • items[0].price_after_tax                  = 1387500
+  • items[0].product                          (object with 21 keys)
+  • items[0].product.avg_base_price           = 1250000
+  • items[0].product.base_price               = 1250000
+  • items[0].product.bundle_items             (array with 0 items)
+  • items[0].product.bundle_type_id           = 0
+  • items[0].product.code                     = 'SKU/CD/00003'
+  • items[0].product.id                       = 3
+  • items[0].product.is_purchase              = True
+  • items[0].product.is_sell                  = True
+  • items[0].product.is_track                 = True
+  • items[0].product.manage_expiry            = null
+  • items[0].product.name                     = 'NIPPON WEATHERBOND (PASTEL)'
+  • items[0].product.pos_product_category_id  = 2
+  • items[0].product.price                    = 1490000
+  • items[0].product.product_category         (object with 5 keys)
+  • items[0].product.product_category.id      = 2
+  • items[0].product.product_category.is_active  = True
+  • items[0].product.product_category.local_id  = 'd4ea292f-9c77-4e70-97b8-f3c1e0b3b2a3'
+  • items[0].product.product_category.name    = 'Material'
+  • items[0].product.product_category.pos_id  = null
+  • items[0].product.product_units            (array with 0 items)
+  • items[0].product.purchase_account_id      = 131
+  • items[0].product.sell_account_id          = 121
+  • items[0].product.sn_type                  = null
+  • items[0].product.track_start_date         = null
+  • items[0].product.unit_id                  = 2
+  • items[0].product.wholesale_price          (array with 0 items)
+  • items[0].qty                              = 3
+  • items[0].serial_numbers                   (array with 0 items)
+  • items[0].subtotal                         = 3750000
+  • items[0].tax                              = 412500
+  • items[0].tax_id                           = 1
+  • items[0].taxable                          = 3750000
+  • items[0].total_volume                     = null
+  • items[0].total_weight_in_gram             = null
+  • items[0].tran_id                          = 13222
+  • items[0].trans_type_id                    = 8
+  • items[0].unit_conv                        = 1
+  • items[0].unit_id                          = 2
+  • items[0].weight_in_gram                   = 0
+  • items[0].width                            = null
+  • local_id                                  = null
+  • log                                       (object with 2 keys)
+  • log.action                                (object with 10 keys)
+  • log.action.action_type_id                 = 1
+  • log.action.changes                        = null
+  • log.action.created_at                     = '2026-01-15 09:54'
+  • log.action.extra                          = '{"number":"PD\\/25\\/DES\\/00555","amount":7215000,"i'
+  • log.action.id                             = 38124
+  • log.action.remote_addr                    = '182.2.164.133'
+  • log.action.tran_id                        = 13222
+  • log.action.trans_type_id                  = 8
+  • log.action.user                           (object with 7 keys)
+  • log.action.user.email                     = 'mekanour@cepatservicestation.com'
+  • log.action.user.id                        = 218933
+  • log.action.user.is_active                 = 1
+  • log.action.user.local_id                  = 'ead6d706-80aa-48af-a973-e3998fba6e0d'
+  • log.action.user.name                      = 'Meka GN'
+  • log.action.user.phone_number              = '081312133234'
+  • log.action.user.token_website_id          = 0
+  • log.action.user_id                        = 218933
+  • log.print                                 = null
+  • message                                   = null
+  • next                                      = 13219
+  • outlet_id                                 = null
+  • owner_id                                  = 218933
+  • parent_tran                               (object with 4 keys)
+  • parent_tran.id                            = 12954
+  • parent_tran.ref_number                    = 'PO/25/DES/00886'
+  • parent_tran.trans_date                    = '2025-12-26'
+  • parent_tran.trans_type_id                 = 2
+  • pay_from_finance_account_id               = null
+  • pay_later                                 = False
+  • payment_id                                = null
+  • payment_type_id                           = null
+  • pos_shift_id                              = null
+  • position                                  = null
+  • prev                                      = null
+  • print_url                                 = 'eyJpdiI6IjIrUy9HVW1JN0g5SldFTHhaV3BXVFE9PSIsInZhbH'
+  • print_url_label                           = 'eyJpdiI6IkZKdjdMek52SEYxRktTdlRtMER4V1E9PSIsInZhbH'
+  • print_url_word                            = 'eyJpdiI6IlRnYll6TnpmVXdVUlJpSkNnWmJySEE9PSIsInZhbH'
+  • purchase_order                            (object with 4 keys)
+  • purchase_order.id                         = 12954
+  • purchase_order.include_tax                = False
+  • purchase_order.ref_number                 = 'PO/25/DES/00886'
+  • purchase_order.trans_date                 = '2025-12-26'
+  • relations                                 (array with 2 items)
+  • relations[0].additional_discount_amount   = '0.0000000'
+  • relations[0].additional_discount_percent  = '0.00'
+  • relations[0].amount                       = 6500000
+  • relations[0].amount_after_tax             = 7215000
+  • relations[0].amount_after_tax_ori         = null
+  • relations[0].amount_ori                   = null
+  • relations[0].attachment                   (array with 0 items)
+  • relations[0].balance                      = null
+  • relations[0].bank_account_id              = null
+  • relations[0].bank_statement_id            = null
+  • relations[0].business_tran_id             = 13222
+  • relations[0].contact_id                   = 31
+  • relations[0].contact_shipping_address_id  = null
+  • relations[0].created_at                   = '2026-01-15'
+  • relations[0].currency_id                  = 0
+  • relations[0].currency_rate                = '1.000000'
+  • relations[0].currency_source_id           = 0
+  • relations[0].delivery_ids                 = '[13222]'
+  • relations[0].desc                         = ''
+  • relations[0].discount_amount              = '0.0000000'
+  • relations[0].discount_percent             = 0
+  • relations[0].due                          = 7215000
+  • relations[0].due_date                     = '2026-03-16'
+  • relations[0].id                           = 13223
+  • relations[0].include_tax                  = False
+  • relations[0].invoice_type_id              = null
+  • relations[0].is_stamped                   = 0
+  • relations[0].local_id                     = null
+  • relations[0].memo                         = 'Riyadush Shalihin - A2E - 3011351386'
+  • relations[0].outlet_id                    = null
+  • relations[0].owner_id                     = 218933
+  • relations[0].paid_date                    = null
+  • relations[0].pay_from_finance_account_id  = null
+  • relations[0].pay_later                    = False
+  • relations[0].payment_date                 = null
+  • relations[0].payment_id                   = null
+  • relations[0].payment_type_id              = null
+  • relations[0].pos_shift_id                 = null
+  • relations[0].position                     = null
+  • relations[0].ref_number                   = 'PI/26/JAN/01163'
+  • relations[0].related_id                   = null
+  • relations[0].related_type                 = null
+  • relations[0].sales_id                     = null
+  • relations[0].shipping_comp_id             = null
+  • relations[0].shipping_cost                = '0.00'
+  • relations[0].shipping_date                = null
+  • relations[0].shipping_tracking            = null
+  • relations[0].source                       = 0
+  • relations[0].source_id                    = null
+  • relations[0].stamp_serial_number          = null
+  • relations[0].status_id                    = 1
+  • relations[0].sub_business_tran_id         = null
+  • relations[0].subtotal                     = '6500000.0000000'
+  • relations[0].tags                         (array with 1 items)
+  • relations[0].tags[0].color                = '#000000'
+  • relations[0].tags[0].id                   = 1
+  • relations[0].tags[0].is_archive           = 0
+  • relations[0].tags[0].local_id             = 'f7e9b7e8-0740-4903-9594-75a8c9ce60f6'
+  • relations[0].tags[0].name                 = 'Penjualan Material'
+  • relations[0].tags[0].owner_id             = 145707
+  • relations[0].tax                          (object with 1 keys)
+  • relations[0].tax.1                        = 715000
+  • relations[0].term_id                      = 4
+  • relations[0].total_tax                    = '715000.00000'
+  • relations[0].trans_date                   = '2026-01-15'
+  • relations[0].trans_type                   = 'Tagihan Pembelian'
+  • relations[0].trans_type_id                = 3
+  • relations[0].warehouse_id                 = 1
+  • relations[0].witholding_account_id        = null
+  • relations[0].witholding_amount            = '0.00000'
+  • relations[0].witholding_percent           = '0.00'
+  • sales_id                                  = null
+  • shipping_comp_id                          = null
+  • shipping_tracking                         = null
+  • source                                    = 0
+  • source_id                                 = null
+  • stamp_serial_number                       = null
+  • sub_business_tran_id                      = 13223
+  • subtotal                                  = 6500000
+  • tags                                      (array with 1 items)
+  • tags[0].color                             = '#000000'
+  • tags[0].id                                = 1
+  • tags[0].is_archive                        = 0
+  • tags[0].local_id                          = 'f7e9b7e8-0740-4903-9594-75a8c9ce60f6'
+  • tags[0].name                              = 'Penjualan Material'
+  • tags[0].owner_id                          = 145707
+  • tax                                       (object with 1 keys)
+  • tax.1                                     = 715000
+  • term_id                                   = null
+  • total_tax                                 = 715000
+  • transactions                              (array with 0 items)
+  • warehouse_id                              = 1
+  • witholding_account_id                     = null
+  • witholding_amount                         = 0
+  • witholding_percent                        = 0
+
+📋 FIELDS ONLY IN LIST (missing from DETAIL): 7
+----------------------------------------------------------------------------------------------------
+  • products
+  • products[0].id
+  • products[0].is_purchase
+  • products[0].is_sell
+  • products[0].name
+  • products[0].qty
+  • products[0].unit
+
+📄 SAMPLE LIST OBJECT:
+----------------------------------------------------------------------------------------------------
+{
+  "ref_number": "PD/25/DES/00555",
+  "memo": "Riyadush Shalihin - A2E",
+  "contact_id": 31,
+  "trans_date": "2025-12-29",
+  "status_id": 7,
+  "id": 13222,
+  "additional_discount_amount": 0,
+  "currency_rate": 1,
+  "currency_id": 0,
+  "shipping_cost": 0,
+  "shipping_date": null,
+  "payment_date": null,
+  "paid_date": null,
+  "trans_type_id": 8,
+  "related_id": null,
+  "related_type": null,
+  "contact": {
+    "id": 31,
+    "name": "Vania",
+    "email": "iu_billing@nipponpaint-indonesia.com",
+    "phone": "0216900546",
+    "company": "PT. NIPSEA PAINT AND CHEMICALS",
+    "address": "JL. ANCOL BARAT I/A5/C NO. 12 ANCOL, PADEMANGAN, Kodya Jakarta Utara, DKI Jakarta",
+    "country_id": 1,
+    "province_id": 6,
+    "city_id": 61,
+    "district_id": null,
+    "village_id": null,
+    "group_id": 3,
+    "salutation_id": 1,
+    "ref_number": null,
+    "npwp": null,
+    "opening_hour": null,
+    "closing_hour": null,
+    "type_ids": [],
+    "edit_address": "JL. ANCOL BARAT I/A5/C NO. 12 ANCOL, P...
+
+📄 SAMPLE DETAIL OBJECT:
+----------------------------------------------------------------------------------------------------
+{
+  "id": 13222,
+  "business_tran_id": 12954,
+  "trans_type_id": 8,
+  "trans_date": "2025-12-29",
+  "due_date": null,
+  "contact_id": 31,
+  "status_id": 7,
+  "ref_number": "PD/25/DES/00555",
+  "amount": 6500000,
+  "amount_after_tax": 7215000,
+  "due": 0,
+  "bank_statement_id": null,
+  "bank_account_id": null,
+  "balance": null,
+  "position": null,
+  "pay_later": false,
+  "pay_from_finance_account_id": null,
+  "payment_id": null,
+  "include_tax": false,
+  "term_id": null,
+  "attachment": [],
+  "memo": "Riyadush Shalihin - A2E",
+  "desc": "",
+  "tax": {
+    "1": 715000
+  },
+  "warehouse_id": 1,
+  "discount_percent": 0,
+  "discount_amount": 0,
+  "additional_discount_percent": 0,
+  "additional_discount_amount": 0,
+  "total_tax": 715000,
+  "subtotal": 6500000,
+  "shipping_cost": 0,
+  "shipping_date": null,
+  "shipping_comp_id": null,
+  "shipping_tracking": null,
+  "sub_business_tran_id": 13223,
+  "delivery_ids": null,
+  "witholding_percent": 0,
+  "witholding_amount": 0,
+  "witholding_accoun...
+
+====================================================================================================
+TESTING COMPLETE
+====================================================================================================

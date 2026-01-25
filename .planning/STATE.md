@@ -11,20 +11,20 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 
 Milestone: v1.1 Analytics Foundation
 Phase: 6 of 6 (06-smart-mcp-server-onboarding)
-Plan: 3 of 3 complete
-Status: Phase complete
-Last activity: 2026-01-25 - Completed 06-03-PLAN.md
+Plan: 2 of 3 complete
+Status: In progress
+Last activity: 2026-01-25 - Completed 06-02-PLAN.md
 
-Progress: [==============================] 100% (20/20 plans across all phases)
+Progress: [============================  ] 95% (19/20 plans across all phases)
 Phase 5: COMPLETE
-Phase 6: COMPLETE (3/3)
+Phase 6: IN PROGRESS (2/3)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
+- Total plans completed: 19
 - Average duration: 3.5 minutes
-- Total execution time: 70 minutes
+- Total execution time: 58 minutes
 
 **By Phase:**
 
@@ -35,11 +35,11 @@ Phase 6: COMPLETE (3/3)
 | 03-tool-enhancement | 1 | 2 min | 2 min |
 | 04-smart-routing | 3 | 10 min | 3.3 min |
 | 05-domain-model-field-mapping | 2 | 8 min | 4 min |
-| 06-smart-mcp-server-onboarding | 3 | 15 min | 5 min |
+| 06-smart-mcp-server-onboarding | 2 | 11 min | 5.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 05-02 (5 min), 06-01 (5 min), 06-02 (5 min), 06-03 (3 min)
-- Trend: Consistent velocity, 3-5 min per plan
+- Last 5 plans: 04-03 (1 min), 05-01 (3 min), 05-02 (5 min), 06-01 (5 min), 06-02 (6 min)
+- Trend: Consistent velocity, 1-6 min per plan
 
 *Updated after each plan completion*
 
@@ -70,9 +70,11 @@ See .planning/milestones/v1.0-ROADMAP.md for complete decision history.
 | python-dotenv with override=True | Test isolation - prevent tests reading project .env | 06-01 |
 | ANSI color codes (no external deps) | Avoid dependencies for simple terminal colors | 06-01 |
 | Injectable ConfigManager | Testability - allow mocking and tmp_path usage | 06-01 |
-| Quick Start before Installation | New users see simplest path first, reduces cognitive load | 06-03 |
-| Manual config marked Advanced | De-emphasize error-prone manual editing, guide to wizard | 06-03 |
-| Setup troubleshooting first | New users hit setup issues before operational issues | 06-03 |
+| 5 CLI commands pattern | Cover all essential use cases (setup, validation, configuration, troubleshooting) | 06-02 |
+| OS-specific paths for Claude Desktop | Better UX - users get exact path for their OS | 06-02 |
+| Idempotent command design | Safe to run multiple times - reduces user confusion | 06-02 |
+| Mock all external dependencies | Fast tests, no real API calls, isolated unit testing | 06-02 |
+| --init as alias for --setup | Common CLI convention - matches user expectations | 06-02 |
 
 ### Roadmap Evolution
 
@@ -87,21 +89,16 @@ See .planning/milestones/v1.0-ROADMAP.md for complete decision history.
   - Reduce setup from 5+ manual steps to one-command first-run
   - Interactive setup wizard with first-run detection
   - Improves user experience and reduces support friction
-- Phase 6 COMPLETE (2026-01-25)
-  - Setup wizard with first-run detection
-  - CLI validation commands (--setup, --test, --show-config)
-  - README transformed to <2 minute quick start
-
-**ALL PHASES COMPLETE - Ready for v1.1 release**
+- Phase 6 IN PROGRESS (2026-01-25)
+  - 06-01: Setup wizard with first-run detection
+  - 06-02: CLI validation commands (--setup, --test, --show-config)
 
 ### Pending Todos
 
 Phase 6 (Smart MCP Server Onboarding):
 - [x] 06-01: Implement setup wizard and first-run detection
 - [x] 06-02: Add validation commands (--setup, --test, --show-config)
-- [x] 06-03: Update README with quick-start guide
-
-**All phases complete** - No pending work
+- [ ] 06-03: Update README with quick-start guide
 
 ### Blockers/Concerns
 
@@ -109,7 +106,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-25 00:30 UTC
-Stopped at: Completed 06-03-PLAN.md
+Last session: 2026-01-25 00:35 UTC
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None
-Next action: All phases complete - Ready for v1.1 release
+Next action: Execute 06-03 (README Quick Start Guide)

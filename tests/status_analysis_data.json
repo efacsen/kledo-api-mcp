@@ -1,0 +1,246 @@
+{
+  "sales_invoice_status_distribution": {
+    "3": [
+      {
+        "ref": "INV/26/JAN/01153",
+        "amount": 4410000,
+        "due": 0,
+        "paid_date": "2026-01-19"
+      },
+      {
+        "ref": "INV/26/JAN/01152",
+        "amount": 8391600,
+        "due": 0,
+        "paid_date": "2026-01-19"
+      },
+      {
+        "ref": "INV/26/JAN/01151",
+        "amount": 6915300,
+        "due": 0,
+        "paid_date": "2026-01-15"
+      },
+      {
+        "ref": "INV/26/JAN/01150",
+        "amount": 2553000,
+        "due": 0,
+        "paid_date": "2026-01-15"
+      },
+      {
+        "ref": "INV/26/JAN/01149",
+        "amount": 5594400,
+        "due": 0,
+        "paid_date": "2026-01-14"
+      }
+    ],
+    "1": [
+      {
+        "ref": "INV/26/JAN/01158",
+        "amount": 2797200,
+        "due": 2797200,
+        "paid_date": null
+      },
+      {
+        "ref": "INV/26/JAN/01148",
+        "amount": 4828500,
+        "due": 4828500,
+        "paid_date": null
+      },
+      {
+        "ref": "INV/26/JAN/01138",
+        "amount": 14430000,
+        "due": 14430000,
+        "paid_date": null
+      },
+      {
+        "ref": "INV/25/DES/01130",
+        "amount": 19629240,
+        "due": 19629240,
+        "paid_date": null
+      },
+      {
+        "ref": "INV/25/DES/01115",
+        "amount": 12298800,
+        "due": 12298800,
+        "paid_date": null
+      }
+    ],
+    "2": [
+      {
+        "ref": "INV/25/NOV/00983",
+        "amount": 28083000,
+        "due": 2900,
+        "paid_date": null
+      },
+      {
+        "ref": "INV/25/NOV/00955",
+        "amount": 8424900,
+        "due": 900,
+        "paid_date": null
+      },
+      {
+        "ref": "INV/25/NOV/00955",
+        "amount": 8424900,
+        "due": 900,
+        "paid_date": null
+      },
+      {
+        "ref": "INV/25/OKT/00890",
+        "amount": 14185800,
+        "due": 800,
+        "paid_date": null
+      },
+      {
+        "ref": "INV/25/OKT/00887",
+        "amount": 48795600,
+        "due": 100,
+        "paid_date": null
+      }
+    ]
+  },
+  "purchase_invoice_status_distribution": {
+    "1": [
+      {
+        "ref": "PI/26/JAN/01174",
+        "amount": 4225936.5,
+        "due": 4225936.5
+      },
+      {
+        "ref": "PI/26/JAN/01173",
+        "amount": 2442000,
+        "due": 2442000
+      },
+      {
+        "ref": "PI/26/JAN/01172",
+        "amount": 4162500,
+        "due": 4162500
+      },
+      {
+        "ref": "PI/26/JAN/01171",
+        "amount": 810300,
+        "due": 810300
+      },
+      {
+        "ref": "PI/26/JAN/01170",
+        "amount": 1404150,
+        "due": 1404150
+      }
+    ],
+    "3": [
+      {
+        "ref": "PI/26/JAN/01136",
+        "amount": 2454813.84,
+        "due": 0
+      },
+      {
+        "ref": "PI/25/DES/01100",
+        "amount": 34542090,
+        "due": 0
+      },
+      {
+        "ref": "PI/25/DES/01078",
+        "amount": 49525200,
+        "due": 0
+      },
+      {
+        "ref": "PI/25/DES/01070",
+        "amount": 4440000,
+        "due": 0
+      },
+      {
+        "ref": "PI/25/DES/01053",
+        "amount": 25815758.4,
+        "due": 0
+      }
+    ]
+  },
+  "contact_type_distribution": {
+    "3": [
+      {
+        "name": "Samuel Hariandya",
+        "type_name": null
+      },
+      {
+        "name": "NUNGKY HENDRIYANI",
+        "type_name": null
+      },
+      {
+        "name": "Aldy Reyhanshah",
+        "type_name": null
+      },
+      {
+        "name": "Ichsan Permana",
+        "type_name": null
+      },
+      {
+        "name": "Yusril",
+        "type_name": null
+      }
+    ],
+    "1": [
+      {
+        "name": "KLEDO",
+        "type_name": null
+      },
+      {
+        "name": "Elmo",
+        "type_name": null
+      },
+      {
+        "name": "Fadhel Zarmen",
+        "type_name": null
+      },
+      {
+        "name": "Namecheap",
+        "type_name": null
+      },
+      {
+        "name": "Vania",
+        "type_name": null
+      }
+    ],
+    "4": [
+      {
+        "name": "Teuku Muda Rabian Hussein",
+        "type_name": null
+      },
+      {
+        "name": "Dani Sulistiyawan",
+        "type_name": null
+      },
+      {
+        "name": "Squarespace",
+        "type_name": null
+      },
+      {
+        "name": "Amir",
+        "type_name": null
+      },
+      {
+        "name": "Mason Pine Hotel",
+        "type_name": null
+      }
+    ],
+    "2": [
+      {
+        "name": "Yadi",
+        "type_name": null
+      },
+      {
+        "name": "Dodo",
+        "type_name": null
+      },
+      {
+        "name": "Achmad Marcel Zakaria",
+        "type_name": null
+      },
+      {
+        "name": "Juned",
+        "type_name": null
+      },
+      {
+        "name": "A Kevin Zakaria",
+        "type_name": null
+      }
+    ]
+  }
+}
