@@ -120,7 +120,9 @@ class ConfigManager:
         if not self.env_path.exists():
             return None
 
-        load_dotenv(self.env_path)
+        # Use override=True to ensure we read from the specified path
+        # and not from parent directories
+        load_dotenv(self.env_path, override=True)
 
         config = {
             "api_key": os.getenv("KLEDO_API_KEY", ""),
