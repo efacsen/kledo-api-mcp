@@ -89,15 +89,23 @@ class TestConfigManager:
         assert is_valid is False
         assert "cannot be empty" in error
 
-    def test_env_file_exists_no_file(self, tmp_path):
+    def test_env_file_exists_no_file(self, tmp_path, monkeypatch):
         """Test env_file_exists returns False when .env missing."""
+        # Clear environment variables so test is isolated
+        monkeypatch.delenv("KLEDO_API_KEY", raising=False)
+        monkeypatch.delenv("KLEDO_BASE_URL", raising=False)
+
         env_path = tmp_path / ".env"
         cm = ConfigManager(env_path=env_path)
 
         assert cm.env_file_exists() is False
 
-    def test_env_file_exists_empty_file(self, tmp_path):
+    def test_env_file_exists_empty_file(self, tmp_path, monkeypatch):
         """Test env_file_exists returns False for empty .env."""
+        # Clear environment variables so test is isolated
+        monkeypatch.delenv("KLEDO_API_KEY", raising=False)
+        monkeypatch.delenv("KLEDO_BASE_URL", raising=False)
+
         env_path = tmp_path / ".env"
         env_path.write_text("")
         cm = ConfigManager(env_path=env_path)
@@ -172,8 +180,12 @@ class TestConfigManager:
         result = cm.create_env_file(config)
         assert result is False
 
-    def test_load_current_config_no_file(self, tmp_path):
+    def test_load_current_config_no_file(self, tmp_path, monkeypatch):
         """Test load_current_config returns None when .env missing."""
+        # Clear environment variables so test is isolated
+        monkeypatch.delenv("KLEDO_API_KEY", raising=False)
+        monkeypatch.delenv("KLEDO_BASE_URL", raising=False)
+
         env_path = tmp_path / ".env"
         cm = ConfigManager(env_path=env_path)
 
@@ -182,6 +194,10 @@ class TestConfigManager:
 
     def test_load_current_config_with_file(self, tmp_path, monkeypatch):
         """Test load_current_config reads existing .env."""
+        # Clear environment variables so they don't override file values
+        monkeypatch.delenv("KLEDO_API_KEY", raising=False)
+        monkeypatch.delenv("KLEDO_BASE_URL", raising=False)
+
         env_path = tmp_path / ".env"
         env_path.write_text("""KLEDO_API_KEY=test_key_123
 KLEDO_BASE_URL=https://api.kledo.com/api/v1
@@ -204,16 +220,24 @@ LOG_LEVEL=DEBUG
 class TestSetupWizard:
     """Test SetupWizard interactive setup flow."""
 
-    def test_detect_first_run_no_env(self, tmp_path):
+    def test_detect_first_run_no_env(self, tmp_path, monkeypatch):
         """Test detect_first_run returns True when .env missing."""
+        # Clear environment variables so test is isolated
+        monkeypatch.delenv("KLEDO_API_KEY", raising=False)
+        monkeypatch.delenv("KLEDO_BASE_URL", raising=False)
+
         env_path = tmp_path / ".env"
         cm = ConfigManager(env_path=env_path)
         wizard = SetupWizard(config_manager=cm)
 
         assert wizard.detect_first_run() is True
 
-    def test_detect_first_run_with_env(self, tmp_path):
+    def test_detect_first_run_with_env(self, tmp_path, monkeypatch):
         """Test detect_first_run returns False when .env exists."""
+        # Clear environment variables so they don't interfere
+        monkeypatch.delenv("KLEDO_API_KEY", raising=False)
+        monkeypatch.delenv("KLEDO_BASE_URL", raising=False)
+
         env_path = tmp_path / ".env"
         env_path.write_text("KLEDO_API_KEY=test_key_1234567890\n")
         cm = ConfigManager(env_path=env_path)
@@ -221,8 +245,16 @@ class TestSetupWizard:
 
         assert wizard.detect_first_run() is False
 
-    def test_save_configuration_success(self, tmp_path):
+    def test_save_configuration_success(self, tmp_path, monkeypatch):
         """Test save_configuration creates .env with correct content."""
+        # Clear environment variables
+        monkeypatch.delenv("KLEDO_API_KEY", raising=False)
+        monkeypatch.delenv("KLEDO_BASE_URL", raising=False)
+
+        # Use tmp_path for .kledo config directory to avoid writing to user home
+        kledo_config_dir = tmp_path / ".kledo"
+        monkeypatch.setattr("pathlib.Path.home", lambda: tmp_path)
+
         env_path = tmp_path / ".env"
         cm = ConfigManager(env_path=env_path)
         wizard = SetupWizard(config_manager=cm)
@@ -234,10 +266,13 @@ class TestSetupWizard:
 
         result = wizard.save_configuration(config)
         assert result is True
-        assert env_path.exists()
+
+        # Check that config was saved to ~/.kledo/.env (which is tmp_path/.kledo/.env in test)
+        kledo_env_path = kledo_config_dir / ".env"
+        assert kledo_env_path.exists(), f"Expected config at {kledo_env_path}"
 
         # Verify content
-        content = env_path.read_text()
+        content = kledo_env_path.read_text()
         assert "KLEDO_API_KEY=kledo_pat_1234567890123456789012345" in content
         assert "KLEDO_BASE_URL=https://api.kledo.com/api/v1" in content
 

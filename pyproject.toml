@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kledo-api-mcp"
-version = "0.1.0"
+version = "0.2.0-beta"
 description = "Model Context Protocol server for Kledo accounting software"
 readme = "README.md"
 license = {text = "MIT"}

@@ -21,6 +21,7 @@ def main():
     # Import CLI and setup components
     from src.cli import parse_args, dispatch_command
     from src.setup import SetupWizard
+    from src.config_manager import ConfigManager
 
     # Parse command-line arguments
     args = parse_args(sys.argv[1:])
@@ -29,9 +30,19 @@ def main():
     if any([args.setup, args.test, args.show_config, args.init, args.version]):
         return dispatch_command(args)
 
-    # No command: check first-run
-    wizard = SetupWizard()
-    if wizard.detect_first_run():
+    # No command: check configuration status
+    config_manager = ConfigManager()
+
+    # Check if already configured (env vars or .env file)
+    if config_manager.has_env_vars_configured():
+        # Already configured via environment variables - start server
+        pass
+    elif config_manager.env_file_exists():
+        # Already configured via .env file - start server
+        pass
+    else:
+        # Not configured - run setup wizard
+        wizard = SetupWizard()
         print("\n🚀 Welcome to Kledo MCP Server!")
         print("Let's set up your connection to Kledo API.\n")
 
