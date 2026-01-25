@@ -15,6 +15,41 @@ Model Context Protocol (MCP) server for Kledo accounting software API - enables 
 - **Smart Caching** - Configurable caching for optimal performance
 - **Type-Safe** - Comprehensive type hints throughout
 
+## 🚀 Quick Start in 2 Minutes
+
+**First time setup:**
+
+1. **Install the package:**
+   ```bash
+   git clone https://github.com/efacsen/kledo-api-mcp.git
+   cd kledo-api-mcp
+   pip install -e .
+   ```
+
+2. **Run the setup wizard:**
+   ```bash
+   kledo-mcp
+   ```
+   The interactive wizard will:
+   - ✓ Prompt for your Kledo API key
+   - ✓ Validate your connection
+   - ✓ Create your `.env` configuration
+   - ✓ Show you the Claude Desktop config to copy
+
+3. **Copy the config to Claude Desktop:**
+   - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+   - Linux: `~/.config/Claude/claude_desktop_config.json`
+
+4. **Restart Claude Desktop** - Done! 🎉
+
+**Every time after:**
+```bash
+kledo-mcp  # Just works - no setup needed
+```
+
+**Need help?** See [Troubleshooting](#-troubleshooting) below.
+
 ## 📊 Revenue & Commission Features
 
 ### Commission Calculation (Verified ✓)
