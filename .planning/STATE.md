@@ -11,20 +11,20 @@ See: .planning/PROJECT.md (updated 2026-01-24)
 
 Milestone: v1.1 Analytics Foundation
 Phase: 6 of 6 (06-smart-mcp-server-onboarding)
-Plan: 1 of 3 complete
-Status: In progress
-Last activity: 2026-01-25 - Completed 06-01-PLAN.md
+Plan: 3 of 3 complete
+Status: Phase complete
+Last activity: 2026-01-25 - Completed 06-03-PLAN.md
 
-Progress: [=========================     ] 65% (13/20 plans across all phases)
+Progress: [==============================] 100% (20/20 plans across all phases)
 Phase 5: COMPLETE
-Phase 6: IN PROGRESS (1/3)
+Phase 6: COMPLETE (3/3)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
-- Average duration: 3.6 minutes
-- Total execution time: 47 minutes
+- Total plans completed: 20
+- Average duration: 3.5 minutes
+- Total execution time: 70 minutes
 
 **By Phase:**
 
@@ -35,11 +35,11 @@ Phase 6: IN PROGRESS (1/3)
 | 03-tool-enhancement | 1 | 2 min | 2 min |
 | 04-smart-routing | 3 | 10 min | 3.3 min |
 | 05-domain-model-field-mapping | 2 | 8 min | 4 min |
-| 06-smart-mcp-server-onboarding | 1 | 5 min | 5 min |
+| 06-smart-mcp-server-onboarding | 3 | 15 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-03 (1 min), 05-01 (3 min), 05-02 (5 min), 06-01 (5 min)
-- Trend: Consistent velocity, 1-5 min per plan
+- Last 5 plans: 05-02 (5 min), 06-01 (5 min), 06-02 (5 min), 06-03 (3 min)
+- Trend: Consistent velocity, 3-5 min per plan
 
 *Updated after each plan completion*
 
@@ -70,6 +70,9 @@ See .planning/milestones/v1.0-ROADMAP.md for complete decision history.
 | python-dotenv with override=True | Test isolation - prevent tests reading project .env | 06-01 |
 | ANSI color codes (no external deps) | Avoid dependencies for simple terminal colors | 06-01 |
 | Injectable ConfigManager | Testability - allow mocking and tmp_path usage | 06-01 |
+| Quick Start before Installation | New users see simplest path first, reduces cognitive load | 06-03 |
+| Manual config marked Advanced | De-emphasize error-prone manual editing, guide to wizard | 06-03 |
+| Setup troubleshooting first | New users hit setup issues before operational issues | 06-03 |
 
 ### Roadmap Evolution
 
@@ -84,13 +87,21 @@ See .planning/milestones/v1.0-ROADMAP.md for complete decision history.
   - Reduce setup from 5+ manual steps to one-command first-run
   - Interactive setup wizard with first-run detection
   - Improves user experience and reduces support friction
+- Phase 6 COMPLETE (2026-01-25)
+  - Setup wizard with first-run detection
+  - CLI validation commands (--setup, --test, --show-config)
+  - README transformed to <2 minute quick start
+
+**ALL PHASES COMPLETE - Ready for v1.1 release**
 
 ### Pending Todos
 
 Phase 6 (Smart MCP Server Onboarding):
 - [x] 06-01: Implement setup wizard and first-run detection
-- [ ] 06-02: Add validation commands (--setup, --test, --show-config)
-- [ ] 06-03: Update README with quick-start guide
+- [x] 06-02: Add validation commands (--setup, --test, --show-config)
+- [x] 06-03: Update README with quick-start guide
+
+**All phases complete** - No pending work
 
 ### Blockers/Concerns
 
@@ -98,7 +109,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-25 08:11 UTC
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-01-25 00:30 UTC
+Stopped at: Completed 06-03-PLAN.md
 Resume file: None
-Next action: Execute 06-02 (Validation commands)
+Next action: All phases complete - Ready for v1.1 release
