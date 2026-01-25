@@ -186,6 +186,120 @@ If you prefer to configure manually, edit your Claude Desktop config file:
 
 **Security Note**: Never commit your API key to version control.
 
+## 🚀 Deployment & Production Setup
+
+The MCP server supports multiple deployment scenarios with flexible configuration:
+
+### Environment Variables (Recommended for Production)
+
+For Docker, Kubernetes, and Infrastructure-as-Code deployments:
+
+```bash
+export KLEDO_API_KEY="your_api_key_here"
+export KLEDO_BASE_URL="https://api.kledo.com/api/v1"
+kledo-mcp  # Starts immediately, skips setup wizard
+```
+
+**Perfect for:**
+- Docker containers
+- Kubernetes deployments
+- Terraform/CloudFormation
+- CI/CD pipelines
+- Non-interactive deployments
+
+### Configuration File Locations
+
+The server checks for configuration in this priority order:
+
+1. **Environment variables** (highest priority)
+   - `KLEDO_API_KEY`
+   - `KLEDO_BASE_URL`
+
+2. **User config directory** (persistent)
+   - `~/.kledo/.env` - Persists across projects/clones
+
+3. **XDG config directory** (Unix/Linux standard)
+   - `~/.config/kledo/.env`
+
+4. **System config directory**
+   - `/etc/kledo/.env`
+
+5. **Project directory** (fallback)
+   - `./.env` - Project root
+
+### Deployment Scenarios
+
+**Scenario A: EC2 with SSH (Interactive)**
+```bash
+ssh -i key.pem ubuntu@your-ec2-instance
+cd ~/kledo-api-mcp
+kledo-mcp
+# Wizard prompts for API key
+# Saves to ~/.kledo/.env automatically
+```
+
+**Scenario B: Docker Container**
+```dockerfile
+FROM python:3.11-slim
+RUN pip install kledo-api-mcp
+ENV KLEDO_API_KEY=your_key_here
+ENV KLEDO_BASE_URL=https://api.kledo.com/api/v1
+CMD ["kledo-mcp"]
+```
+
+**Scenario C: Kubernetes Pod**
+```yaml
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: kledo-mcp
+    image: kledo-mcp:latest
+    env:
+    - name: KLEDO_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: kledo-secrets
+          key: api_key
+    - name: KLEDO_BASE_URL
+      value: https://api.kledo.com/api/v1
+```
+
+**Scenario D: Pre-configured VM Image**
+```bash
+# During image creation
+mkdir -p ~/.kledo
+cat > ~/.kledo/.env << EOF
+KLEDO_API_KEY=your_key
+KLEDO_BASE_URL=https://api.kledo.com/api/v1
+EOF
+
+# Later, on cloned instances
+kledo-mcp  # Automatically finds ~/.kledo/.env
+```
+
+### Configuration Priority
+
+The server uses this decision tree:
+
+```
+Does environment variables have KLEDO_API_KEY?
+  ├─ YES → Use environment variables
+  └─ NO → Check ~/.kledo/.env
+           ├─ YES → Use ~/.kledo/.env
+           └─ NO → Check ~/.config/kledo/.env
+                    ├─ YES → Use ~/.config/kledo/.env
+                    └─ NO → Check /etc/kledo/.env
+                             ├─ YES → Use /etc/kledo/.env
+                             └─ NO → Run interactive setup wizard
+```
+
+This means:
+- Environment variables always override .env files
+- Once configured, the wizard is skipped
+- Config persists across reinstalls (in ~/.kledo/)
+- Non-interactive deployments are fully supported
+
 ## 🚀 Usage Examples
 
 ### Get Monthly Revenue (with Commission Base)

@@ -164,6 +164,9 @@ class SetupWizard:
         """
         Save configuration to .env file.
 
+        Saves to ~/.kledo/.env by default for persistence across projects.
+        Falls back to project root/.env if ~/.kledo/ is not writable.
+
         Args:
             config: Configuration dictionary
 
@@ -172,10 +175,30 @@ class SetupWizard:
         """
         print(f"\n{Colors.CYAN}{Colors.BOLD}Saving configuration...{Colors.RESET}\n")
 
+        # Create a new ConfigManager pointing to user's kledo directory
+        kledo_config_dir = Path.home() / ".kledo"
+        kledo_config_path = kledo_config_dir / ".env"
+
+        # Try to save to user's kledo directory first (persistent across projects)
+        try:
+            config_manager = ConfigManager(env_path=kledo_config_path)
+            success = config_manager.create_env_file(config)
+
+            if success:
+                print(f"{Colors.GREEN}✓{Colors.RESET} Configuration saved to {Colors.BLUE}{kledo_config_path}{Colors.RESET}")
+                print()
+                print(f"This configuration will be used for all Kledo MCP instances.")
+                print(f"You can override it with environment variables or edit: {kledo_config_path}")
+                return True
+        except Exception as e:
+            logger.debug(f"Could not save to {kledo_config_path}: {str(e)}")
+
+        # Fallback: save to project root
+        print(f"{Colors.YELLOW}⚠{Colors.RESET} Could not save to {kledo_config_path}, using project directory")
         success = self.config_manager.create_env_file(config)
 
         if success:
-            print(f"{Colors.GREEN}✓{Colors.RESET} Configuration saved to .env file")
+            print(f"{Colors.GREEN}✓{Colors.RESET} Configuration saved to {Colors.BLUE}.env{Colors.RESET}")
             return True
         else:
             print(f"{Colors.RED}✗{Colors.RESET} Failed to save configuration")

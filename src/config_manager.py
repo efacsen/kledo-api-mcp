@@ -21,6 +21,8 @@ class ConfigManager:
         Args:
             env_path: Path to .env file. Defaults to project root/.env
         """
+        self._is_default_path = env_path is None
+
         if env_path is None:
             # Find .env in project root (parent of src/)
             self.env_path = Path(__file__).parent.parent / ".env"
@@ -28,6 +30,36 @@ class ConfigManager:
             self.env_path = Path(env_path)
 
         self.env_example_path = self.env_path.parent / ".env.example"
+
+    def get_config_file_locations(self) -> list[Path]:
+        """
+        Get list of config file locations to check in priority order.
+
+        Returns:
+            List of Path objects to check for .env files
+        """
+        locations = [
+            # 1. Current directory (project root)
+            Path(__file__).parent.parent / ".env",
+            # 2. User's kledo config directory (for persistent config)
+            Path.home() / ".kledo" / ".env",
+            # 3. XDG config directory (Unix/Linux standard)
+            Path.home() / ".config" / "kledo" / ".env",
+            # 4. System-wide config (if running as service)
+            Path("/etc/kledo/.env"),
+        ]
+        return locations
+
+    def has_env_vars_configured(self) -> bool:
+        """
+        Check if KLEDO_API_KEY and KLEDO_BASE_URL are set via environment.
+
+        Returns:
+            True if both env vars are set, False otherwise
+        """
+        api_key = os.getenv("KLEDO_API_KEY", "").strip()
+        base_url = os.getenv("KLEDO_BASE_URL", "").strip()
+        return bool(api_key and base_url)
 
     def validate_api_key(self, api_key: str) -> tuple[bool, str]:
         """
@@ -94,39 +126,115 @@ class ConfigManager:
         except Exception as e:
             return False, f"Invalid URL format: {str(e)}"
 
-    def env_file_exists(self) -> bool:
+    def _file_has_api_key(self, file_path: Path) -> bool:
         """
-        Check if .env file exists and has KLEDO_API_KEY set.
+        Check if a .env file contains KLEDO_API_KEY without loading it into environment.
+
+        Args:
+            file_path: Path to .env file to check
 
         Returns:
-            True if .env exists with KLEDO_API_KEY, False otherwise
+            True if file contains KLEDO_API_KEY, False otherwise
         """
-        if not self.env_path.exists():
+        try:
+            if not file_path.exists():
+                return False
+            content = file_path.read_text()
+            return "KLEDO_API_KEY=" in content
+        except Exception as e:
+            logger.debug(f"Error reading {file_path}: {str(e)}")
             return False
 
-        # Load and check for KLEDO_API_KEY
-        load_dotenv(self.env_path)
-        api_key = os.getenv("KLEDO_API_KEY")
+    def find_config_file(self) -> Optional[Path]:
+        """
+        Find the first existing config file from standard locations.
 
-        return api_key is not None and len(api_key.strip()) > 0
+        Checks self.env_path first (for tests and custom paths), then standard locations.
+        Does NOT load environment variables during search to avoid pollution.
+
+        Returns:
+            Path to existing config file, or None if not found
+        """
+        # First check the configured env_path (important for tests)
+        if self._file_has_api_key(self.env_path):
+            logger.debug(f"Found config file at: {self.env_path}")
+            return self.env_path
+
+        # Then check standard locations
+        for location in self.get_config_file_locations():
+            if location != self.env_path and self._file_has_api_key(location):
+                logger.debug(f"Found config file at: {location}")
+                return location
+
+        return None
+
+    def env_file_exists(self) -> bool:
+        """
+        Check if configuration exists (env vars or .env file).
+
+        Returns:
+            True if configured via env vars OR .env file exists with KLEDO_API_KEY
+        """
+        # First check environment variables (highest priority)
+        if self.has_env_vars_configured():
+            logger.debug("Configuration found via environment variables")
+            return True
+
+        # Only search standard locations if using default path
+        # (for tests with custom paths, only check the specified path)
+        if self._is_default_path:
+            config_file = self.find_config_file()
+            if config_file:
+                # Update env_path to the found location for consistency
+                self.env_path = config_file
+                return True
+        else:
+            # Custom path: only check that specific path
+            if self._file_has_api_key(self.env_path):
+                return True
+
+        return False
 
     def load_current_config(self) -> Optional[dict]:
         """
-        Load current configuration from .env file.
+        Load current configuration from environment variables or .env file.
+
+        Priority:
+        1. Environment variables (KLEDO_API_KEY, KLEDO_BASE_URL)
+        2. .env file in standard locations (or specified path for custom env_path)
+        3. Return None if not configured
 
         Returns:
-            Dictionary of configuration values, or None if .env doesn't exist
+            Dictionary of configuration values, or None if not configured
         """
-        if not self.env_path.exists():
+        # First check environment variables
+        api_key = os.getenv("KLEDO_API_KEY", "").strip()
+        base_url = os.getenv("KLEDO_BASE_URL", "").strip()
+
+        # If not in env vars, check .env files
+        if not api_key or not base_url:
+            config_file = None
+
+            if self._is_default_path:
+                # Default path: search standard locations
+                config_file = self.find_config_file()
+            else:
+                # Custom path: only check specified path
+                if self._file_has_api_key(self.env_path):
+                    config_file = self.env_path
+
+            if config_file:
+                load_dotenv(config_file, override=True)
+                api_key = os.getenv("KLEDO_API_KEY", "").strip()
+                base_url = os.getenv("KLEDO_BASE_URL", "").strip()
+
+        # If still not configured, return None
+        if not api_key or not base_url:
             return None
 
-        # Use override=True to ensure we read from the specified path
-        # and not from parent directories
-        load_dotenv(self.env_path, override=True)
-
         config = {
-            "api_key": os.getenv("KLEDO_API_KEY", ""),
-            "base_url": os.getenv("KLEDO_BASE_URL", ""),
+            "api_key": api_key,
+            "base_url": base_url,
             "cache_enabled": os.getenv("CACHE_ENABLED", "true"),
             "cache_ttl": os.getenv("CACHE_DEFAULT_TTL", "1800"),
             "log_level": os.getenv("LOG_LEVEL", "INFO"),
