@@ -128,28 +128,41 @@ All tools show BOTH revenue calculations:
 
 - Python 3.11 or higher
 - Kledo account with API access
-- Claude Code CLI, Claude Desktop, or any AI IDE that supports MCP
+- Claude Desktop, or any AI IDE that supports MCP
 
-### Quick Install
+### Standard Install
 
-1. **Clone and install:**
-   ```bash
-   git clone https://github.com/efacsen/kledo-api-mcp.git
-   cd kledo-api-mcp
-   pip install -e .
-   ```
+```bash
+git clone https://github.com/efacsen/kledo-api-mcp.git
+cd kledo-api-mcp
+pip install -e .
+```
 
-2. **Configure environment:**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your Kledo credentials
-   ```
+**The `kledo-mcp` command is now available!**
 
-3. **Your MCP server is now available as `kledo-mcp` command!**
+### Getting Your Kledo API Key
 
-### Configuration Options
+1. Log in to your Kledo account at [https://kledo.com](https://kledo.com)
+2. Navigate to **Settings** → **Integration** → **API**
+3. Click **Generate New API Key**
+4. Copy the key (it starts with `kledo_pat_`)
 
-**For Claude Desktop/CLI (Recommended):**
+The setup wizard will prompt you for this key when you run `kledo-mcp` for the first time.
+
+### Claude Desktop Configuration
+
+The easiest way is to run the setup wizard:
+
+```bash
+kledo-mcp --show-config
+```
+
+This displays your Claude Desktop configuration with the correct paths. Just copy and paste!
+
+**Manual Configuration (Advanced):**
+
+If you prefer to configure manually, edit your Claude Desktop config file:
+
 ```json
 {
   "mcpServers": {
@@ -166,45 +179,12 @@ All tools show BOTH revenue calculations:
 }
 ```
 
-**For Other IDEs (like VS Code Copilot, etc.):**
-Simply use `"command": "kledo-mcp"` with the environment variables above.
+**Config file locations:**
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+- Linux: `~/.config/Claude/claude_desktop_config.json`
 
-**Legacy Configuration (still works):**
-If you prefer the old approach:
-```json
-{
-  "mcpServers": {
-    "kledo-crm": {
-      "command": "python",
-      "args": ["-m", "src.server"],
-      "cwd": "/path/to/kledo-api-mcp",
-      "env": {
-        "KLEDO_API_KEY": "your_api_key_here"
-      }
-    }
-  }
-}
-```
-
-### Manual Testing
-
-You can test the server directly from anywhere:
-```bash
-# Start the MCP server
-kledo-mcp
-
-# Or use the old way (still works)
-python -m src.server
-```
-
-### Getting Your Kledo API Key
-
-1. Log in to your Kledo account at https://kledo.com
-2. Go to **Settings** → **Integration** → **API**
-3. Generate a new API key
-4. Copy the key and add it to your `.env` file
-
-**Security Note**: Never commit your `.env` file to version control. The `.gitignore` file already excludes it.
+**Security Note**: Never commit your API key to version control.
 
 ## 🚀 Usage Examples
 
