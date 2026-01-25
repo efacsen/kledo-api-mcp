@@ -325,6 +325,76 @@ Claude will use `utility_test_connection` to verify authentication and API acces
 
 ## 🐛 Troubleshooting
 
+### Setup & First-Run Issues
+
+**Setup wizard won't start:**
+
+```bash
+# Verify installation
+pip install -e .
+
+# Try explicit setup
+kledo-mcp --setup
+```
+
+**"Invalid API key" error:**
+
+1. Verify your API key starts with `kledo_pat_`
+2. Check for extra spaces when copying
+3. Test the key directly:
+   ```bash
+   kledo-mcp --test
+   ```
+4. Generate a new key from Kledo dashboard if needed
+
+**Configuration not saved:**
+
+```bash
+# Check .env was created
+ls -la .env
+
+# Force re-initialization
+kledo-mcp --init
+```
+
+**"Connection failed" during setup:**
+
+1. Verify your internet connection
+2. Check Kledo API status: [https://status.kledo.com](https://status.kledo.com)
+3. Test with curl:
+   ```bash
+   curl -H "Authorization: Bearer YOUR_API_KEY" \
+        https://api.kledo.com/api/v1/finance/account
+   ```
+
+**Claude Desktop doesn't show the server:**
+
+1. Run `kledo-mcp --show-config` and copy the output
+2. Verify JSON syntax (use [jsonlint.com](https://jsonlint.com))
+3. Check config file location:
+   ```bash
+   # macOS
+   cat ~/Library/Application\ Support/Claude/claude_desktop_config.json
+
+   # Linux
+   cat ~/.config/Claude/claude_desktop_config.json
+   ```
+4. Restart Claude Desktop completely (quit and reopen)
+5. Check Claude logs:
+   ```bash
+   # macOS
+   tail -f ~/Library/Logs/Claude/mcp*.log
+   ```
+
+**Still stuck?**
+
+Open an issue with:
+- Output of `kledo-mcp --version`
+- Output of `kledo-mcp --test`
+- Any error messages from the setup wizard
+
+---
+
 ### MCP Server Not Showing in Claude
 
 1. **Check configuration file location:**
