@@ -469,11 +469,7 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
                 # Try fuzzy company name matching
                 invoices = filter_invoices_by_company_fuzzy(all_invoices, search_term)
                 
-                if invoices:
-                    # Found matches via client-side fuzzy search
-                    result = ["# Sales Invoices\n"]
-                    result.append(f"_Note: Results found via fuzzy company name matching for '{search_term}'_\n")
-                else:
+                if not invoices:
                     result = ["# Sales Invoices\n"]
                     result.append("No invoices found matching the criteria.")
                     return "\n".join(result)
@@ -481,6 +477,37 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
                 result = ["# Sales Invoices\n"]
                 result.append("No invoices found matching the criteria.")
                 return "\n".join(result)
+            
+            # Handle invoice selection if specified (for normal search too)
+            if invoice_selection is not None and len(invoices) > 0:
+                action_type, indices = parse_invoice_selection(str(invoice_selection), len(invoices))
+                
+                if action_type == "invalid":
+                    return f"❌ Invalid selection '{invoice_selection}'. Pilih nomor 1-{len(invoices)}, atau 'all', atau 'summary'."
+                
+                elif action_type == "summary":
+                    # Return aggregate summary only
+                    total_net = sum(float(safe_get(inv, "subtotal", 0)) for inv in invoices)
+                    total_tax = sum(float(safe_get(inv, "total_tax", 0)) for inv in invoices)
+                    total_gross = sum(float(safe_get(inv, "amount_after_tax", 0)) for inv in invoices)
+                    total_due = sum(float(safe_get(inv, "due", 0)) for inv in invoices)
+                    total_paid = total_gross - total_due
+                    
+                    result = [f"# Summary: {len(invoices)} Invoices for '{search_term}'\n"]
+                    result.append(f"**Penjualan Neto (Net Sales)**: {format_currency(total_net)}")
+                    result.append(f"**PPN Collected**: {format_currency(total_tax)}")
+                    result.append(f"**Penjualan Bruto (Gross Sales)**: {format_currency(total_gross)}")
+                    result.append(f"**Paid**: {format_currency(total_paid)}")
+                    result.append(f"**Outstanding**: {format_currency(total_due)}")
+                    return "\n".join(result)
+                
+                elif action_type in ["single", "multiple", "all"]:
+                    # Filter to selected invoices
+                    invoices = [invoices[i] for i in indices]
+            
+            # If multiple matches and no selection, present disambiguation
+            elif len(invoices) > 1 and search_term:
+                return _handle_fuzzy_search_disambiguation(invoices, search_term)
 
         result = ["# Sales Invoices\n"]
 
