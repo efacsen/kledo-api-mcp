@@ -10,6 +10,125 @@ from ..kledo_client import KledoAPIClient
 from ..utils.helpers import parse_date_range, format_currency, safe_get
 
 
+def format_customer_display(invoice: dict) -> str:
+    """
+    Format customer/vendor display name prioritizing company name.
+    
+    For B2B context (PT CSS), company name is more important than contact person name.
+    
+    Args:
+        invoice: Invoice dictionary with contact data
+    
+    Returns:
+        Formatted customer string
+        
+    Examples:
+        - Company only: "PT Nippon Paint Indonesia"
+        - Company + Contact: "PT Nippon Paint Indonesia (Darma)"
+        - Contact only: "Suwito"
+    """
+    contact_name = (safe_get(invoice, "contact.name", "") or "").strip()
+    company_name = (safe_get(invoice, "contact.company", "") or "").strip()
+    
+    # Priority 1: Company name with contact in parentheses (if different)
+    if company_name:
+        if contact_name and contact_name.lower() != company_name.lower():
+            return f"{company_name} ({contact_name})"
+        return company_name
+    
+    # Priority 2: Contact name only (fallback)
+    if contact_name:
+        return contact_name
+    
+    # Priority 3: Unknown
+    return "Unknown"
+
+
+def fuzzy_company_match(search_term: str, company_name: str, contact_name: str, threshold: int = 55) -> tuple[bool, float]:
+    """
+    Fuzzy match search term against company name and contact name.
+    
+    Args:
+        search_term: Search input (e.g., "Nipsea", "Nipon")
+        company_name: Company/organization name
+        contact_name: Contact person name
+        threshold: Minimum match score (0-100), default 70
+    
+    Returns:
+        Tuple of (is_match, best_score)
+        
+    Examples:
+        - "Nipsea" matches "PT Nippon Paint Indonesia" (fuzzy)
+        - "Nipon" matches "PT Nippon Paint Indonesia" (fuzzy)
+        - "Nippon" matches "PT Nippon Paint Indonesia" (exact substring)
+    """
+    search_lower = search_term.lower().strip()
+    company_lower = (company_name or "").lower().strip()
+    contact_lower = (contact_name or "").lower().strip()
+    
+    # Skip very short terms
+    if len(search_lower) < 3:
+        return False, 0.0
+    
+    best_score = 0.0
+    
+    # Check exact substring match first (highest priority)
+    if search_lower in company_lower:
+        best_score = 100.0
+    elif search_lower in contact_lower:
+        best_score = 90.0
+    else:
+        # Fuzzy matching - try multiple algorithms
+        if company_lower:
+            # partial_ratio: Good for substring matches
+            partial_score = fuzz.partial_ratio(search_lower, company_lower)
+            # token_sort_ratio: Good for word order variations
+            token_score = fuzz.token_sort_ratio(search_lower, company_lower)
+            company_score = max(partial_score, token_score)
+            best_score = max(best_score, company_score)
+        
+        if contact_lower:
+            partial_score = fuzz.partial_ratio(search_lower, contact_lower)
+            token_score = fuzz.token_sort_ratio(search_lower, contact_lower)
+            contact_score = max(partial_score, token_score) * 0.9  # Slightly lower priority
+            best_score = max(best_score, contact_score)
+    
+    return best_score >= threshold, best_score
+
+
+def filter_invoices_by_company_fuzzy(invoices: list[dict], search_term: str) -> list[dict]:
+    """
+    Filter invoices using fuzzy matching on company names and contact names.
+    
+    Args:
+        invoices: List of invoice dictionaries
+        search_term: Search term to match fuzzily
+    
+    Returns:
+        Filtered list of invoices sorted by match quality
+        
+    Examples:
+        - "Nipsea" → matches "PT Nippon Paint Indonesia"
+        - "Nipon" → matches "PT Nippon Paint Indonesia"
+        - "Kurnia" → matches "PT. KURNIA PROPERTINDO SEJAHTERA"
+    """
+    matches = []
+    
+    for invoice in invoices:
+        company_name = safe_get(invoice, "contact.company", "")
+        contact_name = safe_get(invoice, "contact.name", "")
+        
+        is_match, score = fuzzy_company_match(search_term, company_name, contact_name)
+        
+        if is_match:
+            matches.append((invoice, score))
+    
+    # Sort by score (best matches first)
+    matches.sort(key=lambda x: x[1], reverse=True)
+    
+    return [inv for inv, score in matches]
+
+
 def extract_invoice_digits(ref_number: str) -> list[str]:
     """
     Extract numeric sequences from invoice reference numbers.
@@ -124,6 +243,8 @@ def get_tools() -> list[Tool]:
 
 Shows invoice details including Net Sales (Penjualan Neto), Gross Sales (Penjualan Bruto), payment status, and customer info.
 
+Displays company name prominently for B2B customers (e.g., 'PT Nippon Paint Indonesia (Darma)').
+
 Status codes (VERIFIED):
 - 1 = Belum Dibayar (Unpaid)
 - 2 = Dibayar Sebagian (Partially Paid)
@@ -133,7 +254,7 @@ Status codes (VERIFIED):
                 "properties": {
                     "search": {
                         "type": "string",
-                        "description": "Search invoice number, customer name, or reference. Supports fuzzy search for invoice numbers (e.g., '1153' will match 'INV/26/JAN/01153')"
+                        "description": "Search invoice number, customer name, or company name. Supports fuzzy search for both invoice numbers (e.g., '1153' → 'INV/26/JAN/01153') and company names (e.g., 'Nipsea' → 'PT Nippon Paint Indonesia')"
                     },
                     "contact_id": {
                         "type": "integer",
@@ -197,13 +318,13 @@ Status codes (VERIFIED):
         ),
         Tool(
             name="invoice_list_purchase",
-            description="List purchase invoices (bills from vendors) with optional filtering.",
+            description="List purchase invoices (bills from vendors) with optional filtering. Displays vendor company name prominently for B2B vendors.",
             inputSchema={
                 "type": "object",
                 "properties": {
                     "search": {
                         "type": "string",
-                        "description": "Search term"
+                        "description": "Search term for vendor name or company name. Supports fuzzy matching (e.g., 'Nipsea' → 'PT Nippon Paint Indonesia')"
                     },
                     "contact_id": {
                         "type": "integer",
@@ -313,7 +434,32 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
             )
             invoices = safe_get(data, "data.data", [])
 
-            if not invoices:
+            # If no results and search_term looks like a company name, try client-side fuzzy search
+            if not invoices and search_term and len(search_term) >= 3:
+                # Fetch more invoices without search filter for client-side matching
+                broader_data = await client.list_invoices(
+                    search="",
+                    contact_id=args.get("contact_id"),
+                    status_id=args.get("status_id"),
+                    date_from=date_from,
+                    date_to=date_to,
+                    per_page=100,
+                    force_refresh=args.get("force_refresh", False)
+                )
+                all_invoices = safe_get(broader_data, "data.data", [])
+                
+                # Try fuzzy company name matching
+                invoices = filter_invoices_by_company_fuzzy(all_invoices, search_term)
+                
+                if invoices:
+                    # Found matches via client-side fuzzy search
+                    result = ["# Sales Invoices\n"]
+                    result.append(f"_Note: Results found via fuzzy company name matching for '{search_term}'_\n")
+                else:
+                    result = ["# Sales Invoices\n"]
+                    result.append("No invoices found matching the criteria.")
+                    return "\n".join(result)
+            elif not invoices:
                 result = ["# Sales Invoices\n"]
                 result.append("No invoices found matching the criteria.")
                 return "\n".join(result)
@@ -347,7 +493,7 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
 
         for invoice in invoices[:20]:  # Limit display
             inv_number = safe_get(invoice, "ref_number", "N/A")
-            customer = safe_get(invoice, "contact.name", "Unknown")
+            customer = format_customer_display(invoice)  # Show company name + contact
             date = safe_get(invoice, "trans_date", "")
 
             # Get amounts
@@ -405,7 +551,7 @@ def _handle_fuzzy_search_disambiguation(invoices: list[dict], search_term: str) 
     # Show up to 15 matches
     for i, invoice in enumerate(invoices[:15], 1):
         inv_number = safe_get(invoice, "ref_number", "N/A")
-        customer = safe_get(invoice, "contact.name", "Unknown")
+        customer = format_customer_display(invoice)  # Show company name + contact
         date = safe_get(invoice, "trans_date", "")
         amount_after_tax = float(safe_get(invoice, "amount_after_tax", 0))
         due = float(safe_get(invoice, "due", 0))
@@ -631,6 +777,7 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
     """List purchase invoices."""
     date_from = args.get("date_from")
     date_to = args.get("date_to")
+    search_term = args.get("search", "").strip()
 
     if date_from and not date_to:
         parsed_from, parsed_to = parse_date_range(date_from)
@@ -643,7 +790,7 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
             "purchase_invoices",
             "list",
             params={
-                "search": args.get("search"),
+                "search": search_term,
                 "contact_id": args.get("contact_id"),
                 "status_id": args.get("status_id"),
                 "date_from": date_from,
@@ -657,7 +804,34 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
 
         invoices = safe_get(data, "data.data", [])
 
-        if not invoices:
+        # If no results and search_term looks like a company name, try client-side fuzzy search
+        if not invoices and search_term and len(search_term) >= 3:
+            # Fetch more invoices without search filter for client-side matching
+            broader_data = await client.get(
+                "purchase_invoices",
+                "list",
+                params={
+                    "search": "",
+                    "contact_id": args.get("contact_id"),
+                    "status_id": args.get("status_id"),
+                    "date_from": date_from,
+                    "date_to": date_to,
+                    "per_page": 100
+                },
+                cache_category="invoices"
+            )
+            all_invoices = safe_get(broader_data, "data.data", [])
+            
+            # Try fuzzy company name matching
+            invoices = filter_invoices_by_company_fuzzy(all_invoices, search_term)
+            
+            if invoices:
+                # Found matches via client-side fuzzy search
+                result.append(f"_Note: Results found via fuzzy vendor name matching for '{search_term}'_\n")
+            else:
+                result.append("No purchase invoices found.")
+                return "\n".join(result)
+        elif not invoices:
             result.append("No purchase invoices found.")
             return "\n".join(result)
 
@@ -681,7 +855,7 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
 
         for invoice in invoices[:20]:
             inv_number = safe_get(invoice, "ref_number", "N/A")
-            vendor = safe_get(invoice, "contact.name", "Unknown")
+            vendor = format_customer_display(invoice)  # Show company name + contact
             date = safe_get(invoice, "trans_date", "")
             amount = float(safe_get(invoice, "amount_after_tax", 0))
             due = float(safe_get(invoice, "due", 0))
