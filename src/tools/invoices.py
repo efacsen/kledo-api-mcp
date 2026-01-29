@@ -277,8 +277,8 @@ Status codes (VERIFIED):
                         "description": "Results per page (default: 50, max: 100)"
                     },
                     "invoice_selection": {
-                        "type": "integer",
-                        "description": "When fuzzy search returns multiple matches, use this to select a specific invoice by number (1-based index). Will be shown when multiple fuzzy matches are found."
+                        "type": "string",
+                        "description": "When fuzzy search returns multiple matches, use this to select invoice(s). Supports: single number ('1'), multiple ('1,2,3'), range ('1-5'), or 'all' for all matches, 'summary' for aggregate only."
                     }
                 },
                 "required": []
@@ -408,14 +408,32 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
 
             # Handle invoice selection if specified
             if invoice_selection is not None:
-                try:
-                    selection_idx = int(invoice_selection) - 1  # Convert to 0-based index
-                    if 0 <= selection_idx < len(invoices):
-                        invoices = [invoices[selection_idx]]
-                    else:
-                        return f"Invalid invoice selection {invoice_selection}. Please choose a number between 1-{len(invoices)}."
-                except (ValueError, TypeError):
-                    return "Invalid invoice selection. Please provide a number."
+                action_type, indices = parse_invoice_selection(str(invoice_selection), len(invoices))
+                
+                if action_type == "invalid":
+                    return f"❌ Invalid selection '{invoice_selection}'. Pilih nomor 1-{len(invoices)}, atau 'all', atau 'summary'."
+                
+                elif action_type == "summary":
+                    # Return aggregate summary only
+                    total_net = sum(float(safe_get(inv, "subtotal", 0)) for inv in invoices)
+                    total_tax = sum(float(safe_get(inv, "total_tax", 0)) for inv in invoices)
+                    total_gross = sum(float(safe_get(inv, "amount_after_tax", 0)) for inv in invoices)
+                    total_due = sum(float(safe_get(inv, "due", 0)) for inv in invoices)
+                    total_paid = total_gross - total_due
+                    
+                    result = [f"# Summary: {len(invoices)} Invoices for '{search_term}'\n"]
+                    result.append(f"**Penjualan Neto (Net Sales)**: {format_currency(total_net)}")
+                    result.append(f"**PPN Collected**: {format_currency(total_tax)}")
+                    result.append(f"**Penjualan Bruto (Gross Sales)**: {format_currency(total_gross)}")
+                    result.append(f"**Paid**: {format_currency(total_paid)}")
+                    result.append(f"**Outstanding**: {format_currency(total_due)}")
+                    return "\n".join(result)
+                
+                elif action_type in ["single", "multiple", "all"]:
+                    # Filter to selected invoices
+                    invoices = [invoices[i] for i in indices]
+                    # Continue to normal display below
+                
             # If multiple matches and no selection, present disambiguation
             elif len(invoices) > 1:
                 return _handle_fuzzy_search_disambiguation(invoices, search_term)
@@ -523,6 +541,78 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
         return f"Error fetching sales invoices: {str(e)}"
 
 
+def parse_invoice_selection(selection_str: str, max_count: int) -> tuple[str, list[int]]:
+    """
+    Parse invoice selection string into action type and indices.
+    
+    Args:
+        selection_str: Selection string (e.g., "1", "1,2,3", "1-5", "all", "summary")
+        max_count: Maximum number of invoices available
+    
+    Returns:
+        Tuple of (action_type, selected_indices)
+        - action_type: "single", "multiple", "all", "summary"
+        - selected_indices: List of 0-based indices
+    
+    Examples:
+        "1" → ("single", [0])
+        "1,2,3" → ("multiple", [0, 1, 2])
+        "1-5" → ("multiple", [0, 1, 2, 3, 4])
+        "all" → ("all", [0, 1, ..., max_count-1])
+        "summary" → ("summary", [])
+    """
+    selection_lower = selection_str.lower().strip()
+    
+    # Handle special keywords
+    if selection_lower in ["all", "semua", "tampilkan semua", "show all"]:
+        return "all", list(range(max_count))
+    
+    if selection_lower in ["summary", "total", "aggregate", "ringkasan"]:
+        return "summary", []
+    
+    # Parse numeric selections
+    indices = []
+    
+    # Handle ranges (e.g., "1-5")
+    if '-' in selection_str and not selection_str.startswith('-'):
+        try:
+            parts = selection_str.split('-')
+            if len(parts) == 2:
+                start = int(parts[0].strip()) - 1  # Convert to 0-based
+                end = int(parts[1].strip())  # End is inclusive, so don't subtract 1 yet
+                indices = list(range(start, min(end, max_count)))
+        except (ValueError, IndexError):
+            pass
+    
+    # Handle comma-separated (e.g., "1,2,3" or "1, 2, 3")
+    if not indices and ',' in selection_str:
+        try:
+            parts = selection_str.split(',')
+            for part in parts:
+                num = int(part.strip()) - 1  # Convert to 0-based
+                if 0 <= num < max_count:
+                    indices.append(num)
+        except (ValueError, IndexError):
+            pass
+    
+    # Handle single number
+    if not indices:
+        try:
+            num = int(selection_str.strip()) - 1  # Convert to 0-based
+            if 0 <= num < max_count:
+                indices = [num]
+        except (ValueError, IndexError):
+            pass
+    
+    # Determine action type
+    if not indices:
+        return "invalid", []
+    elif len(indices) == 1:
+        return "single", indices
+    else:
+        return "multiple", indices
+
+
 def _handle_fuzzy_search_disambiguation(invoices: list[dict], search_term: str) -> str:
     """
     Present multiple fuzzy search matches for user to choose from.
@@ -532,56 +622,59 @@ def _handle_fuzzy_search_disambiguation(invoices: list[dict], search_term: str) 
         search_term: The original search term that triggered fuzzy search
 
     Returns:
-        Formatted string showing options and instructions for selection
+        Formatted string showing numbered options and selection instructions
     """
-    result = ["# Fuzzy Search Results\n"]
+    result = []
+    
+    result.append(f"Nemu {len(invoices)} invoice yang match dengan **'{search_term}'**\n")
+    result.append("Pilih mana yang lo mau:\n")
 
-    result.append(f"**Search Term**: '{search_term}'")
-    result.append(f"**Multiple Matches Found**: {len(invoices)}\n")
-
-    result.append("## Matching Invoices:\n")
-
-    # Status mapping (VERIFIED from dashboard)
+    # Status mapping
     status_map = {
-        1: "Belum Dibayar (Unpaid)",
-        2: "Dibayar Sebagian (Partially Paid)",
-        3: "Lunas (Paid)"
+        1: "Belum Dibayar",
+        2: "Dibayar Sebagian",
+        3: "Lunas"
     }
 
-    # Show up to 15 matches
-    for i, invoice in enumerate(invoices[:15], 1):
+    # Show up to 10 matches for clarity
+    display_count = min(len(invoices), 10)
+    
+    for i, invoice in enumerate(invoices[:display_count], 1):
         inv_number = safe_get(invoice, "ref_number", "N/A")
-        customer = format_customer_display(invoice)  # Show company name + contact
+        customer = format_customer_display(invoice)
         date = safe_get(invoice, "trans_date", "")
-        amount_after_tax = float(safe_get(invoice, "amount_after_tax", 0))
+        amount = float(safe_get(invoice, "amount_after_tax", 0))
         due = float(safe_get(invoice, "due", 0))
         status_id = safe_get(invoice, "status_id", 0)
         status = status_map.get(status_id, f"Status-{status_id}")
+        
+        # Use emoji for status
+        status_emoji = "✅" if status_id == 3 else "🔴" if due > 0 else "⚠️"
 
-        # Extract the matching part from the invoice number for highlighting
-        best_match_highlight = _get_best_match_highlight(search_term, inv_number)
+        result.append(f"**{i}. {inv_number}**")
+        result.append(f"   {customer}")
+        result.append(f"   {date} • {format_currency(amount)} {status_emoji} {status}")
+        if i < display_count:  # Add separator except last item
+            result.append("")
 
-        result.append(f"### [{i}] {inv_number}")
-        result.append(f"**Best Match**: {best_match_highlight}")
-        result.append(f"- **Customer**: {customer}")
-        result.append(f"- **Date**: {date}")
-        result.append(f"- **Amount**: {format_currency(amount_after_tax)}")
-        result.append(f"- **Outstanding**: {format_currency(due)}")
-        result.append(f"- **Status**: {status}\n")
+    if len(invoices) > display_count:
+        result.append(f"\n... dan {len(invoices) - display_count} invoice lainnya\n")
 
-    if len(invoices) > 15:
-        result.append(f"... and {len(invoices) - 15} more matches\n")
+    # Instructions - more conversational
+    result.append("\n---")
+    result.append("\n**Cara pilih:**")
+    result.append("- **Satu invoice:** Bilang nomor nya (e.g., \"nomor 1\" atau \"yang pertama\")")
+    result.append("- **Beberapa invoice:** Bilang nomor nya (e.g., \"nomor 1 dan 3\" atau \"1, 2, 5\")")
+    result.append("- **Semua invoice:** Bilang \"semua\" atau \"tampilkan semua\"")
+    result.append("- **Agregat/summary:** Bilang \"total\" atau \"summary\"\n")
 
-    result.append("## Select Invoice")
-    result.append("To view a specific invoice, call the tool again with the same search term and add:")
-    result.append(f'- `invoice_selection: <number>` (where <number> is 1-{len(invoices)})\n')
-    result.append("Example:")
-    result.append(f'`{{"search": "{search_term}", "invoice_selection": 1}}`')
-
-    # Show most recent invoice as a suggestion
-    most_recent = max(invoices, key=lambda inv: safe_get(inv, "trans_date", ""))
-    recent_number = safe_get(most_recent, "ref_number", "Unknown")
-    result.append(f"\n**Tip**: Most recent matching invoice is `{recent_number}` (call with `invoice_selection: 1` to view)")
+    # Calculate aggregate for quick reference
+    total_amount = sum(float(safe_get(inv, "amount_after_tax", 0)) for inv in invoices)
+    total_outstanding = sum(float(safe_get(inv, "due", 0)) for inv in invoices)
+    
+    result.append("**Quick Summary:**")
+    result.append(f"- Total {len(invoices)} invoices: {format_currency(total_amount)}")
+    result.append(f"- Outstanding: {format_currency(total_outstanding)}")
 
     return "\n".join(result)
 
