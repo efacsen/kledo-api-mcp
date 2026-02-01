@@ -120,11 +120,15 @@ TOOL_METADATA: dict[str, tuple[str, list[str]]] = {
     ),
     "financial_sales_summary": (
         "Sales by customer",
-        ["date_from", "date_to", "contact_id"],
+        ["date_from", "date_to"],
+    ),
+    "financial_sales_by_person": (
+        "Sales by sales person/rep",
+        ["date_from", "date_to"],
     ),
     "financial_purchase_summary": (
         "Purchases by vendor",
-        ["date_from", "date_to", "contact_id"],
+        ["date_from", "date_to"],
     ),
     "financial_bank_balances": (
         "Bank account balances",
@@ -164,10 +168,14 @@ DATE_PATTERNS = [
     r"\blast year\b",
     r"\btahun lalu\b",
     r"\btahun kemarin\b",
-    # Quarters
-    r"\bq[1-4]\b",
-    r"\bkuartal [1-4]\b",
-    r"\bquarter [1-4]\b",
+    # Quarters (with optional year)
+    r"\bq[1-4](?:\s+20\d{2})?\b",
+    r"\bkuartal\s+[1-4](?:\s+20\d{2})?\b",
+    r"\bquarter\s+[1-4](?:\s+20\d{2})?\b",
+    r"\btriwulan\s+[1-4](?:\s+20\d{2})?\b",
+    # Months (with optional year)
+    r"\b(?:january|february|march|april|may|june|july|august|september|october|november|december)(?:\s+20\d{2})?\b",
+    r"\b(?:januari|februari|maret|april|mei|juni|juli|agustus|september|oktober|november|desember)(?:\s+20\d{2})?\b",
     # Rolling windows
     r"\b\d+\s*(?:days?|hari)\b",
     r"\b(?:seven|fourteen|thirty|sixty|ninety)\s*days\b",
