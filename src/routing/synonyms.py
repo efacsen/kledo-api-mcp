@@ -89,6 +89,19 @@ SYNONYM_MAP: dict[str, str] = {
     "inventory": "stock",
     "persediaan": "stock",
     "stok": "stock",
+
+    # Sales Person terms
+    "salesperson": "salesperson",
+    "sales_person": "salesperson",
+    "salesrep": "salesperson",
+    "sales rep": "salesperson",
+    "per person": "salesperson",
+    "per orang": "salesperson",
+    "per sales": "salesperson",
+    "ranking sales": "salesperson",
+    "performer": "performer",
+    "top performer": "performer",
+    "performa": "performer",
 }
 
 
@@ -96,8 +109,15 @@ SYNONYM_MAP: dict[str, str] = {
 TERM_TO_TOOLS: dict[str, list[str]] = {
     "sales": [
         "financial_sales_summary",
+        "financial_sales_by_person",
         "invoice_list_sales",
         "order_list_sales",
+    ],
+    "salesperson": [
+        "financial_sales_by_person",
+    ],
+    "performer": [
+        "financial_sales_by_person",
     ],
     "invoice": [
         "invoice_list_sales",

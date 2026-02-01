@@ -68,24 +68,55 @@ def parse_natural_date(phrase: str) -> tuple[date, date] | None:
         last_of_prev_year = date(prev_year, 12, 31)
         return (first_of_prev_year, last_of_prev_year)
 
-    # Quarters - using current year
-    year = today.year
+    # Quarters - extract year from query if present, otherwise use current year
+    year_match = re.search(r'\b(20\d{2})\b', phrase)
+    if year_match:
+        year = int(year_match.group(1))
+    else:
+        year = today.year
 
-    # Q1
-    if phrase_lower in ("q1", "kuartal 1", "quarter 1"):
+    # Q1 patterns
+    q1_patterns = [r'\bq1\b', r'kuartal\s*1\b', r'quarter\s*1\b', r'triwulan\s*1\b']
+    if any(re.search(pattern, phrase_lower) for pattern in q1_patterns):
         return (date(year, 1, 1), date(year, 3, 31))
 
-    # Q2
-    if phrase_lower in ("q2", "kuartal 2", "quarter 2"):
+    # Q2 patterns
+    q2_patterns = [r'\bq2\b', r'kuartal\s*2\b', r'quarter\s*2\b', r'triwulan\s*2\b']
+    if any(re.search(pattern, phrase_lower) for pattern in q2_patterns):
         return (date(year, 4, 1), date(year, 6, 30))
 
-    # Q3
-    if phrase_lower in ("q3", "kuartal 3", "quarter 3"):
+    # Q3 patterns
+    q3_patterns = [r'\bq3\b', r'kuartal\s*3\b', r'quarter\s*3\b', r'triwulan\s*3\b']
+    if any(re.search(pattern, phrase_lower) for pattern in q3_patterns):
         return (date(year, 7, 1), date(year, 9, 30))
 
-    # Q4
-    if phrase_lower in ("q4", "kuartal 4", "quarter 4"):
+    # Q4 patterns
+    q4_patterns = [r'\bq4\b', r'kuartal\s*4\b', r'quarter\s*4\b', r'triwulan\s*4\b']
+    if any(re.search(pattern, phrase_lower) for pattern in q4_patterns):
         return (date(year, 10, 1), date(year, 12, 31))
+
+    # Months with year support (e.g., "Oktober 2025", "December 2024")
+    months_map = {
+        # English
+        'january': 1, 'february': 2, 'march': 3, 'april': 4,
+        'may': 5, 'june': 6, 'july': 7, 'august': 8,
+        'september': 9, 'october': 10, 'november': 11, 'december': 12,
+        # Indonesian
+        'januari': 1, 'februari': 2, 'maret': 3, 'mei': 5,
+        'juni': 6, 'juli': 7, 'agustus': 8, 'oktober': 10,
+        'november': 11, 'desember': 12
+    }
+    
+    for month_name, month_num in months_map.items():
+        if month_name in phrase_lower:
+            # Check for year in query
+            year_match = re.search(r'\b(20\d{2})\b', phrase)
+            target_year = int(year_match.group(1)) if year_match else today.year
+            
+            # Get last day of month
+            last_day = monthrange(target_year, month_num)[1]
+            
+            return (date(target_year, month_num, 1), date(target_year, month_num, last_day))
 
     # Rolling windows (from today backward)
 
