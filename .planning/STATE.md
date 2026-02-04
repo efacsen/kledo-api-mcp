@@ -10,19 +10,31 @@ See: .planning/PROJECT.md (updated 2026-02-04)
 ## Current Position
 
 Milestone: v1.2 Query Script Refactor
-Phase: Not started (defining requirements)
+Phase: 7 of 10 (Infrastructure Foundation)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-02-04 — Milestone v1.2 started
+Status: Ready to plan
+Last activity: 2026-02-04 — Roadmap created for v1.2
 
-Note: v1.1 Phase 6 has 1 remaining plan (06-03: README Quick Start Guide) — can be completed separately.
+Progress: [██████░░░░] 60% (across all milestones: 18/30 plans)
 
 ## Performance Metrics
 
 **Velocity (from v1.0 + v1.1):**
-- Total plans completed: 19
-- Average duration: 3.5 minutes
-- Total execution time: 58 minutes
+- Total plans completed: 18
+- Average duration: ~3.5 minutes
+- Total execution time: ~63 minutes
+
+**By Milestone:**
+
+| Milestone | Phases | Plans | Status |
+|-----------|--------|-------|--------|
+| v1.0 | 1-4 | 9/9 | Complete |
+| v1.1 | 5-6 | 4/4 | Complete |
+| v1.2 | 7-10 | 0/10 | Not started |
+
+**Recent Trend:**
+- Stable velocity (~3-4 min per plan)
+- Consistent execution quality
 
 *Updated after each plan completion*
 
@@ -30,36 +42,27 @@ Note: v1.1 Phase 6 has 1 remaining plan (06-03: README Quick Start Guide) — ca
 
 ### Decisions
 
-All v1.0 decisions logged in PROJECT.md Key Decisions table.
-See .planning/milestones/v1.0-ROADMAP.md for complete decision history.
+All v1.0 and v1.1 decisions logged in PROJECT.md Key Decisions table.
 
-**v1.2 Context Decisions (pre-milestone):**
+**v1.2 Context Decisions:**
 
-| Decision | Rationale | Context |
+| Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Monospace code blocks for Telegram | Telegram can't render GFM markdown tables | Deployed to VPS 2026-02-04 |
-| format_currency(short=True) | Compact currency display (99.2jt) for Telegram readability | Deployed to VPS 2026-02-04 |
-| Per-entity scripts over multi-function modules | Atom AI gets confused with current structure; dedicated scripts are clearer | User request |
-
-### Roadmap Evolution
-
-- v1.0 Phases 1-4: COMPLETE (shipped 2026-01-24)
-- v1.1 Phases 5-6: Phase 5 COMPLETE, Phase 6 at 2/3 plans
-- v1.2 started: 2026-02-04 — Query Script Refactor
+| Per-entity scripts | Atom AI gets confused with current multi-function modules; dedicated scripts are clearer | Pending |
+| Monospace + short currency | Telegram can't render markdown tables; use code blocks + compact numbers | Good — deployed to VPS |
+| Consistent date filtering | All scripts need same interface for predictable behavior | Pending |
 
 ### Pending Todos
 
-- [ ] v1.1 Phase 6 remaining: 06-03 README Quick Start Guide
-- [ ] Define v1.2 requirements
-- [ ] Create v1.2 roadmap
+None — fresh start for v1.2.
 
 ### Blockers/Concerns
 
-None.
+**Phase 8 concern:** Expenses entity doesn't exist yet. Need to discover Kledo API endpoint for expenses/biaya during Phase 8 planning.
 
 ## Session Continuity
 
-Last session: 2026-02-04
-Stopped at: Starting milestone v1.2
+Last session: 2026-02-04 20:45
+Stopped at: Roadmap created for v1.2 milestone
 Resume file: None
-Next action: Define requirements and create roadmap
+Next action: `/gsd:plan-phase 7` to plan Infrastructure Foundation
