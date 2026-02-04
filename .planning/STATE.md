@@ -2,44 +2,27 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-24)
+See: .planning/PROJECT.md (updated 2026-02-04)
 
 **Core value:** AI agents can directly query Kledo business data with clear understanding of which endpoint to use
-**Current focus:** Phase 5 complete - Domain Model & Field Mapping
+**Current focus:** Milestone v1.2 — Query Script Refactor
 
 ## Current Position
 
-Milestone: v1.1 Analytics Foundation
-Phase: 6 of 6 (06-smart-mcp-server-onboarding)
-Plan: 2 of 3 complete
-Status: In progress
-Last activity: 2026-01-25 - Completed 06-02-PLAN.md
+Milestone: v1.2 Query Script Refactor
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-04 — Milestone v1.2 started
 
-Progress: [============================  ] 95% (19/20 plans across all phases)
-Phase 5: COMPLETE
-Phase 6: IN PROGRESS (2/3)
+Note: v1.1 Phase 6 has 1 remaining plan (06-03: README Quick Start Guide) — can be completed separately.
 
 ## Performance Metrics
 
-**Velocity:**
+**Velocity (from v1.0 + v1.1):**
 - Total plans completed: 19
 - Average duration: 3.5 minutes
 - Total execution time: 58 minutes
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 01-entity-registry | 3 | 12 min | 4 min |
-| 02-documentation-layer | 3 | 10 min | 3 min |
-| 03-tool-enhancement | 1 | 2 min | 2 min |
-| 04-smart-routing | 3 | 10 min | 3.3 min |
-| 05-domain-model-field-mapping | 2 | 8 min | 4 min |
-| 06-smart-mcp-server-onboarding | 2 | 11 min | 5.5 min |
-
-**Recent Trend:**
-- Last 5 plans: 04-03 (1 min), 05-01 (3 min), 05-02 (5 min), 06-01 (5 min), 06-02 (6 min)
-- Trend: Consistent velocity, 1-6 min per plan
 
 *Updated after each plan completion*
 
@@ -50,55 +33,25 @@ Phase 6: IN PROGRESS (2/3)
 All v1.0 decisions logged in PROJECT.md Key Decisions table.
 See .planning/milestones/v1.0-ROADMAP.md for complete decision history.
 
-**Phase 5 Decisions:**
+**v1.2 Context Decisions (pre-milestone):**
 
-| Decision | Rationale | Plan |
-|----------|-----------|------|
-| Pydantic BaseModel for domain models | Consistent with project patterns, validation included | 05-01 |
-| 1 rupiah tolerance for validation | Handle Kledo API rounding differences | 05-01 |
-| Decimal(str()) pattern | Avoid float precision issues | 05-01 |
-| skip_invalid option for batch | Production resilience | 05-01 |
-| Keep outstanding_receivables raw | Needs 'due' field not in domain model | 05-02 |
-| Indonesian terms inline | Format: "Penjualan Neto (Net Sales)" for clarity | 05-02 |
-
-**Phase 6 Decisions:**
-
-| Decision | Rationale | Plan |
-|----------|-----------|------|
-| HTTPS-only for base URLs | Security requirement, prevent accidental plaintext API traffic | 06-01 |
-| API key length validation | 20+ chars generic, 30+ for kledo_pat_ prefix - ensure entropy | 06-01 |
-| python-dotenv with override=True | Test isolation - prevent tests reading project .env | 06-01 |
-| ANSI color codes (no external deps) | Avoid dependencies for simple terminal colors | 06-01 |
-| Injectable ConfigManager | Testability - allow mocking and tmp_path usage | 06-01 |
-| 5 CLI commands pattern | Cover all essential use cases (setup, validation, configuration, troubleshooting) | 06-02 |
-| OS-specific paths for Claude Desktop | Better UX - users get exact path for their OS | 06-02 |
-| Idempotent command design | Safe to run multiple times - reduces user confusion | 06-02 |
-| Mock all external dependencies | Fast tests, no real API calls, isolated unit testing | 06-02 |
-| --init as alias for --setup | Common CLI convention - matches user expectations | 06-02 |
+| Decision | Rationale | Context |
+|----------|-----------|---------|
+| Monospace code blocks for Telegram | Telegram can't render GFM markdown tables | Deployed to VPS 2026-02-04 |
+| format_currency(short=True) | Compact currency display (99.2jt) for Telegram readability | Deployed to VPS 2026-02-04 |
+| Per-entity scripts over multi-function modules | Atom AI gets confused with current structure; dedicated scripts are clearer | User request |
 
 ### Roadmap Evolution
 
-- Phase 5 added: Domain Model & Field Mapping (2026-01-24)
-  - Convert Kledo API fields to clear business terminology
-  - Foundation for professional analytics platform
-  - Based on validated data from 5 invoices proving field relationships
-- Phase 5 COMPLETE (2026-01-24)
-  - Domain model created with InvoiceFinancials
-  - All analytics tools updated with clear terminology
-- Phase 6 added: Smart MCP Server Onboarding (2026-01-25)
-  - Reduce setup from 5+ manual steps to one-command first-run
-  - Interactive setup wizard with first-run detection
-  - Improves user experience and reduces support friction
-- Phase 6 IN PROGRESS (2026-01-25)
-  - 06-01: Setup wizard with first-run detection
-  - 06-02: CLI validation commands (--setup, --test, --show-config)
+- v1.0 Phases 1-4: COMPLETE (shipped 2026-01-24)
+- v1.1 Phases 5-6: Phase 5 COMPLETE, Phase 6 at 2/3 plans
+- v1.2 started: 2026-02-04 — Query Script Refactor
 
 ### Pending Todos
 
-Phase 6 (Smart MCP Server Onboarding):
-- [x] 06-01: Implement setup wizard and first-run detection
-- [x] 06-02: Add validation commands (--setup, --test, --show-config)
-- [ ] 06-03: Update README with quick-start guide
+- [ ] v1.1 Phase 6 remaining: 06-03 README Quick Start Guide
+- [ ] Define v1.2 requirements
+- [ ] Create v1.2 roadmap
 
 ### Blockers/Concerns
 
@@ -106,7 +59,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-01-25 00:35 UTC
-Stopped at: Completed 06-02-PLAN.md
+Last session: 2026-02-04
+Stopped at: Starting milestone v1.2
 Resume file: None
-Next action: Execute 06-03 (README Quick Start Guide)
+Next action: Define requirements and create roadmap

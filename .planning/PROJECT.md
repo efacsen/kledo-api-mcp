@@ -5,6 +5,17 @@
 MCP (Model Context Protocol) server yang menghubungkan AI agents dengan Kledo accounting software. Server ini menyediakan self-documenting API layer dengan intelligent natural language routing, sehingga AI agents (Claude Code, atau agent lain) dapat dengan mudah mengakses dan memahami data bisnis dari Kledo — tanpa perlu manual export CSV lagi.
 
 v1.0 includes: Entity registry, comprehensive documentation layer, tool disambiguation, and bilingual smart routing.
+v1.1 includes: Domain model with clear business terminology, smart onboarding wizard.
+
+## Current Milestone: v1.2 Query Script Refactor
+
+**Goal:** Refactor query scripts into clean, dedicated per-entity scripts so atom doesn't get confused when users query Kledo data. Each entity type gets its own focused script with consistent date filtering.
+
+**Target features:**
+- Dedicated per-entity query scripts (total_inv.py, total_pi.py, total_exp.py, etc.)
+- Consistent date filtering across all scripts
+- Clean, less confusing structure for AI agent consumption
+- Proper Telegram-friendly output formatting (monospace code blocks)
 
 ## Core Value
 
@@ -32,10 +43,11 @@ AI agents dapat langsung query data bisnis real-time dari Kledo dengan tau persi
 
 ### Active
 
-- [ ] Expenses/biaya tools
+- [ ] Dedicated per-entity query scripts with date filtering
+- [ ] Expenses/biaya tools (total_exp.py)
+- [ ] Clean tool structure — one script per entity type
+- [ ] Consistent output formatting (monospace, short currency)
 - [ ] Operation cost tools
-- [ ] Tool parameter documentation with examples
-- [ ] Structured error responses across all tools
 
 ### Out of Scope
 
@@ -46,12 +58,15 @@ AI agents dapat langsung query data bisnis real-time dari Kledo dengan tau persi
 
 ## Context
 
-**Current State (v1.0):**
+**Current State (v1.1):**
 - Shipped self-documenting MCP server with 30+ tools
 - Complete entity registry with Pydantic models
 - MkDocs documentation site with ERD generation
 - Bilingual smart routing (Indonesian/English)
-- Codebase: ~581K LOC Python
+- Domain model with clear business terminology (InvoiceFinancials)
+- Smart onboarding wizard (--setup, --test, --show-config)
+- Telegram-friendly monospace formatting + short currency (99.2jt)
+- Codebase: 9 tool modules, 4,033 lines across tools
 
 **Business Context:**
 - Kledo adalah CRM akuntansi yang dipakai untuk manage semua data perusahaan
@@ -91,5 +106,8 @@ AI agents dapat langsung query data bisnis real-time dari Kledo dengan tau persi
 | Pattern matching precedence | Idiomatic expressions matched before keyword scoring | ✓ Good — "outstanding invoices" → direct tool match |
 | 80% fuzzy match threshold | Balance typo tolerance with precision | ✓ Good — "invoise" matches "invoice" at 85.7% |
 
+| Per-entity scripts | Atom gets confused with current multi-function modules; dedicated scripts are clearer | — Pending |
+| Monospace + short currency | Telegram can't render markdown tables; use code blocks + compact numbers | ✓ Good — deployed to VPS |
+
 ---
-*Last updated: 2026-01-24 after v1.0 milestone*
+*Last updated: 2026-02-04 after v1.2 milestone start*
