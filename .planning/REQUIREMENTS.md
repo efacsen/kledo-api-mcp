@@ -71,13 +71,31 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be filled by roadmap) | | |
+| INF-01 | Phase 7 | Not started |
+| INF-02 | Phase 7 | Not started |
+| INF-03 | Phase 7 | Not started |
+| INF-04 | Phase 7 | Not started |
+| INF-05 | Phase 7 | Not started |
+| ENT-01 | Phase 8 | Not started |
+| ENT-02 | Phase 8 | Not started |
+| ENT-03 | Phase 8 | Not started |
+| ENT-04 | Phase 8 | Not started |
+| ENT-05 | Phase 8 | Not started |
+| ANL-01 | Phase 9 | Not started |
+| ANL-02 | Phase 9 | Not started |
+| ANL-03 | Phase 9 | Not started |
+| ANL-04 | Phase 9 | Not started |
+| CLN-01 | Phase 10 | Not started |
+| CLN-02 | Phase 10 | Not started |
+| CLN-03 | Phase 10 | Not started |
+| CLN-04 | Phase 10 | Not started |
+| CLN-05 | Phase 10 | Not started |
 
 **Coverage:**
 - v1.2 requirements: 18 total
-- Mapped to phases: 0
-- Unmapped: 18 ⚠️
+- Mapped to phases: 18 ✓
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-04*
-*Last updated: 2026-02-04 after initial definition*
+*Last updated: 2026-02-04 after roadmap creation*
