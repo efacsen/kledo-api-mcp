@@ -134,6 +134,15 @@ TOOL_METADATA: dict[str, tuple[str, list[str]]] = {
         "Bank account balances",
         [],
     ),
+    # Aggregation Tools
+    "outstanding_by_customer": (
+        "Outstanding amounts grouped by customer",
+        ["min_outstanding", "overdue_days", "sort_by", "date_from", "date_to"],
+    ),
+    "outstanding_by_vendor": (
+        "Outstanding amounts grouped by vendor",
+        ["min_outstanding", "overdue_days", "sort_by", "date_from", "date_to"],
+    ),
     # System Tools
     "utility_clear_cache": (
         "Clear cached data",
@@ -388,6 +397,19 @@ def route_query(query: str) -> RoutingResult:
 
     # Sort by score descending, then alphabetically for ties
     scored_suggestions.sort(key=lambda s: (-s.score, s.tool_name))
+
+    # Ambiguity detection: if top 2 tools have similar scores, suggest clarification
+    if len(scored_suggestions) >= 2:
+        top_score = scored_suggestions[0].score
+        second_score = scored_suggestions[1].score
+        if top_score < 5.0 and (top_score - second_score) < 2.0:
+            # Low confidence and close scores - suggest clarification
+            top_tool = scored_suggestions[0].tool_name
+            second_tool = scored_suggestions[1].tool_name
+            result.clarification_needed = (
+                f"Maksudnya '{scored_suggestions[0].purpose}' "
+                f"atau '{scored_suggestions[1].purpose}'?"
+            )
 
     # Return top 5 suggestions
     result.matched_tools = scored_suggestions[:5]

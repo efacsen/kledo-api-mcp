@@ -102,6 +102,20 @@ SYNONYM_MAP: dict[str, str] = {
     "performer": "performer",
     "top performer": "performer",
     "performa": "performer",
+
+    # Outstanding/aggregation terms
+    "outstanding": "outstanding",
+    "overdue": "outstanding",
+    "telat": "outstanding",
+    "terlambat": "outstanding",
+    "jatuh tempo": "outstanding",
+
+    # Aggregation action terms
+    "per": "aggregation",
+    "grouped": "aggregation",
+    "group by": "aggregation",
+    "breakdown": "aggregation",
+    "ringkasan per": "aggregation",
 }
 
 
@@ -138,10 +152,25 @@ TERM_TO_TOOLS: dict[str, list[str]] = {
     "receivable": [
         "invoice_get_totals",
         "invoice_list_sales",
+        "outstanding_by_customer",
     ],
     "payable": [
         "invoice_list_purchase",
         "financial_purchase_summary",
+        "outstanding_by_vendor",
+    ],
+    "outstanding": [
+        "outstanding_by_customer",
+        "outstanding_by_vendor",
+        "invoice_get_totals",
+        "invoice_list_sales",
+    ],
+    "aggregation": [
+        "outstanding_by_customer",
+        "outstanding_by_vendor",
+        "financial_sales_summary",
+        "financial_purchase_summary",
+        "financial_sales_by_person",
     ],
     "balance": [
         "financial_bank_balances",
