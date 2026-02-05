@@ -345,10 +345,12 @@ Status codes (VERIFIED):
 
 Displays vendor company name prominently for B2B vendors.
 
-Supports due date and overdue filtering:
-- Filter by due date range (e.g., "purchase invoice yang jatuh tempo minggu ini")
-- Filter by overdue threshold (e.g., "purchase invoice yang telat lebih dari 30 hari")
-- Show aging buckets for overdue invoices (1-30, 31-60, 60+ days)
+Supports filtering:
+- Due date range (e.g., "purchase invoice yang jatuh tempo minggu ini")
+- Overdue threshold (e.g., "purchase invoice yang telat lebih dari 30 hari")
+- Vendor name with fuzzy matching (e.g., "purchase invoice dari vendor Nippon")
+- Minimum outstanding amount per vendor (e.g., "vendor dengan outstanding diatas 10 juta")
+- Aging buckets for overdue invoices (1-30, 31-60, 60+ days)
 
 Status codes: 1=Belum Dibayar (Unpaid), 3=Lunas (Paid)""",
             inputSchema={
@@ -358,9 +360,17 @@ Status codes: 1=Belum Dibayar (Unpaid), 3=Lunas (Paid)""",
                         "type": "string",
                         "description": "Search term for vendor name or company name. Supports fuzzy matching (e.g., 'Nipsea' → 'PT Nippon Paint Indonesia')"
                     },
+                    "vendor_name": {
+                        "type": "string",
+                        "description": "Filter by vendor name using fuzzy matching (e.g., 'Nippon', 'Nipsea'). Resolves to vendor contact_id automatically. If multiple vendors match, returns disambiguation list."
+                    },
                     "contact_id": {
                         "type": "integer",
                         "description": "Filter by vendor ID"
+                    },
+                    "min_outstanding": {
+                        "type": "number",
+                        "description": "Minimum total outstanding amount per vendor. Only returns vendors with total outstanding >= this amount. Amount is in IDR (e.g., 10000000 for 10 juta). Applied AFTER vendor-level aggregation."
                     },
                     "status_id": {
                         "type": "integer",
@@ -1114,6 +1124,30 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
             date_from = parsed_from
             date_to = parsed_to
 
+    # Resolve vendor name to contact_id if provided
+    vendor_name = args.get("vendor_name", "").strip()
+    resolved_contact_id = args.get("contact_id")  # Existing param takes priority
+
+    if vendor_name and not resolved_contact_id:
+        resolution = await resolve_vendor_name(client, vendor_name)
+
+        if resolution is None:
+            return f"No vendors found matching '{vendor_name}'. Try a different name or check spelling."
+
+        if isinstance(resolution, list):
+            # Multiple matches - present disambiguation
+            result = [f"Found {len(resolution)} vendors matching '{vendor_name}':\n"]
+            for i, contact in enumerate(resolution, 1):
+                name = contact.get("name", "Unknown")
+                company = contact.get("company_name", "") or contact.get("company", "")
+                display = f"{company} ({name})" if company and name != company else (company or name)
+                result.append(f"**{i}.** {display} (ID: {contact['id']})")
+            result.append(f"\nPlease specify which vendor by using contact_id parameter or a more specific vendor_name.")
+            return "\n".join(result)
+
+        # Single match - use resolved contact_id
+        resolved_contact_id = resolution
+
     # Resolve due date filters
     due_date_from = args.get("due_date_from")
     due_date_to = args.get("due_date_to")
@@ -1152,7 +1186,7 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
             "list",
             params={
                 "search": search_term,
-                "contact_id": args.get("contact_id"),
+                "contact_id": resolved_contact_id,
                 "status_id": args.get("status_id"),
                 "date_from": date_from,
                 "date_to": date_to,
@@ -1170,6 +1204,22 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
         # Apply client-side overdue filtering (exclude fully paid invoices)
         if is_overdue_query and invoices:
             invoices = [inv for inv in invoices if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3]
+
+        # Apply minimum outstanding filter
+        min_outstanding = args.get("min_outstanding")
+        if min_outstanding is not None:
+            min_outstanding = float(min_outstanding)
+            # FILT-07: min_outstanding applies to total per VENDOR, not per invoice
+            # Since we already filtered by contact_id (single vendor), check total
+            total_outstanding = sum(float(safe_get(inv, "due", 0)) for inv in invoices)
+
+            if total_outstanding < min_outstanding:
+                vendor_display = vendor_name or f"contact_id={resolved_contact_id}" if resolved_contact_id else "all vendors"
+                return (
+                    f"Vendor '{vendor_display}' has total outstanding "
+                    f"{format_currency(total_outstanding)}, which is below the minimum "
+                    f"threshold of {format_currency(min_outstanding)}."
+                )
 
         # If no results and search_term looks like a company name, try client-side fuzzy search
         if not invoices and search_term and len(search_term) >= 3:
