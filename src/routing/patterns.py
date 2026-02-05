@@ -16,6 +16,84 @@ from typing import Any
 #   - alternative: optional secondary tool
 #   - confidence: "definitive" or "context-dependent"
 PATTERNS: list[dict[str, Any]] = [
+    # Aggregation patterns - specific patterns first to avoid shadowing
+    {
+        "patterns": [
+            "outstanding per customer",
+            "outstanding per pelanggan",
+            "piutang per customer",
+            "piutang per pelanggan",
+            "daftar outstanding customer",
+            "daftar piutang customer",
+            "customer mana yang paling banyak outstanding",
+            "pelanggan mana yang paling banyak hutang",
+            "siapa yang paling banyak hutang ke kita",
+            "outstanding terbesar",
+            "piutang terbesar",
+        ],
+        "tool": "outstanding_by_customer",
+        "params": {},
+        "confidence": "definitive",
+    },
+    {
+        "patterns": [
+            "outstanding per vendor",
+            "outstanding per pemasok",
+            "hutang per vendor",
+            "utang per vendor",
+            "hutang per pemasok",
+            "utang per pemasok",
+            "daftar outstanding vendor",
+            "daftar hutang vendor",
+            "vendor mana yang kita hutangi paling banyak",
+            "siapa aja yang kita hutangi",
+            "hutang terbesar kita",
+            "utang terbesar kita",
+        ],
+        "tool": "outstanding_by_vendor",
+        "params": {},
+        "confidence": "definitive",
+    },
+    {
+        "patterns": [
+            "siapa aja yang punya hutang",
+            "siapa saja yang punya hutang",
+            "siapa yang hutang",
+            "daftar yang hutang",
+            "yang belum bayar siapa aja",
+            "yang belum lunas siapa aja",
+        ],
+        "tool": "outstanding_by_customer",
+        "params": {},
+        "alternative": "invoice_list_sales",
+        "confidence": "definitive",
+    },
+    # List-intent overrides for invoice queries
+    {
+        "patterns": [
+            "daftar invoice",
+            "daftar faktur",
+            "list invoice",
+            "invoice mana",
+            "faktur mana",
+            "invoice yang mana",
+        ],
+        "tool": "invoice_list_sales",
+        "params": {},
+        "confidence": "definitive",
+    },
+    {
+        "patterns": [
+            "daftar purchase invoice",
+            "daftar purchase",
+            "purchase invoice mana",
+            "tagihan vendor mana",
+        ],
+        "tool": "invoice_list_purchase",
+        "params": {},
+        "confidence": "definitive",
+    },
+    # Generic outstanding patterns (less specific, comes after aggregation patterns)
     {
         "patterns": [
             "outstanding invoices",
