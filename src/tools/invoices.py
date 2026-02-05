@@ -1028,6 +1028,38 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
             date_from = parsed_from
             date_to = parsed_to
 
+    # Resolve due date filters
+    due_date_from = args.get("due_date_from")
+    due_date_to = args.get("due_date_to")
+
+    if due_date_from:
+        parsed_from, parsed_to = parse_indonesian_date_phrase(due_date_from)
+        if parsed_from:
+            due_date_from = parsed_from.isoformat()
+            if not due_date_to:
+                due_date_to = parsed_to.isoformat()
+
+    if due_date_to and not isinstance(due_date_to, str):
+        due_date_to = due_date_to.isoformat()
+    elif due_date_to:
+        parsed_from, parsed_to = parse_indonesian_date_phrase(due_date_to)
+        if parsed_to:
+            due_date_to = parsed_to.isoformat()
+
+    # Handle overdue filtering
+    overdue_only = args.get("overdue_only", False)
+    overdue_days = args.get("overdue_days")
+    is_overdue_query = overdue_only or overdue_days is not None
+
+    if overdue_only and not due_date_to:
+        today = get_jakarta_today()
+        due_date_to = (today - timedelta(days=1)).isoformat()
+
+    if overdue_days is not None and not due_date_to:
+        today = get_jakarta_today()
+        cutoff = today - timedelta(days=overdue_days)
+        due_date_to = cutoff.isoformat()
+
     try:
         data = await client.get(
             "purchase_invoices",
@@ -1038,6 +1070,8 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
                 "status_id": args.get("status_id"),
                 "date_from": date_from,
                 "date_to": date_to,
+                "due_date_from": due_date_from,
+                "due_date_to": due_date_to,
                 "per_page": args.get("per_page", 50)
             },
             cache_category="invoices"
@@ -1046,6 +1080,10 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
         result = ["# Purchase Invoices\n"]
 
         invoices = safe_get(data, "data.data", [])
+
+        # Apply client-side overdue filtering (exclude fully paid invoices)
+        if is_overdue_query and invoices:
+            invoices = [inv for inv in invoices if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3]
 
         # If no results and search_term looks like a company name, try client-side fuzzy search
         if not invoices and search_term and len(search_term) >= 3:
@@ -1059,15 +1097,21 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
                     "status_id": args.get("status_id"),
                     "date_from": date_from,
                     "date_to": date_to,
+                    "due_date_from": due_date_from,
+                    "due_date_to": due_date_to,
                     "per_page": 100
                 },
                 cache_category="invoices"
             )
             all_invoices = safe_get(broader_data, "data.data", [])
-            
+
             # Try fuzzy company name matching
             invoices = filter_invoices_by_company_fuzzy(all_invoices, search_term)
-            
+
+            # Apply client-side overdue filtering
+            if is_overdue_query and invoices:
+                invoices = [inv for inv in invoices if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3]
+
             if invoices:
                 # Found matches via client-side fuzzy search
                 result.append(f"_Note: Results found via fuzzy vendor name matching for '{search_term}'_\n")
@@ -1088,6 +1132,22 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
         result.append(f"**Total Paid**: {format_currency(total_paid)}")
         result.append(f"**Total Outstanding**: {format_currency(total_due)}\n")
 
+        # Add aging bucket display if in overdue mode
+        if is_overdue_query:
+            today_jakarta = get_jakarta_today()
+            buckets = categorize_overdue_invoices(invoices, today_jakarta)
+            result.append("\n## Overdue Aging:\n")
+
+            # Calculate totals for each bucket
+            for bucket_name in ["1-30", "31-60", "60+"]:
+                bucket_items = buckets[bucket_name]
+                if bucket_items:
+                    bucket_count = len(bucket_items)
+                    bucket_outstanding = sum(float(safe_get(inv, "due", 0)) for inv, _ in bucket_items)
+                    result.append(f"**{bucket_name} hari**: {bucket_count} invoices, {format_currency(bucket_outstanding)} outstanding")
+
+            result.append("")  # Empty line
+
         result.append("\n## Purchase Invoices:\n")
 
         # Status mapping (VERIFIED from dashboard - purchase invoices only have status 1 and 3)
@@ -1100,6 +1160,7 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
             inv_number = safe_get(invoice, "ref_number", "N/A")
             vendor = format_customer_display(invoice)  # Show company name + contact
             date = safe_get(invoice, "trans_date", "")
+            due_date = safe_get(invoice, "due_date", "")
             amount = float(safe_get(invoice, "amount_after_tax", 0))
             due = float(safe_get(invoice, "due", 0))
             paid = amount - due
@@ -1109,6 +1170,14 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
             result.append(f"### {inv_number}")
             result.append(f"- **Vendor**: {vendor}")
             result.append(f"- **Date**: {date}")
+            if due_date:
+                result.append(f"- **Due Date**: {due_date}")
+                # Show overdue days if in overdue mode
+                if is_overdue_query:
+                    today_jakarta = get_jakarta_today()
+                    overdue_days_count = calculate_overdue_days(due_date, today_jakarta)
+                    if overdue_days_count > 0:
+                        result.append(f"- **Overdue**: {overdue_days_count} hari")
             result.append(f"- **Gross Amount**: {format_currency(amount)}")
             result.append(f"- **Paid**: {format_currency(paid)}")
             result.append(f"- **Outstanding**: {format_currency(due)}")
