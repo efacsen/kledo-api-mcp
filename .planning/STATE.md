@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-04)
 
 **Core value:** AI agents can directly query Kledo business data with clear understanding of which endpoint to use
-**Current focus:** Milestone v1.2 — Query Script Refactor
+**Current focus:** Milestone v1.1 — Kledo API Enhancements
 
 ## Current Position
 
-Milestone: v1.2 Query Script Refactor
-Phase: 7 of 10 (Infrastructure Foundation)
-Plan: —
-Status: Ready to plan
-Last activity: 2026-02-04 — Roadmap created for v1.2
+Milestone: v1.1 Kledo API Enhancements
+Phase: 6 of 8 (Filtering Enhancements)
+Plan: 2 of 3 complete
+Status: In progress
+Last activity: 2026-02-05 — Completed 06-02-PLAN.md
 
-Progress: [██████░░░░] 60% (across all milestones: 18/30 plans)
+Progress: [███--------------------------] 11% (2/9 plans in v1.1)
 
 ## Performance Metrics
 
@@ -42,27 +42,27 @@ Progress: [██████░░░░] 60% (across all milestones: 18/30 pla
 
 ### Decisions
 
-All v1.0 and v1.1 decisions logged in PROJECT.md Key Decisions table.
+**Phase 6 (Filtering Enhancements) Decisions:**
 
-**v1.2 Context Decisions:**
-
-| Decision | Rationale | Outcome |
-|----------|-----------|---------|
-| Per-entity scripts | Atom AI gets confused with current multi-function modules; dedicated scripts are clearer | Pending |
-| Monospace + short currency | Telegram can't render markdown tables; use code blocks + compact numbers | Good — deployed to VPS |
-| Consistent date filtering | All scripts need same interface for predictable behavior | Pending |
+| Decision | Rationale | Outcome | Plan |
+|----------|-----------|---------|------|
+| Jakarta timezone (Asia/Jakarta) for all date calculations | Match business location (PT CSS operates in Jakarta, GMT+7) | Implemented in get_jakarta_today() utility | 06-01 |
+| Support 11 Indonesian date phrases | Natural language queries ("minggu ini", "bulan lalu", etc.) | Implemented in parse_indonesian_date_phrase() | 06-01 |
+| Exclude fully paid invoices in overdue mode | Paid invoices (status_id=3) shouldn't appear in overdue queries | Applied in both sales and purchase invoice handlers | 06-01, 06-02 |
+| Display aging buckets (1-30, 31-60, 60+ hari) | Business needs to prioritize collections by aging | Implemented in categorize_overdue_invoices() | 06-01, 06-02 |
+| Maintain parity between sales and purchase invoice tools | Consistent API for predictable behavior across invoice types | Purchase invoice tool mirrors sales invoice filtering exactly | 06-02 |
 
 ### Pending Todos
 
-None — fresh start for v1.2.
+None - Phase 6 Plan 2 completed successfully.
 
 ### Blockers/Concerns
 
-**Phase 8 concern:** Expenses entity doesn't exist yet. Need to discover Kledo API endpoint for expenses/biaya during Phase 8 planning.
+None - filtering enhancements proceeding smoothly.
 
 ## Session Continuity
 
-Last session: 2026-02-04 20:45
-Stopped at: Roadmap created for v1.2 milestone
+Last session: 2026-02-05 19:14
+Stopped at: Completed 06-02-PLAN.md (Purchase Invoice Due Date Filtering)
 Resume file: None
-Next action: `/gsd:plan-phase 7` to plan Infrastructure Foundation
+Next action: Execute remaining Phase 6 plan (06-03) or proceed to Phase 7
