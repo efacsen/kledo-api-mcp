@@ -341,7 +341,16 @@ Status codes (VERIFIED):
         ),
         Tool(
             name="invoice_list_purchase",
-            description="List purchase invoices (bills from vendors) with optional filtering. Displays vendor company name prominently for B2B vendors.",
+            description="""List purchase invoices (bills from vendors) with optional filtering.
+
+Displays vendor company name prominently for B2B vendors.
+
+Supports due date and overdue filtering:
+- Filter by due date range (e.g., "purchase invoice yang jatuh tempo minggu ini")
+- Filter by overdue threshold (e.g., "purchase invoice yang telat lebih dari 30 hari")
+- Show aging buckets for overdue invoices (1-30, 31-60, 60+ days)
+
+Status codes: 1=Belum Dibayar (Unpaid), 3=Lunas (Paid)""",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -355,19 +364,35 @@ Status codes (VERIFIED):
                     },
                     "status_id": {
                         "type": "integer",
-                        "description": "Filter by status"
+                        "description": "Filter by status: 1=Belum Dibayar (Unpaid), 3=Lunas (Paid)"
                     },
                     "date_from": {
                         "type": "string",
-                        "description": "Start date"
+                        "description": "Start date for invoice date filter (YYYY-MM-DD or 'last_month', 'this_month', etc.)"
                     },
                     "date_to": {
                         "type": "string",
-                        "description": "End date"
+                        "description": "End date for invoice date filter (YYYY-MM-DD)"
+                    },
+                    "due_date_from": {
+                        "type": "string",
+                        "description": "Start date for due_date filter (YYYY-MM-DD or Indonesian phrase like 'minggu ini', 'bulan lalu'). Use for 'jatuh tempo' queries."
+                    },
+                    "due_date_to": {
+                        "type": "string",
+                        "description": "End date for due_date filter (YYYY-MM-DD or Indonesian phrase)"
+                    },
+                    "overdue_days": {
+                        "type": "integer",
+                        "description": "Filter purchase invoices overdue by at least this many days. E.g., 30 for 'telat lebih dari 30 hari'. Use 0 for any overdue invoice."
+                    },
+                    "overdue_only": {
+                        "type": "boolean",
+                        "description": "If true, show only overdue purchase invoices (due_date < today Jakarta time). Shortcut for overdue_days=0."
                     },
                     "per_page": {
                         "type": "integer",
-                        "description": "Results per page (default: 50)"
+                        "description": "Results per page (default: 50, max: 100)"
                     }
                 },
                 "required": []
