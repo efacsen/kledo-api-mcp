@@ -408,6 +408,84 @@ Status codes: 1=Belum Dibayar (Unpaid), 3=Lunas (Paid)""",
                 },
                 "required": []
             }
+        ),
+        Tool(
+            name="outstanding_by_customer",
+            description="""Get outstanding amounts grouped by customer.
+
+Shows which customers owe money, with totals per customer and individual invoice details.
+Each invoice shows age in days overdue (e.g., "45 hari overdue") using Jakarta timezone.
+
+Default sort: highest outstanding first. Capped at top 10 for readability.
+Supports filtering by minimum outstanding amount and overdue threshold.
+
+Contact type: Uses type_id=3 (Customer/pelanggan) from Kledo contacts.""",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "min_outstanding": {
+                        "type": "number",
+                        "description": "Minimum total outstanding per customer (IDR). Applied AFTER grouping (HAVING semantics). E.g., 10000000 for '>10 juta'."
+                    },
+                    "overdue_days": {
+                        "type": "integer",
+                        "description": "Only include invoices overdue by at least this many days. E.g., 30 for '>30 hari overdue'. Applied BEFORE grouping (WHERE semantics)."
+                    },
+                    "sort_by": {
+                        "type": "string",
+                        "enum": ["amount", "count", "overdue"],
+                        "description": "Sort results by: 'amount' (total outstanding, default), 'count' (invoice count), 'overdue' (max overdue days)"
+                    },
+                    "date_from": {
+                        "type": "string",
+                        "description": "Start date filter for invoice date (YYYY-MM-DD or 'last_month', 'this_month')"
+                    },
+                    "date_to": {
+                        "type": "string",
+                        "description": "End date filter for invoice date (YYYY-MM-DD)"
+                    }
+                },
+                "required": []
+            }
+        ),
+        Tool(
+            name="outstanding_by_vendor",
+            description="""Get outstanding amounts grouped by vendor (supplier).
+
+Shows which vendors we owe money to, with totals per vendor and individual invoice details.
+Each invoice shows age in days overdue using Jakarta timezone.
+
+Default sort: highest outstanding first. Capped at top 10 for readability.
+Supports filtering by minimum outstanding amount and overdue threshold.
+
+Contact type: Uses type_id=1 (Vendor/pemasok) from Kledo contacts.""",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "min_outstanding": {
+                        "type": "number",
+                        "description": "Minimum total outstanding per vendor (IDR). Applied AFTER grouping (HAVING semantics). E.g., 5000000 for '>5 juta'."
+                    },
+                    "overdue_days": {
+                        "type": "integer",
+                        "description": "Only include invoices overdue by at least this many days. Applied BEFORE grouping (WHERE semantics)."
+                    },
+                    "sort_by": {
+                        "type": "string",
+                        "enum": ["amount", "count", "overdue"],
+                        "description": "Sort results by: 'amount' (total outstanding, default), 'count' (invoice count), 'overdue' (max overdue days)"
+                    },
+                    "date_from": {
+                        "type": "string",
+                        "description": "Start date filter for invoice date (YYYY-MM-DD or 'last_month', 'this_month')"
+                    },
+                    "date_to": {
+                        "type": "string",
+                        "description": "End date filter for invoice date (YYYY-MM-DD)"
+                    }
+                },
+                "required": []
+            }
         )
     ]
 
@@ -422,6 +500,10 @@ async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClie
         return await _get_invoice_totals(arguments, client)
     elif name == "invoice_list_purchase":
         return await _list_purchase_invoices(arguments, client)
+    elif name == "outstanding_by_customer":
+        return await _outstanding_by_customer(arguments, client)
+    elif name == "outstanding_by_vendor":
+        return await _outstanding_by_vendor(arguments, client)
     else:
         return f"Unknown invoice tool: {name}"
 
