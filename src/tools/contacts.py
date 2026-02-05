@@ -23,7 +23,7 @@ def get_tools() -> list[Tool]:
                     },
                     "type_id": {
                         "type": "integer",
-                        "description": "Filter by type (1=Customer, 2=Vendor, 3=Both)"
+                        "description": "Filter by type (1=Vendor, 2=Employee, 3=Customer)"
                     },
                     "per_page": {
                         "type": "integer",

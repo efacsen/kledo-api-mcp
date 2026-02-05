@@ -2,6 +2,7 @@
 Invoice tools for Kledo MCP Server
 """
 import re
+from collections import defaultdict
 from datetime import timedelta
 from typing import Any, Dict
 from mcp.types import Tool
@@ -1026,6 +1027,336 @@ async def _get_invoice_totals(args: Dict[str, Any], client: KledoAPIClient) -> s
         return f"Error fetching invoice totals: {str(e)}"
 
 
+async def _fetch_all_purchase_invoices(client: KledoAPIClient, date_from: str = None, date_to: str = None) -> list:
+    """Fetch all purchase invoices for a date range (handles pagination)."""
+    all_invoices = []
+    page = 1
+    max_pages = 20  # Safety limit
+
+    while page <= max_pages:
+        data = await client.get(
+            "purchase_invoices",
+            "list",
+            params={
+                "date_from": date_from,
+                "date_to": date_to,
+                "per_page": 100,
+                "page": page
+            },
+            cache_category="invoices"
+        )
+
+        invoices = safe_get(data, "data.data", [])
+        if not invoices:
+            break
+
+        all_invoices.extend(invoices)
+
+        current_page = safe_get(data, "data.current_page", 1)
+        last_page = safe_get(data, "data.last_page", 1)
+
+        if current_page >= last_page:
+            break
+        page += 1
+
+    return all_invoices
+
+
+async def _outstanding_by_customer(args: Dict[str, Any], client: KledoAPIClient) -> str:
+    """Get outstanding amounts grouped by customer."""
+    date_from = args.get("date_from")
+    date_to = args.get("date_to")
+    min_outstanding = args.get("min_outstanding")
+    overdue_days = args.get("overdue_days")
+    sort_by = args.get("sort_by", "amount")
+
+    # Parse date range
+    if date_from and not date_to:
+        from ..utils.helpers import parse_date_range
+        parsed_from, parsed_to = parse_date_range(date_from)
+        if parsed_from:
+            date_from = parsed_from
+            date_to = parsed_to
+
+    try:
+        # Import _fetch_all_invoices from financial module pattern
+        # Fetch all sales invoices
+        all_invoices = []
+        page = 1
+        max_pages = 20
+
+        while page <= max_pages:
+            data = await client.get(
+                "invoices",
+                "list",
+                params={
+                    "date_from": date_from,
+                    "date_to": date_to,
+                    "per_page": 100,
+                    "page": page
+                },
+                cache_category="invoices"
+            )
+
+            invoices = safe_get(data, "data.data", [])
+            if not invoices:
+                break
+
+            all_invoices.extend(invoices)
+
+            current_page = safe_get(data, "data.current_page", 1)
+            last_page = safe_get(data, "data.last_page", 1)
+
+            if current_page >= last_page:
+                break
+            page += 1
+
+        # Filter out fully paid and zero-due invoices
+        all_invoices = [inv for inv in all_invoices if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3]
+
+        if not all_invoices:
+            return "No outstanding invoices found."
+
+        # Get Jakarta today for overdue calculation
+        today_jakarta = get_jakarta_today()
+
+        # Apply overdue_days filter (WHERE clause)
+        if overdue_days is not None:
+            filtered_invoices = []
+            for inv in all_invoices:
+                due_date_str = safe_get(inv, "due_date", "")
+                if due_date_str:
+                    days_overdue = calculate_overdue_days(due_date_str, today_jakarta)
+                    if days_overdue >= overdue_days:
+                        filtered_invoices.append(inv)
+            all_invoices = filtered_invoices
+
+        if not all_invoices:
+            return f"No invoices found overdue by at least {overdue_days} days."
+
+        # Group by customer
+        customer_groups = defaultdict(lambda: {
+            "total_outstanding": 0,
+            "count": 0,
+            "invoices": [],
+            "max_overdue_days": 0
+        })
+
+        for inv in all_invoices:
+            customer_name = format_customer_display(inv)
+            due_amount = float(safe_get(inv, "due", 0))
+            ref_number = safe_get(inv, "ref_number", "N/A")
+            due_date_str = safe_get(inv, "due_date", "")
+
+            # Calculate age
+            age_days = calculate_overdue_days(due_date_str, today_jakarta) if due_date_str else 0
+
+            # Accumulate
+            customer_groups[customer_name]["total_outstanding"] += due_amount
+            customer_groups[customer_name]["count"] += 1
+            customer_groups[customer_name]["max_overdue_days"] = max(
+                customer_groups[customer_name]["max_overdue_days"],
+                age_days
+            )
+
+            # Store invoice details (limit to 5 per customer for memory efficiency)
+            if len(customer_groups[customer_name]["invoices"]) < 5:
+                customer_groups[customer_name]["invoices"].append({
+                    "ref_number": ref_number,
+                    "due": due_amount,
+                    "age_days": age_days
+                })
+
+        # Apply min_outstanding filter (HAVING clause)
+        if min_outstanding is not None:
+            min_outstanding = float(min_outstanding)
+            customer_groups = {
+                name: data
+                for name, data in customer_groups.items()
+                if data["total_outstanding"] >= min_outstanding
+            }
+
+        if not customer_groups:
+            return f"No customers with outstanding >= {format_currency(min_outstanding)}."
+
+        # Sort results
+        if sort_by == "count":
+            sorted_customers = sorted(customer_groups.items(), key=lambda x: x[1]["count"], reverse=True)
+        elif sort_by == "overdue":
+            sorted_customers = sorted(customer_groups.items(), key=lambda x: x[1]["max_overdue_days"], reverse=True)
+        else:  # Default: amount
+            sorted_customers = sorted(customer_groups.items(), key=lambda x: x[1]["total_outstanding"], reverse=True)
+
+        # Cap at top 10
+        display_count = min(len(sorted_customers), 10)
+        top_customers = sorted_customers[:display_count]
+        overflow_customers = sorted_customers[display_count:]
+
+        # Calculate totals
+        grand_total = sum(data["total_outstanding"] for _, data in customer_groups.items())
+        overflow_total = sum(data["total_outstanding"] for _, data in overflow_customers)
+
+        # Format output
+        result = ["# Outstanding by Customer\n"]
+        result.append(f"**Total Customers with Outstanding**: {len(customer_groups)}")
+        result.append(f"**Grand Total Outstanding**: {format_currency(grand_total)}\n")
+        result.append("## Results:\n")
+
+        for idx, (customer_name, data) in enumerate(top_customers, 1):
+            result.append(f"{idx}. **{customer_name}**: {format_currency(data['total_outstanding'])} ({data['count']} invoices)")
+
+            for inv in data["invoices"]:
+                age_text = f"{inv['age_days']} hari overdue" if inv['age_days'] > 0 else "Not yet due"
+                result.append(f"   - {inv['ref_number']} | {format_currency(inv['due'])} | {age_text}")
+
+            remaining = data["count"] - len(data["invoices"])
+            if remaining > 0:
+                result.append(f"   ... dan {remaining} invoice lainnya\n")
+            else:
+                result.append("")
+
+        if overflow_customers:
+            result.append(f"... dan {len(overflow_customers)} customer lainnya dengan total {format_currency(overflow_total)}")
+
+        return "\n".join(result)
+
+    except Exception as e:
+        return f"Error fetching outstanding by customer: {str(e)}"
+
+
+async def _outstanding_by_vendor(args: Dict[str, Any], client: KledoAPIClient) -> str:
+    """Get outstanding amounts grouped by vendor."""
+    date_from = args.get("date_from")
+    date_to = args.get("date_to")
+    min_outstanding = args.get("min_outstanding")
+    overdue_days = args.get("overdue_days")
+    sort_by = args.get("sort_by", "amount")
+
+    # Parse date range
+    if date_from and not date_to:
+        from ..utils.helpers import parse_date_range
+        parsed_from, parsed_to = parse_date_range(date_from)
+        if parsed_from:
+            date_from = parsed_from
+            date_to = parsed_to
+
+    try:
+        # Fetch all purchase invoices
+        all_invoices = await _fetch_all_purchase_invoices(client, date_from, date_to)
+
+        # Filter out fully paid and zero-due invoices
+        all_invoices = [inv for inv in all_invoices if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3]
+
+        if not all_invoices:
+            return "No outstanding purchase invoices found."
+
+        # Get Jakarta today for overdue calculation
+        today_jakarta = get_jakarta_today()
+
+        # Apply overdue_days filter (WHERE clause)
+        if overdue_days is not None:
+            filtered_invoices = []
+            for inv in all_invoices:
+                due_date_str = safe_get(inv, "due_date", "")
+                if due_date_str:
+                    days_overdue = calculate_overdue_days(due_date_str, today_jakarta)
+                    if days_overdue >= overdue_days:
+                        filtered_invoices.append(inv)
+            all_invoices = filtered_invoices
+
+        if not all_invoices:
+            return f"No purchase invoices found overdue by at least {overdue_days} days."
+
+        # Group by vendor
+        vendor_groups = defaultdict(lambda: {
+            "total_outstanding": 0,
+            "count": 0,
+            "invoices": [],
+            "max_overdue_days": 0
+        })
+
+        for inv in all_invoices:
+            vendor_name = format_customer_display(inv)  # Works for vendors too
+            due_amount = float(safe_get(inv, "due", 0))
+            ref_number = safe_get(inv, "ref_number", "N/A")
+            due_date_str = safe_get(inv, "due_date", "")
+
+            # Calculate age
+            age_days = calculate_overdue_days(due_date_str, today_jakarta) if due_date_str else 0
+
+            # Accumulate
+            vendor_groups[vendor_name]["total_outstanding"] += due_amount
+            vendor_groups[vendor_name]["count"] += 1
+            vendor_groups[vendor_name]["max_overdue_days"] = max(
+                vendor_groups[vendor_name]["max_overdue_days"],
+                age_days
+            )
+
+            # Store invoice details (limit to 5 per vendor for memory efficiency)
+            if len(vendor_groups[vendor_name]["invoices"]) < 5:
+                vendor_groups[vendor_name]["invoices"].append({
+                    "ref_number": ref_number,
+                    "due": due_amount,
+                    "age_days": age_days
+                })
+
+        # Apply min_outstanding filter (HAVING clause)
+        if min_outstanding is not None:
+            min_outstanding = float(min_outstanding)
+            vendor_groups = {
+                name: data
+                for name, data in vendor_groups.items()
+                if data["total_outstanding"] >= min_outstanding
+            }
+
+        if not vendor_groups:
+            return f"No vendors with outstanding >= {format_currency(min_outstanding)}."
+
+        # Sort results
+        if sort_by == "count":
+            sorted_vendors = sorted(vendor_groups.items(), key=lambda x: x[1]["count"], reverse=True)
+        elif sort_by == "overdue":
+            sorted_vendors = sorted(vendor_groups.items(), key=lambda x: x[1]["max_overdue_days"], reverse=True)
+        else:  # Default: amount
+            sorted_vendors = sorted(vendor_groups.items(), key=lambda x: x[1]["total_outstanding"], reverse=True)
+
+        # Cap at top 10
+        display_count = min(len(sorted_vendors), 10)
+        top_vendors = sorted_vendors[:display_count]
+        overflow_vendors = sorted_vendors[display_count:]
+
+        # Calculate totals
+        grand_total = sum(data["total_outstanding"] for _, data in vendor_groups.items())
+        overflow_total = sum(data["total_outstanding"] for _, data in overflow_vendors)
+
+        # Format output
+        result = ["# Outstanding by Vendor\n"]
+        result.append(f"**Total Vendors with Outstanding**: {len(vendor_groups)}")
+        result.append(f"**Grand Total Outstanding**: {format_currency(grand_total)}\n")
+        result.append("## Results:\n")
+
+        for idx, (vendor_name, data) in enumerate(top_vendors, 1):
+            result.append(f"{idx}. **{vendor_name}**: {format_currency(data['total_outstanding'])} ({data['count']} invoices)")
+
+            for inv in data["invoices"]:
+                age_text = f"{inv['age_days']} hari overdue" if inv['age_days'] > 0 else "Not yet due"
+                result.append(f"   - {inv['ref_number']} | {format_currency(inv['due'])} | {age_text}")
+
+            remaining = data["count"] - len(data["invoices"])
+            if remaining > 0:
+                result.append(f"   ... dan {remaining} invoice lainnya\n")
+            else:
+                result.append("")
+
+        if overflow_vendors:
+            result.append(f"... dan {len(overflow_vendors)} vendor lainnya dengan total {format_currency(overflow_total)}")
+
+        return "\n".join(result)
+
+    except Exception as e:
+        return f"Error fetching outstanding by vendor: {str(e)}"
+
+
 async def resolve_vendor_name(client: KledoAPIClient, vendor_name: str) -> int | list[dict] | None:
     """
     Resolve vendor name to contact_id via contacts API with fuzzy matching.
@@ -1043,8 +1374,8 @@ async def resolve_vendor_name(client: KledoAPIClient, vendor_name: str) -> int |
         return None
 
     try:
-        # Step 1: Try API search with type_id=2 (vendors only)
-        data = await client.list_contacts(search=vendor_name, type_id=2, per_page=100)
+        # Step 1: Try API search with type_id=1 (vendors only)
+        data = await client.list_contacts(search=vendor_name, type_id=1, per_page=100)
         contacts = safe_get(data, "data.data", [])
 
         if contacts:
@@ -1078,7 +1409,7 @@ async def resolve_vendor_name(client: KledoAPIClient, vendor_name: str) -> int |
 
         # Step 2: API search returned no results - try broader fuzzy search
         # Fetch broader vendor list without search filter
-        broader_data = await client.list_contacts(search="", type_id=2, per_page=200)
+        broader_data = await client.list_contacts(search="", type_id=1, per_page=200)
         all_vendors = safe_get(broader_data, "data.data", [])
 
         if not all_vendors:
