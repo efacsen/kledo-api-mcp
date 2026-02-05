@@ -49,6 +49,12 @@ ACTION_VERBS: dict[str, list[str]] = {
     "totals": ["_summary", "_totals"],
     "ringkasan": ["_summary", "_totals"],  # Indonesian: summary
     "laporan": ["_summary", "_totals"],  # Indonesian: report
+    # Indonesian list-intent and aggregation verbs
+    "siapa": ["_by_", "_list"],        # "siapa aja" implies list/aggregation
+    "mana": ["_by_", "_list"],          # "yang mana" implies list
+    "berapa": ["_totals", "_summary", "_by_"],  # "berapa" implies totals/summary
+    "per": ["_by_", "_summary"],        # "per customer" implies aggregation
+    "grouped": ["_by_", "_summary"],    # "grouped by" implies aggregation
 }
 
 
@@ -122,7 +128,7 @@ def score_tool(
     # Action verb boost: +0.5 if tool suffix matches action verb
     action_suffixes = get_action_verb_suffixes(query_keywords)
     for suffix in action_suffixes:
-        if tool_name_lower.endswith(suffix):
+        if tool_name_lower.endswith(suffix) or suffix in tool_name_lower:
             base_score += 0.5
             break  # Only one boost per tool
 
