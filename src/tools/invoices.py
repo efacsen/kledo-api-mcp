@@ -1016,6 +1016,92 @@ async def _get_invoice_totals(args: Dict[str, Any], client: KledoAPIClient) -> s
         return f"Error fetching invoice totals: {str(e)}"
 
 
+async def resolve_vendor_name(client: KledoAPIClient, vendor_name: str) -> int | list[dict] | None:
+    """
+    Resolve vendor name to contact_id via contacts API with fuzzy matching.
+
+    Args:
+        client: Kledo API client
+        vendor_name: Vendor name to search (e.g., "Nippon", "Nipsea")
+
+    Returns:
+        - int: contact_id if single match found
+        - list[dict]: list of matching contacts if multiple matches (for disambiguation)
+        - None: if no matches found
+    """
+    if not vendor_name or len(vendor_name) < 3:
+        return None
+
+    try:
+        # Step 1: Try API search with type_id=2 (vendors only)
+        data = await client.list_contacts(search=vendor_name, type_id=2, per_page=100)
+        contacts = safe_get(data, "data.data", [])
+
+        if contacts:
+            # API found results
+            if len(contacts) == 1:
+                # Single match - return contact_id directly
+                return contacts[0]["id"]
+            else:
+                # Multiple results - apply fuzzy matching to rank
+                matches = []
+                for contact in contacts:
+                    company_name = contact.get("company_name", "") or contact.get("company", "")
+                    contact_name = contact.get("name", "")
+                    is_match, score = fuzzy_company_match(vendor_name, company_name, contact_name)
+                    if is_match:
+                        matches.append((contact, score))
+
+                if not matches:
+                    # No fuzzy matches above threshold - return all API results for disambiguation
+                    return contacts
+
+                # Sort by score
+                matches.sort(key=lambda x: x[1], reverse=True)
+
+                # If single high-confidence match (>= 90), return that contact_id
+                if len(matches) == 1 or (matches[0][1] >= 90 and matches[0][1] - matches[1][1] >= 10):
+                    return matches[0][0]["id"]
+
+                # Multiple good matches - return for disambiguation
+                return [contact for contact, score in matches]
+
+        # Step 2: API search returned no results - try broader fuzzy search
+        # Fetch broader vendor list without search filter
+        broader_data = await client.list_contacts(search="", type_id=2, per_page=200)
+        all_vendors = safe_get(broader_data, "data.data", [])
+
+        if not all_vendors:
+            return None
+
+        # Apply fuzzy matching to all vendors
+        matches = []
+        for contact in all_vendors:
+            company_name = contact.get("company_name", "") or contact.get("company", "")
+            contact_name = contact.get("name", "")
+            is_match, score = fuzzy_company_match(vendor_name, company_name, contact_name, threshold=55)
+            if is_match:
+                matches.append((contact, score))
+
+        if not matches:
+            return None
+
+        # Sort by score
+        matches.sort(key=lambda x: x[1], reverse=True)
+
+        if len(matches) == 1:
+            # Single match - return contact_id
+            return matches[0][0]["id"]
+        else:
+            # Multiple matches - return for disambiguation
+            return [contact for contact, score in matches]
+
+    except Exception as e:
+        # Log error but don't fail - return None
+        print(f"Error resolving vendor name '{vendor_name}': {e}")
+        return None
+
+
 async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) -> str:
     """List purchase invoices."""
     date_from = args.get("date_from")
