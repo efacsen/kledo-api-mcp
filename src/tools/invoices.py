@@ -2,12 +2,17 @@
 Invoice tools for Kledo MCP Server
 """
 import re
+from datetime import timedelta
 from typing import Any, Dict
 from mcp.types import Tool
 from rapidfuzz import fuzz
 
 from ..kledo_client import KledoAPIClient
-from ..utils.helpers import parse_date_range, format_currency, safe_get
+from ..utils.helpers import (
+    parse_date_range, format_currency, safe_get,
+    parse_indonesian_date_phrase, get_jakarta_today,
+    calculate_overdue_days, categorize_overdue_invoices
+)
 
 
 def format_customer_display(invoice: dict) -> str:
@@ -245,6 +250,8 @@ Shows invoice details including Net Sales (Penjualan Neto), Gross Sales (Penjual
 
 Displays company name prominently for B2B customers (e.g., 'PT Nippon Paint Indonesia (Darma)').
 
+Supports due date filtering and overdue analysis with aging buckets.
+
 Status codes (VERIFIED):
 - 1 = Belum Dibayar (Unpaid)
 - 2 = Dibayar Sebagian (Partially Paid)
@@ -266,11 +273,27 @@ Status codes (VERIFIED):
                     },
                     "date_from": {
                         "type": "string",
-                        "description": "Start date (YYYY-MM-DD or 'last_month', 'this_month', etc.)"
+                        "description": "Start date for invoice date filter (YYYY-MM-DD or 'last_month', 'this_month', etc.)"
                     },
                     "date_to": {
                         "type": "string",
-                        "description": "End date (YYYY-MM-DD)"
+                        "description": "End date for invoice date filter (YYYY-MM-DD)"
+                    },
+                    "due_date_from": {
+                        "type": "string",
+                        "description": "Start date for due_date filter (YYYY-MM-DD or Indonesian phrase like 'minggu ini', 'bulan lalu'). Use for 'jatuh tempo' queries."
+                    },
+                    "due_date_to": {
+                        "type": "string",
+                        "description": "End date for due_date filter (YYYY-MM-DD or Indonesian phrase)"
+                    },
+                    "overdue_days": {
+                        "type": "integer",
+                        "description": "Filter invoices overdue by at least this many days. E.g., 30 for 'telat lebih dari 30 hari'. Use 0 for any overdue invoice."
+                    },
+                    "overdue_only": {
+                        "type": "boolean",
+                        "description": "If true, show only overdue invoices (due_date < today Jakarta time). Shortcut for overdue_days=0."
                     },
                     "per_page": {
                         "type": "integer",
@@ -369,7 +392,7 @@ async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClie
 
 async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> str:
     """List sales invoices."""
-    # Parse date range
+    # Parse date range (for invoice date)
     date_from = args.get("date_from")
     date_to = args.get("date_to")
 
@@ -379,9 +402,43 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
             date_from = parsed_from
             date_to = parsed_to
 
+    # Parse due date range
+    due_date_from = args.get("due_date_from")
+    due_date_to = args.get("due_date_to")
+    overdue_only = args.get("overdue_only", False)
+    overdue_days = args.get("overdue_days")
+
+    # Handle Indonesian date phrases for due_date
+    if due_date_from:
+        parsed_dates = parse_indonesian_date_phrase(due_date_from)
+        if parsed_dates[0] is not None:
+            due_date_from = parsed_dates[0].isoformat()
+            if due_date_to is None and parsed_dates[1] is not None:
+                due_date_to = parsed_dates[1].isoformat()
+
+    if due_date_to and not due_date_from:
+        parsed_dates = parse_indonesian_date_phrase(due_date_to)
+        if parsed_dates[1] is not None:
+            due_date_to = parsed_dates[1].isoformat()
+
+    # Handle overdue filtering
+    today_jakarta = get_jakarta_today()
+    if overdue_only:
+        # Set due_date_to to yesterday (invoices due before today are overdue)
+        yesterday = today_jakarta - timedelta(days=1)
+        due_date_to = yesterday.isoformat()
+
+    if overdue_days is not None:
+        # Calculate cutoff date: today - overdue_days
+        cutoff_date = today_jakarta - timedelta(days=overdue_days)
+        due_date_to = cutoff_date.isoformat()
+
     search_term = args.get("search", "").strip()
     fuzzy_search = should_use_fuzzy_search(search_term)
     invoice_selection = args.get("invoice_selection")
+
+    # Track if we're in overdue mode for filtering and display
+    is_overdue_mode = overdue_only or overdue_days is not None
 
     try:
         # For fuzzy search, try to get a broader set of invoices first
@@ -394,6 +451,8 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
                 status_id=args.get("status_id"),
                 date_from=date_from,
                 date_to=date_to,
+                due_date_from=due_date_from,
+                due_date_to=due_date_to,
                 per_page=200,  # Fetch more invoices for fuzzy matching
                 force_refresh=args.get("force_refresh", False)
             )
@@ -402,6 +461,10 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
 
             # Apply fuzzy filtering
             invoices = filter_invoices_by_fuzzy_search(all_invoices, search_term)
+
+            # Apply client-side overdue filtering (exclude fully paid invoices)
+            if is_overdue_mode and invoices:
+                invoices = [inv for inv in invoices if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3]
 
             if not invoices:
                 return f"No invoices found matching fuzzy search for '{search_term}'."
@@ -447,10 +510,16 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
                 status_id=args.get("status_id"),
                 date_from=date_from,
                 date_to=date_to,
+                due_date_from=due_date_from,
+                due_date_to=due_date_to,
                 per_page=args.get("per_page", 50),
                 force_refresh=args.get("force_refresh", False)
             )
             invoices = safe_get(data, "data.data", [])
+
+            # Apply client-side overdue filtering (exclude fully paid invoices)
+            if is_overdue_mode and invoices:
+                invoices = [inv for inv in invoices if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3]
 
             # If no results and search_term looks like a company name, try client-side fuzzy search
             if not invoices and search_term and len(search_term) >= 3:
@@ -461,13 +530,19 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
                     status_id=args.get("status_id"),
                     date_from=date_from,
                     date_to=date_to,
+                    due_date_from=due_date_from,
+                    due_date_to=due_date_to,
                     per_page=100,
                     force_refresh=args.get("force_refresh", False)
                 )
                 all_invoices = safe_get(broader_data, "data.data", [])
-                
+
                 # Try fuzzy company name matching
                 invoices = filter_invoices_by_company_fuzzy(all_invoices, search_term)
+
+                # Apply client-side overdue filtering
+                if is_overdue_mode and invoices:
+                    invoices = [inv for inv in invoices if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3]
                 
                 if not invoices:
                     result = ["# Sales Invoices\n"]
@@ -527,6 +602,21 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
         result.append(f"**Paid**: {format_currency(total_paid)}")
         result.append(f"**Outstanding**: {format_currency(total_due)}\n")
 
+        # Add aging bucket display if in overdue mode
+        if is_overdue_mode:
+            buckets = categorize_overdue_invoices(invoices, today_jakarta)
+            result.append("\n## Overdue Aging:\n")
+
+            # Calculate totals for each bucket
+            for bucket_name in ["1-30", "31-60", "60+"]:
+                bucket_items = buckets[bucket_name]
+                if bucket_items:
+                    bucket_count = len(bucket_items)
+                    bucket_outstanding = sum(float(safe_get(inv, "due", 0)) for inv, _ in bucket_items)
+                    result.append(f"**{bucket_name} hari**: {bucket_count} invoices, {format_currency(bucket_outstanding)} outstanding")
+
+            result.append("")  # Empty line
+
         result.append("\n## Invoices:\n")
 
         # Status mapping (VERIFIED from dashboard)
@@ -540,6 +630,7 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
             inv_number = safe_get(invoice, "ref_number", "N/A")
             customer = format_customer_display(invoice)  # Show company name + contact
             date = safe_get(invoice, "trans_date", "")
+            due_date = safe_get(invoice, "due_date", "")
 
             # Get amounts
             subtotal = float(safe_get(invoice, "subtotal", 0))
@@ -553,6 +644,13 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
             result.append(f"### {inv_number}")
             result.append(f"- **Customer**: {customer}")
             result.append(f"- **Date**: {date}")
+            if due_date:
+                result.append(f"- **Due Date**: {due_date}")
+                # Show overdue days if in overdue mode
+                if is_overdue_mode:
+                    overdue_days_count = calculate_overdue_days(due_date, today_jakarta)
+                    if overdue_days_count > 0:
+                        result.append(f"- **Overdue**: {overdue_days_count} hari")
             result.append(f"- **Net Sales**: {format_currency(subtotal)}")
             result.append(f"- **Tax (PPN)**: {format_currency(tax)}")
             result.append(f"- **Gross Sales**: {format_currency(amount_after_tax)}")

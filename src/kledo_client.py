@@ -244,6 +244,8 @@ class KledoAPIClient:
         status_id: Optional[int] = None,
         date_from: Optional[str] = None,
         date_to: Optional[str] = None,
+        due_date_from: Optional[str] = None,
+        due_date_to: Optional[str] = None,
         per_page: int = 50,
         page: int = 1,
         force_refresh: bool = False
@@ -258,6 +260,8 @@ class KledoAPIClient:
                 "status_id": status_id,
                 "date_from": date_from,
                 "date_to": date_to,
+                "due_date_from": due_date_from,
+                "due_date_to": due_date_to,
                 "per_page": per_page,
                 "page": page
             },
