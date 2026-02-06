@@ -20,6 +20,7 @@ from . import contacts
 from . import deliveries
 from . import utilities
 from . import analytics
+from . import commission
 
 __all__ = [
     "financial",
@@ -29,5 +30,6 @@ __all__ = [
     "contacts",
     "deliveries",
     "utilities",
-    "analytics"
+    "analytics",
+    "commission"
 ]
