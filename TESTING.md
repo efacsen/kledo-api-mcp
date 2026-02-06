@@ -53,7 +53,7 @@ Location: `~/Library/Application Support/Claude/claude_desktop_config.json` (mac
     "kledo-crm": {
       "command": "python",
       "args": ["-m", "src.server"],
-      "cwd": "/Users/kevinzakaria/developers/kledo-api-mcp",
+      "cwd": "/path/to/kledo-api-mcp",
       "env": {
         "KLEDO_API_KEY": "kledo_pat_YOUR_KEY_HERE"
       }

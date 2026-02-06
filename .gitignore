@@ -61,6 +61,9 @@ cache/
 *.bak
 .cache/
 
+# Planning (internal development)
+.planning/
+
 # Auto Claude data directory
 .auto-claude/
 

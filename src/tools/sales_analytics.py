@@ -9,7 +9,7 @@ from decimal import Decimal
 from mcp.types import Tool
 
 from ..kledo_client import KledoAPIClient
-from ..utils.helpers import format_markdown_table, parse_natural_date
+from ..utils.helpers import format_markdown_table, format_currency, parse_natural_date
 from ..mappers.kledo_mapper import from_kledo_invoice
 
 
@@ -260,11 +260,11 @@ async def _sales_rep_revenue_report(client: KledoAPIClient, args: dict[str, Any]
 
         summary_data.append([
             rep_name,
-            f"Rp {rep_data['net_sales']:,.0f}",
-            f"Rp {rep_data['gross_sales']:,.0f}",
+            format_currency(float(rep_data['net_sales']), short=True),
+            format_currency(float(rep_data['gross_sales']), short=True),
             str(rep_data["invoice_count"]),
             str(len(rep_data["customer_ids"])),
-            f"Rp {avg_deal_net:,.0f}"
+            format_currency(float(avg_deal_net), short=True)
         ])
 
     report_lines.append("## Summary by Sales Representative")
@@ -294,8 +294,8 @@ async def _sales_rep_revenue_report(client: KledoAPIClient, args: dict[str, Any]
             gross = rep_data["monthly_gross_sales"][period]
             period_data.append([
                 period,
-                f"Rp {net:,.0f}",
-                f"Rp {gross:,.0f}"
+                format_currency(float(net), short=True),
+                format_currency(float(gross), short=True)
             ])
 
         if period_data:
@@ -328,8 +328,8 @@ async def _sales_rep_revenue_report(client: KledoAPIClient, args: dict[str, Any]
                 inv["date"],
                 inv["sales_rep"],
                 inv["customer"],
-                f"Rp {inv['net_sales']:,.0f}",
-                f"Rp {inv['gross_sales']:,.0f}"
+                format_currency(float(inv['net_sales']), short=True),
+                format_currency(float(inv['gross_sales']), short=True)
             ])
 
         report_lines.append(format_markdown_table(
@@ -492,8 +492,8 @@ async def _sales_rep_list(client: KledoAPIClient, args: dict[str, Any] = None) -
             str(rep_id),
             rep_data["name"],
             str(rep_data["invoice_count"]),
-            f"Rp {rep_data['net_sales']:,.0f}",
-            f"Rp {rep_data['gross_sales']:,.0f}"
+            format_currency(float(rep_data['net_sales']), short=True),
+            format_currency(float(rep_data['gross_sales']), short=True)
         ])
 
     table = format_markdown_table(

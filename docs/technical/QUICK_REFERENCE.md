@@ -105,7 +105,7 @@ customer_revenue_ranking(
     # People
     'sales_person': {
         'id': 230701,
-        'name': 'Teuku Muda Rabian Hussein'
+        'name': 'Ahmad Kurniawan'
     },
     'contact': {
         'id': 489,
@@ -266,7 +266,7 @@ sales_rep_revenue_report(date_from="this_month")
 
 # Returns:
 {
-    'sales_rep_name': 'Teuku Muda Rabian Hussein',
+    'sales_rep_name': 'Ahmad Kurniawan',
     'total_revenue_before_tax': 45000000,
     'total_revenue_after_tax': 49500000,
     'invoice_count': 8,

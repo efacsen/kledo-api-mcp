@@ -30,7 +30,7 @@
 
 ### Base URL Structure
 ```
-https://demo.api.kledo.com/api/v1
+https://yourcompany.api.kledo.com/api/v1
 ```
 
 ### Authentication
@@ -123,7 +123,7 @@ KLEDO_PASSWORD=xxx
 
   'sales_person': {
     'id': 230701,
-    'name': 'Teuku Muda Rabian Hussein'  # Sales rep name (KEY!)
+    'name': 'Ahmad Kurniawan'  # Sales rep name (KEY!)
   },
 
   'warehouse': {
