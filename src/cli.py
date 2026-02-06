@@ -9,7 +9,6 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Optional
 
 from dotenv import load_dotenv
 from loguru import logger
@@ -212,7 +211,7 @@ def handle_show_config() -> int:
     print(f"{Colors.CYAN}{'─' * 40}{Colors.RESET}\n")
 
     # Get current working directory absolute path
-    cwd = Path.cwd()
+    Path.cwd()
 
     # Load configuration
     config_manager = ConfigManager()
@@ -260,28 +259,28 @@ def handle_show_config() -> int:
 
     if os_name == "Darwin":  # macOS
         config_path = Path.home() / "Library" / "Application Support" / "Claude" / "claude_desktop_config.json"
-        print(f"1. Open Claude Desktop configuration file:")
+        print("1. Open Claude Desktop configuration file:")
         print(f"   {Colors.BLUE}{config_path}{Colors.RESET}")
         print()
         print(f"2. Add the JSON above to the {Colors.CYAN}mcpServers{Colors.RESET} section")
         print()
-        print(f"3. Restart Claude Desktop")
+        print("3. Restart Claude Desktop")
     elif os_name == "Windows":
         config_path = Path.home() / "AppData" / "Roaming" / "Claude" / "claude_desktop_config.json"
-        print(f"1. Open Claude Desktop configuration file:")
+        print("1. Open Claude Desktop configuration file:")
         print(f"   {Colors.BLUE}{config_path}{Colors.RESET}")
         print()
         print(f"2. Add the JSON above to the {Colors.CYAN}mcpServers{Colors.RESET} section")
         print()
-        print(f"3. Restart Claude Desktop")
+        print("3. Restart Claude Desktop")
     else:  # Linux
         config_path = Path.home() / ".config" / "Claude" / "claude_desktop_config.json"
-        print(f"1. Open Claude Desktop configuration file:")
+        print("1. Open Claude Desktop configuration file:")
         print(f"   {Colors.BLUE}{config_path}{Colors.RESET}")
         print()
         print(f"2. Add the JSON above to the {Colors.CYAN}mcpServers{Colors.RESET} section")
         print()
-        print(f"3. Restart Claude Desktop")
+        print("3. Restart Claude Desktop")
 
     print()
     print(f"{Colors.YELLOW}Note:{Colors.RESET} Make sure to replace YOUR_API_KEY_HERE with your actual API key")
@@ -315,7 +314,7 @@ def handle_version() -> int:
         logger.debug(f"Could not read version from pyproject.toml: {e}")
 
     print(f"\n{Colors.BOLD}Kledo MCP Server{Colors.RESET} v{version}")
-    print(f"AI-powered access to Kledo accounting data\n")
+    print("AI-powered access to Kledo accounting data\n")
     print(f"Project: {Colors.BLUE}https://github.com/efacsen/kledo-api-mcp{Colors.RESET}")
     print(f"Documentation: {Colors.BLUE}https://efacsen.github.io/kledo-api-mcp/{Colors.RESET}\n")
 

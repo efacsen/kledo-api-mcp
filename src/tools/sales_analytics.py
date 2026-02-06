@@ -241,12 +241,12 @@ async def _sales_rep_revenue_report(client: KledoAPIClient, args: dict[str, Any]
 
     # Build report
     report_lines = []
-    report_lines.append(f"# Sales Representative Revenue Report (PAID INVOICES ONLY)")
-    report_lines.append(f"")
+    report_lines.append("# Sales Representative Revenue Report (PAID INVOICES ONLY)")
+    report_lines.append("")
     report_lines.append(f"**Period:** {start.strftime('%Y-%m-%d')} to {end.strftime('%Y-%m-%d')}")
     report_lines.append(f"**Total Paid Invoices:** {len(all_invoices)} (status_id=3 / Lunas)")
     report_lines.append(f"**Group By:** {group_by}")
-    report_lines.append(f"")
+    report_lines.append("")
 
     # Summary table with domain terminology
     summary_data = []
@@ -461,7 +461,7 @@ async def _sales_rep_list(client: KledoAPIClient, args: dict[str, Any] = None) -
             break
 
     if not all_invoices:
-        return f"No paid invoices found for the specified period"
+        return "No paid invoices found for the specified period"
 
     # Collect unique sales reps using domain terminology
     sales_reps = {}

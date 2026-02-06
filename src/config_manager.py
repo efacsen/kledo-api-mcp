@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from typing import Optional
 from urllib.parse import urlparse
-from dotenv import load_dotenv, set_key, find_dotenv
+from dotenv import load_dotenv, set_key
 from loguru import logger
 
 

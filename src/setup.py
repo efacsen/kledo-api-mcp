@@ -187,7 +187,7 @@ class SetupWizard:
             if success:
                 print(f"{Colors.GREEN}✓{Colors.RESET} Configuration saved to {Colors.BLUE}{kledo_config_path}{Colors.RESET}")
                 print()
-                print(f"This configuration will be used for all Kledo MCP instances.")
+                print("This configuration will be used for all Kledo MCP instances.")
                 print(f"You can override it with environment variables or edit: {kledo_config_path}")
                 return True
         except Exception as e:

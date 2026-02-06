@@ -5,17 +5,12 @@ Enables tiered commission calculation based on paid invoices (cash basis).
 from typing import Any, Dict
 from mcp.types import Tool
 from collections import defaultdict
-from datetime import datetime
-import calendar
 
 from ..kledo_client import KledoAPIClient
 from ..utils.helpers import (
-    parse_indonesian_date_phrase,
     format_currency,
     safe_get,
-    get_jakarta_today,
-    format_markdown_table,
-    parse_date_range
+    format_markdown_table
 )
 from .financial import _fetch_all_invoices
 from .analytics import _resolve_period

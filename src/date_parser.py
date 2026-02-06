@@ -3,7 +3,7 @@ Date parser for natural language period references
 Converts quarters, months, and period references to explicit date ranges
 """
 import re
-from datetime import datetime, date
+from datetime import datetime
 from typing import Optional, Tuple
 
 

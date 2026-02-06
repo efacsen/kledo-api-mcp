@@ -13,7 +13,6 @@ from loguru import logger
 
 # Dynamic imports to handle both module execution and entry point execution
 import sys
-from pathlib import Path
 
 # Add src directory to Python path when running via entry point
 if not __package__:

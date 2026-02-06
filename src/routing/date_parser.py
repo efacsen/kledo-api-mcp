@@ -103,8 +103,7 @@ def parse_natural_date(phrase: str) -> tuple[date, date] | None:
         'september': 9, 'october': 10, 'november': 11, 'december': 12,
         # Indonesian
         'januari': 1, 'februari': 2, 'maret': 3, 'mei': 5,
-        'juni': 6, 'juli': 7, 'agustus': 8, 'oktober': 10,
-        'november': 11, 'desember': 12
+        'juni': 6, 'juli': 7, 'agustus': 8, 'oktober': 10, 'desember': 12
     }
     
     for month_name, month_num in months_map.items():

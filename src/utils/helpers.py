@@ -6,7 +6,6 @@ import json
 import calendar
 from typing import Any, Dict, Optional
 from datetime import datetime, date, timedelta
-from decimal import Decimal
 from zoneinfo import ZoneInfo
 
 # Jakarta timezone constant
