@@ -143,6 +143,36 @@ TOOL_METADATA: dict[str, tuple[str, list[str]]] = {
         "Outstanding amounts grouped by vendor",
         ["min_outstanding", "overdue_days", "sort_by", "date_from", "date_to"],
     ),
+    # Analytics Tools (Phase 8)
+    "analytics_compare_revenue": (
+        "Compare revenue between two periods",
+        ["period", "compare_to", "per_sales"],
+    ),
+    "analytics_compare_outstanding": (
+        "Compare outstanding between two periods",
+        ["period", "compare_to", "per_sales"],
+    ),
+    "analytics_target_achievement": (
+        "Show target vs actual achievement per sales rep",
+        ["period"],
+    ),
+    "analytics_underperformers": (
+        "Show sales reps below target threshold",
+        ["period", "threshold"],
+    ),
+    "analytics_set_target": (
+        "Set sales target for a rep",
+        ["sales_person_name", "period", "amount"],
+    ),
+    # Commission Tools (Phase 8)
+    "commission_calculate": (
+        "Calculate commission for a sales person",
+        ["period", "sales_person_name", "flat_rate"],
+    ),
+    "commission_report": (
+        "Commission breakdown for all sales reps",
+        ["period", "flat_rate"],
+    ),
     # System Tools
     "utility_clear_cache": (
         "Clear cached data",

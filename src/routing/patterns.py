@@ -68,6 +68,104 @@ PATTERNS: list[dict[str, Any]] = [
         "alternative": "invoice_list_sales",
         "confidence": "definitive",
     },
+    # Analytics comparison patterns (specific before generic)
+    {
+        "patterns": [
+            "revenue bulan ini vs",
+            "revenue vs",
+            "penjualan vs",
+            "perbandingan revenue",
+            "compare revenue",
+            "bandingkan revenue",
+            "revenue bulan ini dibanding",
+            "penjualan bulan ini dibanding",
+        ],
+        "tool": "analytics_compare_revenue",
+        "params": {},
+        "confidence": "definitive",
+    },
+    {
+        "patterns": [
+            "outstanding vs",
+            "outstanding bulan ini vs",
+            "piutang vs",
+            "piutang bulan ini vs",
+            "hutang vs",
+            "perbandingan outstanding",
+            "perbandingan piutang",
+            "compare outstanding",
+        ],
+        "tool": "analytics_compare_outstanding",
+        "params": {},
+        "confidence": "definitive",
+    },
+    # Commission patterns
+    {
+        "patterns": [
+            "komisi kevin",
+            "komisi elmo",
+            "komisi rabian",
+            "komisi mono",
+            "komisi meka",
+            "komisi sales",
+            "hitung komisi",
+            "commission sales",
+            "komisi dengan rate",
+        ],
+        "tool": "commission_calculate",
+        "params": {},
+        "confidence": "definitive",
+    },
+    {
+        "patterns": [
+            "komisi per sales",
+            "komisi semua sales",
+            "commission breakdown",
+            "laporan komisi",
+            "komisi seluruh",
+        ],
+        "tool": "commission_report",
+        "params": {},
+        "confidence": "definitive",
+    },
+    # Target patterns
+    {
+        "patterns": [
+            "target vs actual",
+            "pencapaian target",
+            "achievement per sales",
+            "target per sales",
+            "capai target",
+        ],
+        "tool": "analytics_target_achievement",
+        "params": {},
+        "confidence": "definitive",
+    },
+    {
+        "patterns": [
+            "sales dibawah target",
+            "sales yang dibawah target",
+            "siapa yang belum capai target",
+            "underperform",
+            "dibawah target",
+            "belum capai target",
+        ],
+        "tool": "analytics_underperformers",
+        "params": {},
+        "confidence": "definitive",
+    },
+    {
+        "patterns": [
+            "set target",
+            "pasang target",
+            "target baru",
+            "ubah target",
+            "ganti target",
+        ],
+        "tool": "analytics_set_target",
+        "params": {},
+        "confidence": "definitive",
+    },
     # List-intent overrides for invoice queries
     {
         "patterns": [

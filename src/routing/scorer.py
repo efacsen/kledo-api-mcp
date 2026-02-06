@@ -55,6 +55,12 @@ ACTION_VERBS: dict[str, list[str]] = {
     "berapa": ["_totals", "_summary", "_by_"],  # "berapa" implies totals/summary
     "per": ["_by_", "_summary"],        # "per customer" implies aggregation
     "grouped": ["_by_", "_summary"],    # "grouped by" implies aggregation
+    # Phase 8 action verbs
+    "bandingkan": ["_compare"],         # Indonesian: compare
+    "hitung": ["_calculate"],           # Indonesian: calculate
+    "compare": ["_compare"],
+    "calculate": ["_calculate"],
+    "vs": ["_compare"],                 # "revenue vs" pattern
 }
 
 
