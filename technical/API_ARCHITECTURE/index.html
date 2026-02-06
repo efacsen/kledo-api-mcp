@@ -1,0 +1,2970 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="MCP Server for Kledo API - AI-readable documentation">
+      
+      
+      
+        <link rel="canonical" href="https://example.github.io/kledo-api-mcp/technical/API_ARCHITECTURE/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Kledo API MCP Server - Architecture Documentation - Kledo MCP Server</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#kledo-api-mcp-server-architecture-documentation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Kledo MCP Server" class="md-header__button md-logo" aria-label="Kledo MCP Server" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Kledo MCP Server
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Kledo API MCP Server - Architecture Documentation
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../entities/" class="md-tabs__link">
+          
+  
+  
+  Entities
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../tools/" class="md-tabs__link">
+          
+  
+  
+  Tools
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Kledo MCP Server" class="md-nav__button md-logo" aria-label="Kledo MCP Server" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Kledo MCP Server
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Entities
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Entities
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entities/contact/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contact
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entities/product/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Product
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entities/invoice/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Invoice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entities/order/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Order
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entities/delivery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Delivery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entities/account/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Account
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tools
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tools
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catalog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/disambiguation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Find the Right Tool
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/choosing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing Between Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sales
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Sales
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/sales/invoices/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Invoices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/sales/orders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Orders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Purchases
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Purchases
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/purchases/invoices/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Invoices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/purchases/orders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Orders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inventory
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Inventory
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/inventory/products/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Products
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/inventory/deliveries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deliveries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Finance
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Finance
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/finance/reports/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reports
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CRM
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    CRM
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/crm/contacts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contacts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/system/utilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Executive Summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current State
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-finding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Finding
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tested-business-queries-all-successful" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tested Business Queries (All Successful)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-endpoints-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Endpoints Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API Endpoints Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#base-url-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Base URL Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#available-endpoint-categories-13-total" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available Endpoint Categories (13 total)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-structures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Structures
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Structures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#invoice-entity-primary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invoice Entity (Primary)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Invoice Entity (Primary)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#complete-field-list-75-fields-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Field List (75+ fields available)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-fields-for-business-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Fields for Business Queries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key Fields for Business Queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#revenue-calculation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Revenue Calculation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#status-filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Status Filtering
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sales-rep-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sales Rep Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#customer-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Customer Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#current-tool-architecture-25-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Tool Architecture (25 Tools)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Current Tool Architecture (25 Tools)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-financial-reports-4-tools-unused" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Financial Reports (4 tools) - ❌ UNUSED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-products-3-tools-unused" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Products (3 tools) - ❌ UNUSED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-utilities-3-tools-unused" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Utilities (3 tools) - ❌ UNUSED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-contacts-3-tools-low-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Contacts (3 tools) - ⚠️ LOW USAGE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-deliveries-3-tools-unused" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Deliveries (3 tools) - ❌ UNUSED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-orders-3-tools-unused" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Orders (3 tools) - ❌ UNUSED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-sales-analytics-2-tools-high-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Sales Analytics (2 tools) - 🔥 HIGH USAGE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-revenue-receivables-3-tools-high-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Revenue &amp; Receivables (3 tools) - 🔥 HIGH USAGE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-invoices-4-tools-high-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Invoices (4 tools) - 🔥 HIGH USAGE
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tool-usage-analysis-from-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool Usage Analysis (From Testing)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tool Usage Analysis (From Testing)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-date-january-24-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Date: January 24, 2026
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-queries-9-realistic-business-scenarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Queries: 9 realistic business scenarios
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coverage-statistics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coverage Statistics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consolidation-recommendation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consolidation Recommendation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Consolidation Recommendation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#proposed-architecture-25-6-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Proposed Architecture: 25 → 6 Tools
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Proposed Architecture: 25 → 6 Tools">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tool-1-kledo_revenue-replaces-3-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool 1: kledo_revenue (replaces 3 tools)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool-2-kledo_invoice-replaces-4-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool 2: kledo_invoice (replaces 4 tools)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool-3-kledo_sales_analytics-replaces-2-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool 3: kledo_sales_analytics (replaces 2 tools)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool-4-kledo_contact-consolidates-3-tools-keep-for-completeness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool 4: kledo_contact (consolidates 3 tools, keep for completeness)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool-5-kledo_product-consolidates-3-tools-defer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool 5: kledo_product (consolidates 3 tools, defer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool-6-kledo_utility-keep-as-is-3-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool 6: kledo_utility (keep as-is, 3 tools)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#token-economics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Token Economics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Token Economics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-architecture-25-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Architecture (25 Tools)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proposed-architecture-6-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Proposed Architecture (6 Tools)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Notes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Notes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameter-standardization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameter Standardization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#response-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Response Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#business-intelligence-capabilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Business Intelligence Capabilities
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Business Intelligence Capabilities">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#currently-supported-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Currently Supported Queries
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Currently Supported Queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#revenue-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Revenue Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sales-rep-performance_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Sales Rep Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invoice-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Invoice Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#customer-analysis_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Customer Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commission-calculation-partial" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ Commission Calculation (Partial)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-quality-completeness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Quality &amp; Completeness
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Quality &amp; Completeness">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#excellent-data-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Excellent Data Coverage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-missing-critical-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ No Missing Critical Data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recommendations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommendations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Recommendations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#immediate-actions-priority-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Immediate Actions (Priority Order)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool-consolidation-benefits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool Consolidation Benefits
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#when-to-add-more-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Add More Tools
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix-full-endpoint-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Appendix: Full Endpoint Reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Appendix: Full Endpoint Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#invoices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Invoices
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reports
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#products" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Products
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contacts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#supporting-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supporting Data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="kledo-api-mcp-server-architecture-documentation">Kledo API MCP Server - Architecture Documentation<a class="headerlink" href="#kledo-api-mcp-server-architecture-documentation" title="Permanent link">&para;</a></h1>
+<p><strong>Last Updated:</strong> January 24, 2026
+<strong>Version:</strong> 1.0.0
+<strong>Status:</strong> Production-Ready with Consolidation Opportunity</p>
+<hr />
+<h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
+<h3 id="current-state">Current State<a class="headerlink" href="#current-state" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Total Tools:</strong> 25 MCP tools</li>
+<li><strong>Active Usage:</strong> 5 tools (20%) serve 100% of real business queries</li>
+<li><strong>Token Cost:</strong> ~5,000-7,500 tokens per request</li>
+<li><strong>API Health:</strong> ✅ Working perfectly, full data available</li>
+</ul>
+<h3 id="key-finding">Key Finding<a class="headerlink" href="#key-finding" title="Permanent link">&para;</a></h3>
+<p><strong>80% of tools are unused</strong> in realistic business workflows, consuming tokens without providing value.</p>
+<h3 id="tested-business-queries-all-successful">Tested Business Queries (All Successful)<a class="headerlink" href="#tested-business-queries-all-successful" title="Permanent link">&para;</a></h3>
+<ol>
+<li>✅ Revenue analysis (monthly, weekly, daily)</li>
+<li>✅ Sales rep performance tracking</li>
+<li>✅ Invoice lifecycle monitoring (created, paid, outstanding)</li>
+<li>✅ Top customer identification</li>
+<li>✅ Commission calculation data retrieval</li>
+</ol>
+<hr />
+<h2 id="api-endpoints-configuration">API Endpoints Configuration<a class="headerlink" href="#api-endpoints-configuration" title="Permanent link">&para;</a></h2>
+<h3 id="base-url-structure">Base URL Structure<a class="headerlink" href="#base-url-structure" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>https://yourcompany.api.kledo.com/api/v1
+</code></pre></div>
+<h3 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Recommended: API Key</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">KLEDO_API_KEY</span><span class="o">=</span><span class="n">kledo_pat_xxx</span><span class="o">...</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Legacy: Email/Password</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">KLEDO_EMAIL</span><span class="o">=</span><span class="n">user</span><span class="nd">@example</span><span class="o">.</span><span class="n">com</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">KLEDO_PASSWORD</span><span class="o">=</span><span class="n">xxx</span>
+</code></pre></div>
+<h3 id="available-endpoint-categories-13-total">Available Endpoint Categories (13 total)<a class="headerlink" href="#available-endpoint-categories-13-total" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Endpoints</th>
+<th>Status</th>
+<th>Usage in Real Workflows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>invoices</strong></td>
+<td>list, detail, totals</td>
+<td>✅ Active</td>
+<td>🔥 High (3× in tests)</td>
+</tr>
+<tr>
+<td><strong>reports</strong></td>
+<td>activity_team, profit_loss, etc.</td>
+<td>✅ Ready</td>
+<td>❌ Unused</td>
+</tr>
+<tr>
+<td><strong>purchase_invoices</strong></td>
+<td>list, detail, totals</td>
+<td>✅ Ready</td>
+<td>❌ Unused</td>
+</tr>
+<tr>
+<td><strong>orders</strong></td>
+<td>list, detail, totals</td>
+<td>✅ Ready</td>
+<td>❌ Unused</td>
+</tr>
+<tr>
+<td><strong>purchase_orders</strong></td>
+<td>list, detail, totals</td>
+<td>✅ Ready</td>
+<td>❌ Unused</td>
+</tr>
+<tr>
+<td><strong>products</strong></td>
+<td>list, detail, suggestion</td>
+<td>✅ Ready</td>
+<td>❌ Unused</td>
+</tr>
+<tr>
+<td><strong>contacts</strong></td>
+<td>list, detail, transactions</td>
+<td>✅ Ready</td>
+<td>⚠️ Low (1× in tests)</td>
+</tr>
+<tr>
+<td><strong>deliveries</strong></td>
+<td>list, detail, totals</td>
+<td>✅ Ready</td>
+<td>❌ Unused</td>
+</tr>
+<tr>
+<td><strong>purchase_deliveries</strong></td>
+<td>list, detail</td>
+<td>✅ Ready</td>
+<td>❌ Unused</td>
+</tr>
+<tr>
+<td><strong>bank</strong></td>
+<td>transactions, balances</td>
+<td>✅ Ready</td>
+<td>❌ Unused</td>
+</tr>
+<tr>
+<td><strong>accounts</strong></td>
+<td>list, detail</td>
+<td>✅ Ready</td>
+<td>❌ Unused</td>
+</tr>
+<tr>
+<td><strong>supporting</strong></td>
+<td>units, tags, fees, warehouses</td>
+<td>✅ Ready</td>
+<td>❌ Unused</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="data-structures">Data Structures<a class="headerlink" href="#data-structures" title="Permanent link">&para;</a></h2>
+<h3 id="invoice-entity-primary">Invoice Entity (Primary)<a class="headerlink" href="#invoice-entity-primary" title="Permanent link">&para;</a></h3>
+<p><strong>API Endpoint:</strong> <code>/finance/invoices</code></p>
+<h4 id="complete-field-list-75-fields-available">Complete Field List (75+ fields available)<a class="headerlink" href="#complete-field-list-75-fields-available" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  <span class="c1"># Core Identification</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">13454</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  <span class="s1">&#39;business_tran_id&#39;</span><span class="p">:</span> <span class="mi">13448</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>  <span class="s1">&#39;ref_number&#39;</span><span class="p">:</span> <span class="s1">&#39;INV/26/JAN/01161&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  <span class="s1">&#39;trans_type_id&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>  <span class="c1"># Dates</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>  <span class="s1">&#39;trans_date&#39;</span><span class="p">:</span> <span class="s1">&#39;2026-01-23&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>  <span class="s1">&#39;due_date&#39;</span><span class="p">:</span> <span class="s1">&#39;2026-01-23&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>  <span class="s1">&#39;payment_date&#39;</span><span class="p">:</span> <span class="s1">&#39;2026-01-23&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>  <span class="s1">&#39;paid_date&#39;</span><span class="p">:</span> <span class="s1">&#39;2026-01-23&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>  <span class="s1">&#39;shipping_date&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>  <span class="s1">&#39;created_at&#39;</span><span class="p">:</span> <span class="s1">&#39;2026-01-23&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>  <span class="s1">&#39;updated_at&#39;</span><span class="p">:</span> <span class="s1">&#39;2026-01-23&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>  <span class="c1"># Financial Amounts (IDR)</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>  <span class="s1">&#39;subtotal&#39;</span><span class="p">:</span> <span class="mi">16320000</span><span class="p">,</span>              <span class="c1"># Before tax</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>  <span class="s1">&#39;total_tax&#39;</span><span class="p">:</span> <span class="mi">1795200</span><span class="p">,</span>               <span class="c1"># Tax amount</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>  <span class="s1">&#39;amount_after_tax&#39;</span><span class="p">:</span> <span class="mi">18115200</span><span class="p">,</span>       <span class="c1"># After tax (subtotal + tax)</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>  <span class="s1">&#39;amount&#39;</span><span class="p">:</span> <span class="mi">16320000</span><span class="p">,</span>                 <span class="c1"># Base amount</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>  <span class="s1">&#39;due&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                           <span class="c1"># Outstanding amount</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>  <span class="s1">&#39;discount_amount&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>  <span class="s1">&#39;discount_percent&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>  <span class="s1">&#39;additional_discount_amount&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>  <span class="s1">&#39;additional_discount_percent&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>  <span class="s1">&#39;shipping_cost&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a>  <span class="s1">&#39;witholding_amount&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>  <span class="s1">&#39;witholding_percent&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a>
+<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a>  <span class="c1"># Status &amp; Payment</span>
+<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a>  <span class="s1">&#39;status_id&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>                     <span class="c1"># 1=Unpaid, 2=Partial, 3=Paid</span>
+<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a>  <span class="s1">&#39;due_days&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                      <span class="c1"># Days overdue</span>
+<a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a>  <span class="s1">&#39;pay_later&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a>  <span class="s1">&#39;include_tax&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a>
+<a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a>  <span class="c1"># Relationships (IDs)</span>
+<a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a>  <span class="s1">&#39;contact_id&#39;</span><span class="p">:</span> <span class="mi">489</span><span class="p">,</span>
+<a id="__codelineno-2-39" name="__codelineno-2-39" href="#__codelineno-2-39"></a>  <span class="s1">&#39;sales_id&#39;</span><span class="p">:</span> <span class="mi">230701</span><span class="p">,</span>                 <span class="c1"># Sales rep ID (KEY for commissions!)</span>
+<a id="__codelineno-2-40" name="__codelineno-2-40" href="#__codelineno-2-40"></a>  <span class="s1">&#39;owner_id&#39;</span><span class="p">:</span> <span class="mi">218933</span><span class="p">,</span>
+<a id="__codelineno-2-41" name="__codelineno-2-41" href="#__codelineno-2-41"></a>  <span class="s1">&#39;warehouse_id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-2-42" name="__codelineno-2-42" href="#__codelineno-2-42"></a>  <span class="s1">&#39;term_id&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>                       <span class="c1"># Payment terms</span>
+<a id="__codelineno-2-43" name="__codelineno-2-43" href="#__codelineno-2-43"></a>
+<a id="__codelineno-2-44" name="__codelineno-2-44" href="#__codelineno-2-44"></a>  <span class="c1"># Nested Objects (FULL DATA AVAILABLE)</span>
+<a id="__codelineno-2-45" name="__codelineno-2-45" href="#__codelineno-2-45"></a>  <span class="s1">&#39;contact&#39;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-2-46" name="__codelineno-2-46" href="#__codelineno-2-46"></a>    <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">489</span><span class="p">,</span>
+<a id="__codelineno-2-47" name="__codelineno-2-47" href="#__codelineno-2-47"></a>    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Tahroni Arifin&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-48" name="__codelineno-2-48" href="#__codelineno-2-48"></a>    <span class="s1">&#39;company&#39;</span><span class="p">:</span> <span class="s1">&#39;PT. RANGKA RUANG INDONESIA&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-49" name="__codelineno-2-49" href="#__codelineno-2-49"></a>    <span class="s1">&#39;npwp&#39;</span><span class="p">:</span> <span class="s1">&#39;509721197002000&#39;</span>         <span class="c1"># Tax ID</span>
+<a id="__codelineno-2-50" name="__codelineno-2-50" href="#__codelineno-2-50"></a>  <span class="p">},</span>
+<a id="__codelineno-2-51" name="__codelineno-2-51" href="#__codelineno-2-51"></a>
+<a id="__codelineno-2-52" name="__codelineno-2-52" href="#__codelineno-2-52"></a>  <span class="s1">&#39;sales_person&#39;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-2-53" name="__codelineno-2-53" href="#__codelineno-2-53"></a>    <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">230701</span><span class="p">,</span>
+<a id="__codelineno-2-54" name="__codelineno-2-54" href="#__codelineno-2-54"></a>    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Ahmad Kurniawan&#39;</span>  <span class="c1"># Sales rep name (KEY!)</span>
+<a id="__codelineno-2-55" name="__codelineno-2-55" href="#__codelineno-2-55"></a>  <span class="p">},</span>
+<a id="__codelineno-2-56" name="__codelineno-2-56" href="#__codelineno-2-56"></a>
+<a id="__codelineno-2-57" name="__codelineno-2-57" href="#__codelineno-2-57"></a>  <span class="s1">&#39;warehouse&#39;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-2-58" name="__codelineno-2-58" href="#__codelineno-2-58"></a>    <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-2-59" name="__codelineno-2-59" href="#__codelineno-2-59"></a>    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Coating dan Cat&#39;</span>
+<a id="__codelineno-2-60" name="__codelineno-2-60" href="#__codelineno-2-60"></a>  <span class="p">},</span>
+<a id="__codelineno-2-61" name="__codelineno-2-61" href="#__codelineno-2-61"></a>
+<a id="__codelineno-2-62" name="__codelineno-2-62" href="#__codelineno-2-62"></a>  <span class="s1">&#39;termin&#39;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-2-63" name="__codelineno-2-63" href="#__codelineno-2-63"></a>    <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+<a id="__codelineno-2-64" name="__codelineno-2-64" href="#__codelineno-2-64"></a>    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Cash Before Delivery&#39;</span>    <span class="c1"># Payment terms</span>
+<a id="__codelineno-2-65" name="__codelineno-2-65" href="#__codelineno-2-65"></a>  <span class="p">},</span>
+<a id="__codelineno-2-66" name="__codelineno-2-66" href="#__codelineno-2-66"></a>
+<a id="__codelineno-2-67" name="__codelineno-2-67" href="#__codelineno-2-67"></a>  <span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="p">[{</span>
+<a id="__codelineno-2-68" name="__codelineno-2-68" href="#__codelineno-2-68"></a>    <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-2-69" name="__codelineno-2-69" href="#__codelineno-2-69"></a>    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Penjualan Material&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-70" name="__codelineno-2-70" href="#__codelineno-2-70"></a>    <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;#000000&#39;</span>
+<a id="__codelineno-2-71" name="__codelineno-2-71" href="#__codelineno-2-71"></a>  <span class="p">}],</span>
+<a id="__codelineno-2-72" name="__codelineno-2-72" href="#__codelineno-2-72"></a>
+<a id="__codelineno-2-73" name="__codelineno-2-73" href="#__codelineno-2-73"></a>  <span class="c1"># Additional Details</span>
+<a id="__codelineno-2-74" name="__codelineno-2-74" href="#__codelineno-2-74"></a>  <span class="s1">&#39;memo&#39;</span><span class="p">:</span> <span class="s1">&#39;Stadion Wibawa Mukti Bekasi - 452&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-75" name="__codelineno-2-75" href="#__codelineno-2-75"></a>  <span class="s1">&#39;desc&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-76" name="__codelineno-2-76" href="#__codelineno-2-76"></a>  <span class="s1">&#39;order_number&#39;</span><span class="p">:</span> <span class="s1">&#39;SO/26/JAN/00838&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-77" name="__codelineno-2-77" href="#__codelineno-2-77"></a>  <span class="s1">&#39;qty&#39;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>
+<a id="__codelineno-2-78" name="__codelineno-2-78" href="#__codelineno-2-78"></a>  <span class="s1">&#39;print_status&#39;</span><span class="p">:</span> <span class="s1">&#39;Belum&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-79" name="__codelineno-2-79" href="#__codelineno-2-79"></a>  <span class="s1">&#39;attachment&#39;</span><span class="p">:</span> <span class="p">[],</span>
+<a id="__codelineno-2-80" name="__codelineno-2-80" href="#__codelineno-2-80"></a>  <span class="s1">&#39;attachment_exists&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-2-81" name="__codelineno-2-81" href="#__codelineno-2-81"></a>
+<a id="__codelineno-2-82" name="__codelineno-2-82" href="#__codelineno-2-82"></a>  <span class="c1"># Currency (not typically used for IDR)</span>
+<a id="__codelineno-2-83" name="__codelineno-2-83" href="#__codelineno-2-83"></a>  <span class="s1">&#39;currency_id&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-2-84" name="__codelineno-2-84" href="#__codelineno-2-84"></a>  <span class="s1">&#39;currency_rate&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-2-85" name="__codelineno-2-85" href="#__codelineno-2-85"></a>
+<a id="__codelineno-2-86" name="__codelineno-2-86" href="#__codelineno-2-86"></a>  <span class="c1"># Payment Accounts</span>
+<a id="__codelineno-2-87" name="__codelineno-2-87" href="#__codelineno-2-87"></a>  <span class="s1">&#39;payment_accounts&#39;</span><span class="p">:</span> <span class="p">[{</span>
+<a id="__codelineno-2-88" name="__codelineno-2-88" href="#__codelineno-2-88"></a>    <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">1507</span><span class="p">,</span>
+<a id="__codelineno-2-89" name="__codelineno-2-89" href="#__codelineno-2-89"></a>    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Mandiri Main 6667&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-90" name="__codelineno-2-90" href="#__codelineno-2-90"></a>    <span class="s1">&#39;name_id&#39;</span><span class="p">:</span> <span class="s1">&#39;Mandiri Main 6667&#39;</span>
+<a id="__codelineno-2-91" name="__codelineno-2-91" href="#__codelineno-2-91"></a>  <span class="p">}]</span>
+<a id="__codelineno-2-92" name="__codelineno-2-92" href="#__codelineno-2-92"></a><span class="p">}</span>
+</code></pre></div>
+<h4 id="key-fields-for-business-queries">Key Fields for Business Queries<a class="headerlink" href="#key-fields-for-business-queries" title="Permanent link">&para;</a></h4>
+<h5 id="revenue-calculation">Revenue Calculation<a class="headerlink" href="#revenue-calculation" title="Permanent link">&para;</a></h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Revenue Before Tax</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">revenue_before_tax</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">invoice</span><span class="p">[</span><span class="s1">&#39;subtotal&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">invoice</span> <span class="ow">in</span> <span class="n">invoices</span><span class="p">)</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Tax Amount</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">total_tax</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">invoice</span><span class="p">[</span><span class="s1">&#39;total_tax&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">invoice</span> <span class="ow">in</span> <span class="n">invoices</span><span class="p">)</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Revenue After Tax</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">revenue_after_tax</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">invoice</span><span class="p">[</span><span class="s1">&#39;amount_after_tax&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">invoice</span> <span class="ow">in</span> <span class="n">invoices</span><span class="p">)</span>
+</code></pre></div>
+<h5 id="status-filtering">Status Filtering<a class="headerlink" href="#status-filtering" title="Permanent link">&para;</a></h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">status_mapping</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;Belum Dibayar / Unpaid&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;Dibayar Sebagian / Partially Paid&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;Lunas / Paid&quot;</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">}</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Get only paid invoices for revenue</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">paid_invoices</span> <span class="o">=</span> <span class="p">[</span><span class="n">inv</span> <span class="k">for</span> <span class="n">inv</span> <span class="ow">in</span> <span class="n">invoices</span> <span class="k">if</span> <span class="n">inv</span><span class="p">[</span><span class="s1">&#39;status_id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">]</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="c1"># Get outstanding (unpaid + partial)</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="n">outstanding</span> <span class="o">=</span> <span class="p">[</span><span class="n">inv</span> <span class="k">for</span> <span class="n">inv</span> <span class="ow">in</span> <span class="n">invoices</span> <span class="k">if</span> <span class="n">inv</span><span class="p">[</span><span class="s1">&#39;status_id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
+</code></pre></div>
+<h5 id="sales-rep-performance">Sales Rep Performance<a class="headerlink" href="#sales-rep-performance" title="Permanent link">&para;</a></h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Group revenue by sales rep</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">rep_revenue</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="s1">&#39;total_before_tax&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="s1">&#39;total_after_tax&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="s1">&#39;invoice_count&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="s1">&#39;rep_name&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="p">})</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="k">for</span> <span class="n">invoice</span> <span class="ow">in</span> <span class="n">paid_invoices</span><span class="p">:</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="n">sales_id</span> <span class="o">=</span> <span class="n">invoice</span><span class="p">[</span><span class="s1">&#39;sales_id&#39;</span><span class="p">]</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    <span class="n">rep_revenue</span><span class="p">[</span><span class="n">sales_id</span><span class="p">][</span><span class="s1">&#39;total_before_tax&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">invoice</span><span class="p">[</span><span class="s1">&#39;subtotal&#39;</span><span class="p">]</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    <span class="n">rep_revenue</span><span class="p">[</span><span class="n">sales_id</span><span class="p">][</span><span class="s1">&#39;total_after_tax&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">invoice</span><span class="p">[</span><span class="s1">&#39;amount_after_tax&#39;</span><span class="p">]</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>    <span class="n">rep_revenue</span><span class="p">[</span><span class="n">sales_id</span><span class="p">][</span><span class="s1">&#39;invoice_count&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>    <span class="n">rep_revenue</span><span class="p">[</span><span class="n">sales_id</span><span class="p">][</span><span class="s1">&#39;rep_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">invoice</span><span class="p">[</span><span class="s1">&#39;sales_person&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+</code></pre></div>
+<h5 id="customer-analysis">Customer Analysis<a class="headerlink" href="#customer-analysis" title="Permanent link">&para;</a></h5>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Top customers by revenue</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">customer_revenue</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="s1">&#39;total_revenue&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="s1">&#39;invoice_count&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="s1">&#39;customer_name&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="s1">&#39;company&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">})</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="k">for</span> <span class="n">invoice</span> <span class="ow">in</span> <span class="n">paid_invoices</span><span class="p">:</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    <span class="n">contact_id</span> <span class="o">=</span> <span class="n">invoice</span><span class="p">[</span><span class="s1">&#39;contact_id&#39;</span><span class="p">]</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>    <span class="n">customer_revenue</span><span class="p">[</span><span class="n">contact_id</span><span class="p">][</span><span class="s1">&#39;total_revenue&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">invoice</span><span class="p">[</span><span class="s1">&#39;amount_after_tax&#39;</span><span class="p">]</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    <span class="n">customer_revenue</span><span class="p">[</span><span class="n">contact_id</span><span class="p">][</span><span class="s1">&#39;invoice_count&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>    <span class="n">customer_revenue</span><span class="p">[</span><span class="n">contact_id</span><span class="p">][</span><span class="s1">&#39;customer_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">invoice</span><span class="p">[</span><span class="s1">&#39;contact&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>    <span class="n">customer_revenue</span><span class="p">[</span><span class="n">contact_id</span><span class="p">][</span><span class="s1">&#39;company&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">invoice</span><span class="p">[</span><span class="s1">&#39;contact&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;company&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="c1"># Sort by revenue</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="n">top_customers</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>    <span class="n">customer_revenue</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>    <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;total_revenue&#39;</span><span class="p">],</span>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>    <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+</code></pre></div>
+<hr />
+<h2 id="current-tool-architecture-25-tools">Current Tool Architecture (25 Tools)<a class="headerlink" href="#current-tool-architecture-25-tools" title="Permanent link">&para;</a></h2>
+<h3 id="1-financial-reports-4-tools-unused">1. Financial Reports (4 tools) - ❌ UNUSED<a class="headerlink" href="#1-financial-reports-4-tools-unused" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">financial_activity_team_report</span><span class="p">(</span><span class="n">date_from</span><span class="p">,</span> <span class="n">date_to</span><span class="p">)</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">financial_sales_summary</span><span class="p">(</span><span class="n">date_from</span><span class="p">,</span> <span class="n">date_to</span><span class="p">)</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">financial_purchase_summary</span><span class="p">(</span><span class="n">date_from</span><span class="p">,</span> <span class="n">date_to</span><span class="p">)</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">financial_bank_balances</span><span class="p">()</span>
+</code></pre></div>
+<p><strong>Status:</strong> Implemented but not called in real workflows.</p>
+<hr />
+<h3 id="2-products-3-tools-unused">2. Products (3 tools) - ❌ UNUSED<a class="headerlink" href="#2-products-3-tools-unused" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">product_list</span><span class="p">(</span><span class="n">page</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">per_page</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">search</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">product_get_detail</span><span class="p">(</span><span class="n">product_id</span><span class="p">)</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">product_search_by_sku</span><span class="p">(</span><span class="n">sku</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Status:</strong> Ready but not needed for current queries.</p>
+<hr />
+<h3 id="3-utilities-3-tools-unused">3. Utilities (3 tools) - ❌ UNUSED<a class="headerlink" href="#3-utilities-3-tools-unused" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">utility_clear_cache</span><span class="p">()</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">utility_get_cache_stats</span><span class="p">()</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">utility_test_connection</span><span class="p">()</span>
+</code></pre></div>
+<p><strong>Status:</strong> System tools, rarely needed in business workflows.</p>
+<hr />
+<h3 id="4-contacts-3-tools-low-usage">4. Contacts (3 tools) - ⚠️ LOW USAGE<a class="headerlink" href="#4-contacts-3-tools-low-usage" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">contact_list</span><span class="p">(</span><span class="n">page</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">per_page</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">search</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">contact_get_detail</span><span class="p">(</span><span class="n">contact_id</span><span class="p">)</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">contact_get_transactions</span><span class="p">(</span><span class="n">contact_id</span><span class="p">)</span>  <span class="c1"># ✅ Used 1× in tests</span>
+</code></pre></div>
+<p><strong>Usage:</strong> Only transactions endpoint used (customer analysis).
+<strong>Note:</strong> Contact info already embedded in invoice responses!</p>
+<hr />
+<h3 id="5-deliveries-3-tools-unused">5. Deliveries (3 tools) - ❌ UNUSED<a class="headerlink" href="#5-deliveries-3-tools-unused" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">delivery_list</span><span class="p">(</span><span class="n">date_from</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">date_to</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">status_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">delivery_get_detail</span><span class="p">(</span><span class="n">delivery_id</span><span class="p">)</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">delivery_get_pending</span><span class="p">()</span>
+</code></pre></div>
+<p><strong>Status:</strong> Not needed for current financial workflows.</p>
+<hr />
+<h3 id="6-orders-3-tools-unused">6. Orders (3 tools) - ❌ UNUSED<a class="headerlink" href="#6-orders-3-tools-unused" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">order_list_sales</span><span class="p">(</span><span class="n">date_from</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">date_to</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">order_get_detail</span><span class="p">(</span><span class="n">order_id</span><span class="p">)</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">order_list_purchase</span><span class="p">(</span><span class="n">date_from</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">date_to</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Status:</strong> Not queried in revenue/commission workflows.</p>
+<hr />
+<h3 id="7-sales-analytics-2-tools-high-usage">7. Sales Analytics (2 tools) - 🔥 HIGH USAGE<a class="headerlink" href="#7-sales-analytics-2-tools-high-usage" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">sales_rep_revenue_report</span><span class="p">(</span><span class="n">date_from</span><span class="p">,</span> <span class="n">date_to</span><span class="p">)</span>  <span class="c1"># ✅ Used 2× in tests</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">sales_rep_list</span><span class="p">()</span>                               <span class="c1"># ✅ Used 1× in tests</span>
+</code></pre></div>
+<p><strong>Status:</strong> CRITICAL for commission calculations.
+<strong>Fields Used:</strong>
+- <code>sales_rep_name</code>
+- <code>total_revenue</code> (before and after tax)
+- <code>invoice_count</code></p>
+<hr />
+<h3 id="8-revenue-receivables-3-tools-high-usage">8. Revenue &amp; Receivables (3 tools) - 🔥 HIGH USAGE<a class="headerlink" href="#8-revenue-receivables-3-tools-high-usage" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">revenue_summary</span><span class="p">(</span><span class="n">date_from</span><span class="p">,</span> <span class="n">date_to</span><span class="p">)</span>                    <span class="c1"># ✅ Used 3× in tests</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">outstanding_receivables</span><span class="p">(</span><span class="n">status_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_amount</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">customer_revenue_ranking</span><span class="p">(</span><span class="n">date_from</span><span class="p">,</span> <span class="n">date_to</span><span class="p">,</span> <span class="n">top_n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span> <span class="c1"># ✅ Used 1× in tests</span>
+</code></pre></div>
+<p><strong>Status:</strong> CORE tools for financial analysis.
+<strong>Test Results (Jan 2026 data):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Revenue Before Tax: Rp 92,823,250.00
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>Tax (PPN): Rp 8,678,450.00
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>Revenue After Tax: Rp 101,501,700.00
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>Paid Invoices: 16
+</code></pre></div></p>
+<hr />
+<h3 id="9-invoices-4-tools-high-usage">9. Invoices (4 tools) - 🔥 HIGH USAGE<a class="headerlink" href="#9-invoices-4-tools-high-usage" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">invoice_list_sales</span><span class="p">(</span><span class="n">date_from</span><span class="p">,</span> <span class="n">date_to</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># ✅ Used 3× in tests</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">invoice_get_detail</span><span class="p">(</span><span class="n">invoice_id</span><span class="p">)</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">invoice_get_totals</span><span class="p">(</span><span class="n">date_from</span><span class="p">,</span> <span class="n">date_to</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">invoice_list_purchase</span><span class="p">(</span><span class="n">date_from</span><span class="p">,</span> <span class="n">date_to</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Status:</strong> ESSENTIAL for all revenue and invoice queries.
+<strong>Most Used Tool:</strong> <code>invoice_list_sales</code> (3 calls for different status filters).</p>
+<hr />
+<h2 id="tool-usage-analysis-from-testing">Tool Usage Analysis (From Testing)<a class="headerlink" href="#tool-usage-analysis-from-testing" title="Permanent link">&para;</a></h2>
+<h3 id="test-date-january-24-2026">Test Date: January 24, 2026<a class="headerlink" href="#test-date-january-24-2026" title="Permanent link">&para;</a></h3>
+<h3 id="test-queries-9-realistic-business-scenarios">Test Queries: 9 realistic business scenarios<a class="headerlink" href="#test-queries-9-realistic-business-scenarios" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Tool Name</th>
+<th>Call Count</th>
+<th>Purpose</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>revenue_summary</code></td>
+<td>3×</td>
+<td>Monthly/weekly/daily revenue</td>
+<td>✅ CRITICAL</td>
+</tr>
+<tr>
+<td><code>invoice_list_sales</code></td>
+<td>3×</td>
+<td>Created/paid/outstanding invoices</td>
+<td>✅ CRITICAL</td>
+</tr>
+<tr>
+<td><code>sales_rep_revenue_report</code></td>
+<td>2×</td>
+<td>Commission calculations</td>
+<td>✅ CRITICAL</td>
+</tr>
+<tr>
+<td><code>customer_revenue_ranking</code></td>
+<td>1×</td>
+<td>Top customer identification</td>
+<td>✅ IMPORTANT</td>
+</tr>
+<tr>
+<td><code>sales_rep_list</code></td>
+<td>1×</td>
+<td>Sales rep enumeration</td>
+<td>✅ IMPORTANT</td>
+</tr>
+<tr>
+<td><strong>All other tools (20)</strong></td>
+<td>0×</td>
+<td>-</td>
+<td>❌ UNUSED</td>
+</tr>
+</tbody>
+</table>
+<h3 id="coverage-statistics">Coverage Statistics<a class="headerlink" href="#coverage-statistics" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Tools Used:</strong> 5 / 25 (20%)</li>
+<li><strong>Tools Unused:</strong> 20 / 25 (80%)</li>
+<li><strong>Token Overhead:</strong> ~4,000-6,000 tokens/request wasted on unused tool definitions</li>
+</ul>
+<hr />
+<h2 id="consolidation-recommendation">Consolidation Recommendation<a class="headerlink" href="#consolidation-recommendation" title="Permanent link">&para;</a></h2>
+<h3 id="proposed-architecture-25-6-tools">Proposed Architecture: 25 → 6 Tools<a class="headerlink" href="#proposed-architecture-25-6-tools" title="Permanent link">&para;</a></h3>
+<h4 id="tool-1-kledo_revenue-replaces-3-tools"><strong>Tool 1: <code>kledo_revenue</code></strong> (replaces 3 tools)<a class="headerlink" href="#tool-1-kledo_revenue-replaces-3-tools" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">kledo_revenue</span><span class="p">(</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    <span class="n">operation</span><span class="p">:</span> <span class="s2">&quot;summary&quot;</span> <span class="o">|</span> <span class="s2">&quot;receivables&quot;</span> <span class="o">|</span> <span class="s2">&quot;customer_ranking&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    <span class="n">date_from</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>    <span class="n">date_to</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>    <span class="n">filters</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="p">)</span>
+</code></pre></div>
+<p><strong>Handles:</strong>
+- Revenue summaries (monthly, weekly, custom ranges)
+- Outstanding receivables tracking
+- Top customer rankings</p>
+<p><strong>Token Savings:</strong> ~600-900 tokens/request</p>
+<hr />
+<h4 id="tool-2-kledo_invoice-replaces-4-tools"><strong>Tool 2: <code>kledo_invoice</code></strong> (replaces 4 tools)<a class="headerlink" href="#tool-2-kledo_invoice-replaces-4-tools" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">kledo_invoice</span><span class="p">(</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    <span class="n">operation</span><span class="p">:</span> <span class="s2">&quot;list_sales&quot;</span> <span class="o">|</span> <span class="s2">&quot;list_purchase&quot;</span> <span class="o">|</span> <span class="s2">&quot;get_detail&quot;</span> <span class="o">|</span> <span class="s2">&quot;get_totals&quot;</span><span class="p">,</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    <span class="n">invoice_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>    <span class="n">date_from</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>    <span class="n">date_to</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># &quot;paid&quot;, &quot;unpaid&quot;, &quot;partial&quot;</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>    <span class="n">filters</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="p">)</span>
+</code></pre></div>
+<p><strong>Handles:</strong>
+- Invoice listing (sales/purchase)
+- Invoice details
+- Invoice totals and summaries
+- Status-based filtering</p>
+<p><strong>Token Savings:</strong> ~800-1,200 tokens/request</p>
+<hr />
+<h4 id="tool-3-kledo_sales_analytics-replaces-2-tools"><strong>Tool 3: <code>kledo_sales_analytics</code></strong> (replaces 2 tools)<a class="headerlink" href="#tool-3-kledo_sales_analytics-replaces-2-tools" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">kledo_sales_analytics</span><span class="p">(</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="n">operation</span><span class="p">:</span> <span class="s2">&quot;revenue_report&quot;</span> <span class="o">|</span> <span class="s2">&quot;rep_list&quot;</span> <span class="o">|</span> <span class="s2">&quot;commission_calc&quot;</span><span class="p">,</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>    <span class="n">date_from</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>    <span class="n">date_to</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>    <span class="n">sales_rep_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>    <span class="n">filters</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="p">)</span>
+</code></pre></div>
+<p><strong>Handles:</strong>
+- Sales rep performance reports
+- Sales rep enumeration
+- Commission calculation support</p>
+<p><strong>Token Savings:</strong> ~400-600 tokens/request</p>
+<hr />
+<h4 id="tool-4-kledo_contact-consolidates-3-tools-keep-for-completeness"><strong>Tool 4: <code>kledo_contact</code></strong> (consolidates 3 tools, keep for completeness)<a class="headerlink" href="#tool-4-kledo_contact-consolidates-3-tools-keep-for-completeness" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">kledo_contact</span><span class="p">(</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="n">operation</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span> <span class="o">|</span> <span class="s2">&quot;get_detail&quot;</span> <span class="o">|</span> <span class="s2">&quot;get_transactions&quot;</span><span class="p">,</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>    <span class="n">contact_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>    <span class="n">filters</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="p">)</span>
+</code></pre></div>
+<p><strong>Handles:</strong>
+- Customer/vendor listing
+- Contact details
+- Transaction history</p>
+<p><strong>Usage:</strong> Low but may be needed for future queries.</p>
+<hr />
+<h4 id="tool-5-kledo_product-consolidates-3-tools-defer"><strong>Tool 5: <code>kledo_product</code></strong> (consolidates 3 tools, defer)<a class="headerlink" href="#tool-5-kledo_product-consolidates-3-tools-defer" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">kledo_product</span><span class="p">(</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="n">operation</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span> <span class="o">|</span> <span class="s2">&quot;get_detail&quot;</span> <span class="o">|</span> <span class="s2">&quot;search_sku&quot;</span><span class="p">,</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    <span class="n">product_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="n">sku</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>    <span class="n">filters</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="p">)</span>
+</code></pre></div>
+<p><strong>Status:</strong> Not used in current workflows, but keep for completeness.</p>
+<hr />
+<h4 id="tool-6-kledo_utility-keep-as-is-3-tools"><strong>Tool 6: <code>kledo_utility</code></strong> (keep as-is, 3 tools)<a class="headerlink" href="#tool-6-kledo_utility-keep-as-is-3-tools" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">kledo_utility</span><span class="p">(</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>    <span class="n">operation</span><span class="p">:</span> <span class="s2">&quot;clear_cache&quot;</span> <span class="o">|</span> <span class="s2">&quot;cache_stats&quot;</span> <span class="o">|</span> <span class="s2">&quot;test_connection&quot;</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="p">)</span>
+</code></pre></div>
+<p><strong>Status:</strong> System utilities, rarely called but useful for debugging.</p>
+<hr />
+<h2 id="token-economics">Token Economics<a class="headerlink" href="#token-economics" title="Permanent link">&para;</a></h2>
+<h3 id="current-architecture-25-tools">Current Architecture (25 Tools)<a class="headerlink" href="#current-architecture-25-tools" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>Average tool definition: 200-300 tokens
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>Total per request: 5,000-7,500 tokens
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>Over 10-turn conversation: 50,000-75,000 tokens
+</code></pre></div>
+<h3 id="proposed-architecture-6-tools">Proposed Architecture (6 Tools)<a class="headerlink" href="#proposed-architecture-6-tools" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>Average tool definition: 200-300 tokens
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>Total per request: 1,200-1,800 tokens
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>Over 10-turn conversation: 12,000-18,000 tokens
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>SAVINGS: ~62,000 tokens (75% reduction)
+</code></pre></div>
+<hr />
+<h2 id="implementation-notes">Implementation Notes<a class="headerlink" href="#implementation-notes" title="Permanent link">&para;</a></h2>
+<h3 id="parameter-standardization">Parameter Standardization<a class="headerlink" href="#parameter-standardization" title="Permanent link">&para;</a></h3>
+<p><strong>Current Issue:</strong> Inconsistent parameter names across tools.</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Current Params</th>
+<th>Should Be</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>revenue_summary</code></td>
+<td><code>date_from</code>, <code>date_to</code></td>
+<td>✅ Correct</td>
+</tr>
+<tr>
+<td><code>sales_rep_revenue_report</code></td>
+<td><code>date_from</code>, <code>date_to</code></td>
+<td>✅ Correct</td>
+</tr>
+<tr>
+<td><code>invoice_list_sales</code></td>
+<td><code>date_from</code>, <code>date_to</code></td>
+<td>✅ Correct</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Good news:</strong> Already standardized! No changes needed.</p>
+<h3 id="response-format">Response Format<a class="headerlink" href="#response-format" title="Permanent link">&para;</a></h3>
+<p><strong>Current:</strong> Markdown-formatted text (✅ CORRECT for MCP)</p>
+<p>Example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="gh"># Revenue Summary (PAID INVOICES ONLY)</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="gs">**Period**</span>: 2026-01-01 to 2026-01-24
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="gs">**Paid Invoices**</span>: 16
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="gu">## Revenue Calculation:</span>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="gs">**Revenue Before Tax**</span>: Rp 92,823,250.00
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="gs">**Tax (PPN)**</span>: Rp 8,678,450.00
+<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="gs">**Revenue After Tax**</span>: Rp 101,501,700.00
+</code></pre></div></p>
+<p><strong>Status:</strong> No changes needed. Markdown is the correct format for MCP tools.</p>
+<hr />
+<h2 id="business-intelligence-capabilities">Business Intelligence Capabilities<a class="headerlink" href="#business-intelligence-capabilities" title="Permanent link">&para;</a></h2>
+<h3 id="currently-supported-queries">Currently Supported Queries<a class="headerlink" href="#currently-supported-queries" title="Permanent link">&para;</a></h3>
+<h4 id="revenue-analysis">✅ Revenue Analysis<a class="headerlink" href="#revenue-analysis" title="Permanent link">&para;</a></h4>
+<ul>
+<li>"What was revenue last month?"</li>
+<li>"Show revenue for last week"</li>
+<li>"Daily revenue for the past 2 days"</li>
+</ul>
+<h4 id="sales-rep-performance_1">✅ Sales Rep Performance<a class="headerlink" href="#sales-rep-performance_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>"Who are our sales representatives?"</li>
+<li>"Show revenue by sales rep for this month"</li>
+<li>"Which sales rep has the highest revenue?"</li>
+</ul>
+<h4 id="invoice-lifecycle">✅ Invoice Lifecycle<a class="headerlink" href="#invoice-lifecycle" title="Permanent link">&para;</a></h4>
+<ul>
+<li>"How many invoices were created this month?"</li>
+<li>"How many invoices are paid?"</li>
+<li>"Show outstanding invoices"</li>
+</ul>
+<h4 id="customer-analysis_1">✅ Customer Analysis<a class="headerlink" href="#customer-analysis_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>"Who is our biggest customer this month?"</li>
+<li>"Top 10 customers by revenue"</li>
+<li>"Show transaction history for customer X"</li>
+</ul>
+<h4 id="commission-calculation-partial">⚠️ Commission Calculation (Partial)<a class="headerlink" href="#commission-calculation-partial" title="Permanent link">&para;</a></h4>
+<ul>
+<li>✅ Revenue data per sales rep</li>
+<li>❌ Sales targets (not in API)</li>
+<li>❌ Commission formula (not implemented)</li>
+</ul>
+<p><strong>Next Steps for Commissions:</strong>
+1. Add sales target tracking (manual input or separate table)
+2. Implement commission formula logic
+3. Create commission_calculator tool</p>
+<hr />
+<h2 id="data-quality-completeness">Data Quality &amp; Completeness<a class="headerlink" href="#data-quality-completeness" title="Permanent link">&para;</a></h2>
+<h3 id="excellent-data-coverage">✅ Excellent Data Coverage<a class="headerlink" href="#excellent-data-coverage" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Invoice fields:</strong> 75+ fields available</li>
+<li><strong>Nested relationships:</strong> Contact, sales_person, warehouse, payment terms</li>
+<li><strong>Financial precision:</strong> Separate before-tax and after-tax amounts</li>
+<li><strong>Date tracking:</strong> trans_date, due_date, payment_date, paid_date</li>
+<li><strong>Status tracking:</strong> Clear status_id (1/2/3) for payment states</li>
+</ul>
+<h3 id="no-missing-critical-data">✅ No Missing Critical Data<a class="headerlink" href="#no-missing-critical-data" title="Permanent link">&para;</a></h3>
+<p>All fields needed for current business queries are present:
+- ✅ Revenue amounts (subtotal, total_tax, amount_after_tax)
+- ✅ Sales rep identification (sales_id, sales_person.name)
+- ✅ Customer details (contact.name, contact.company)
+- ✅ Payment status (status_id, due_days)
+- ✅ Date ranges for filtering</p>
+<hr />
+<h2 id="recommendations">Recommendations<a class="headerlink" href="#recommendations" title="Permanent link">&para;</a></h2>
+<h3 id="immediate-actions-priority-order">Immediate Actions (Priority Order)<a class="headerlink" href="#immediate-actions-priority-order" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>✅ Complete:</strong> API is working, full data available</li>
+<li><strong>Next:</strong> Refactor to 6 consolidated tools (75% token savings)</li>
+<li><strong>Then:</strong> Build commission calculator with target tracking</li>
+<li><strong>Finally:</strong> Add remaining entities (orders, deliveries) as needed</li>
+</ol>
+<h3 id="tool-consolidation-benefits">Tool Consolidation Benefits<a class="headerlink" href="#tool-consolidation-benefits" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Performance:</strong> 75% reduction in token overhead</li>
+<li><strong>UX:</strong> Clearer tool selection (6 entities vs 25 operations)</li>
+<li><strong>Maintenance:</strong> Simpler codebase, easier to extend</li>
+<li><strong>Cost:</strong> Significant token cost savings at scale</li>
+</ul>
+<h3 id="when-to-add-more-tools">When to Add More Tools<a class="headerlink" href="#when-to-add-more-tools" title="Permanent link">&para;</a></h3>
+<p>Only add new tools when:
+1. Real business query cannot be satisfied by existing 6 tools
+2. New tool serves a distinct business entity (not operation variant)
+3. Usage justifies the token overhead (~200-300 tokens/request)</p>
+<hr />
+<h2 id="appendix-full-endpoint-reference">Appendix: Full Endpoint Reference<a class="headerlink" href="#appendix-full-endpoint-reference" title="Permanent link">&para;</a></h2>
+<h3 id="invoices">Invoices<a class="headerlink" href="#invoices" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>GET /finance/invoices</code> - List sales invoices</li>
+<li><code>GET /finance/invoices/{id}</code> - Invoice details</li>
+<li><code>GET /finance/invoices/totals</code> - Invoice totals</li>
+</ul>
+<h3 id="reports">Reports<a class="headerlink" href="#reports" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>GET /reportings/activity-team</code> - Activity team report</li>
+<li><code>GET /reportings/profit-loss</code> - Profit &amp; loss</li>
+<li><code>GET /reportings/sales-by-contact</code> - Sales by customer</li>
+</ul>
+<h3 id="products">Products<a class="headerlink" href="#products" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>GET /finance/products</code> - List products</li>
+<li><code>GET /finance/products/{id}</code> - Product details</li>
+</ul>
+<h3 id="contacts">Contacts<a class="headerlink" href="#contacts" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>GET /finance/contacts</code> - List contacts</li>
+<li><code>GET /finance/contacts/{id}</code> - Contact details</li>
+<li><code>GET /finance/contacts/{id}/transactions</code> - Contact transactions</li>
+</ul>
+<h3 id="supporting-data">Supporting Data<a class="headerlink" href="#supporting-data" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>GET /finance/units</code> - Product units</li>
+<li><code>GET /finance/tags</code> - Transaction tags</li>
+<li><code>GET /warehouses</code> - Warehouse list</li>
+</ul>
+<hr />
+<p><strong>Document Version:</strong> 1.0.0
+<strong>Last Validated:</strong> January 24, 2026 with real API calls
+<strong>Status:</strong> Production-ready, consolidation recommended</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
