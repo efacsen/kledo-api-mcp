@@ -193,7 +193,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             result = await utilities.handle_tool(name, arguments, api_client)
         elif name.startswith("sales_rep_"):
             result = await sales_analytics.handle_tool(name, arguments, api_client)
-        elif name in ("revenue_summary", "outstanding_receivables", "customer_revenue_ranking"):
+        elif name in ("revenue_summary", "outstanding_receivables", "customer_revenue_ranking", "revenue_daily_breakdown", "outstanding_aging_report", "customer_concentration_report"):
             result = await revenue.handle_tool(name, arguments, api_client)
         elif name.startswith("analytics_"):
             result = await analytics.handle_tool(name, arguments, api_client)
