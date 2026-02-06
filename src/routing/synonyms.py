@@ -116,6 +116,23 @@ SYNONYM_MAP: dict[str, str] = {
     "group by": "aggregation",
     "breakdown": "aggregation",
     "ringkasan per": "aggregation",
+
+    # Commission terms (Phase 8)
+    "komisi": "commission",
+    "commission": "commission",
+
+    # Target/achievement terms (Phase 8)
+    "target": "target",
+    "pencapaian": "achievement",
+    "achievement": "achievement",
+    "capai": "achievement",
+
+    # Comparison terms (Phase 8)
+    "perbandingan": "comparison",
+    "comparison": "comparison",
+    "dibanding": "comparison",
+    "bandingkan": "comparison",
+    "vs": "comparison",
 }
 
 
@@ -196,6 +213,23 @@ TERM_TO_TOOLS: dict[str, list[str]] = {
     "stock": [
         "product_list",
         "product_get_detail",
+    ],
+    # Phase 8 terms
+    "commission": [
+        "commission_calculate",
+        "commission_report",
+    ],
+    "target": [
+        "analytics_target_achievement",
+        "analytics_underperformers",
+        "analytics_set_target",
+    ],
+    "achievement": [
+        "analytics_target_achievement",
+    ],
+    "comparison": [
+        "analytics_compare_revenue",
+        "analytics_compare_outstanding",
     ],
 }
 
