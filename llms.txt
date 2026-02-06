@@ -2,7 +2,7 @@
 
 > MCP Server connecting AI agents to Kledo accounting software. Provides read-only access to invoices, contacts, products, orders, deliveries, and financial reports.
 
-This server exposes 29 tools organized by business domain. Use this file to find the right tool for querying Kledo business data.
+This server exposes 32 tools organized by business domain. Use this file to find the right tool for querying Kledo business data.
 
 ## Invoice Tools
 
@@ -62,6 +62,9 @@ Tools for period-over-period comparison and business analytics.
 
 - [analytics_compare_revenue](docs/tools/analytics.md#analytics_compare_revenue): Compare revenue between periods. Use for: "revenue bulan ini vs bulan lalu", "perbandingan revenue", "penjualan bulan ini dibanding bulan lalu", "revenue kuartal ini vs kuartal lalu", "revenue bulan ini" (single period). Parameters: period, compare_to, per_sales.
 - [analytics_compare_outstanding](docs/tools/analytics.md#analytics_compare_outstanding): Compare outstanding between periods. Use for: "outstanding bulan ini vs bulan lalu", "perbandingan piutang", "hutang bulan ini vs bulan lalu", "piutang kuartal ini vs kuartal lalu", "outstanding bulan ini" (single period). Parameters: period, compare_to, per_sales.
+- [analytics_target_achievement](docs/tools/analytics.md#analytics_target_achievement): Target vs actual per sales rep. Use for: "target vs actual per sales", "pencapaian target", "achievement per sales", "capai target bulan ini". Parameters: period.
+- [analytics_underperformers](docs/tools/analytics.md#analytics_underperformers): Sales reps below target. Use for: "sales mana yang dibawah target", "siapa yang belum capai target", "underperforming sales", "sales dibawah target". Parameters: period, threshold.
+- [analytics_set_target](docs/tools/analytics.md#analytics_set_target): Set sales target. Use for: "set target Kevin bulan ini 50 juta", "pasang target", "target baru Elmo", "ubah target". Parameters: sales_person_name, period, amount.
 
 ## Commission Tools
 

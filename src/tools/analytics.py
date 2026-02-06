@@ -20,7 +20,12 @@ from ..utils.helpers import (
     parse_date_range
 )
 from .financial import _fetch_all_invoices
+from ..utils.targets import SalesTargetManager
 
+
+# Unicode progress bar characters
+FILLED_BLOCK = "\u2588"
+EMPTY_BLOCK = "\u2591"
 
 # Indonesian month names for display
 INDONESIAN_MONTHS = [
@@ -100,6 +105,75 @@ def get_tools() -> list[Tool]:
                 },
                 "required": ["period"]
             }
+        ),
+        Tool(
+            name="analytics_target_achievement",
+            description=(
+                "Compare actual revenue vs sales targets for all reps in a period. "
+                "Shows achievement percentage and progress bar for each sales rep. "
+                "Indonesian hints: 'target vs actual per sales', 'achievement bulan ini', "
+                "'pencapaian target per sales', 'capai target'"
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "period": {
+                        "type": "string",
+                        "description": "Period phrase: 'bulan ini', '2026-02', or YYYY-MM"
+                    }
+                },
+                "required": ["period"]
+            }
+        ),
+        Tool(
+            name="analytics_underperformers",
+            description=(
+                "Show sales reps who are below target threshold. "
+                "Only includes reps with targets set. Default threshold is 80%. "
+                "Indonesian hints: 'sales mana yang dibawah target', "
+                "'siapa yang belum capai target', 'underperforming sales'"
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "period": {
+                        "type": "string",
+                        "description": "Period phrase: 'bulan ini', '2026-02', or YYYY-MM"
+                    },
+                    "threshold": {
+                        "type": "number",
+                        "description": "Achievement threshold (0.8 = 80%). Reps below this are flagged.",
+                        "default": 0.8
+                    }
+                },
+                "required": ["period"]
+            }
+        ),
+        Tool(
+            name="analytics_set_target",
+            description=(
+                "Set or update sales target for a sales rep for a specific month. "
+                "Indonesian hints: 'set target Kevin bulan ini 50 juta', "
+                "'pasang target', 'target baru Elmo', 'ubah target'"
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "sales_person_name": {
+                        "type": "string",
+                        "description": "Sales rep name (e.g., 'Kevin', 'Elmo', 'Rabian')"
+                    },
+                    "period": {
+                        "type": "string",
+                        "description": "Month in YYYY-MM or Indonesian phrase like 'bulan ini'"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "description": "Target amount in IDR"
+                    }
+                },
+                "required": ["sales_person_name", "period", "amount"]
+            }
         )
     ]
 
@@ -110,6 +184,12 @@ async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClie
         return await _compare_revenue(arguments, client)
     elif name == "analytics_compare_outstanding":
         return await _compare_outstanding(arguments, client)
+    elif name == "analytics_target_achievement":
+        return await _target_achievement(arguments, client)
+    elif name == "analytics_underperformers":
+        return await _underperformers(arguments, client)
+    elif name == "analytics_set_target":
+        return await _set_target(arguments, client)
     else:
         return f"Unknown analytics tool: {name}"
 
@@ -518,3 +598,229 @@ async def _compare_outstanding(args: Dict[str, Any], client: KledoAPIClient) -> 
             ))
 
         return "\n".join(result)
+
+
+def format_progress_bar(current: float, target: float, bar_length: int = 10) -> str:
+    """
+    Format a Unicode progress bar with achievement percentage.
+
+    Args:
+        current: Actual amount achieved
+        target: Target amount
+        bar_length: Length of progress bar in characters (default 10)
+
+    Returns:
+        Progress bar string like "████████▓▓ 82%"
+    """
+    if target is None or target <= 0:
+        return EMPTY_BLOCK * bar_length + " N/A"
+
+    # Calculate percentage
+    pct = (current / target) * 100
+
+    # Calculate filled blocks (cap at bar_length)
+    filled_blocks = int(min(current / target, 1.0) * bar_length)
+    empty_blocks = bar_length - filled_blocks
+
+    # Build bar
+    bar = FILLED_BLOCK * filled_blocks + EMPTY_BLOCK * empty_blocks
+
+    return f"{bar} {pct:.0f}%"
+
+
+async def _target_achievement(args: Dict[str, Any], client: KledoAPIClient) -> str:
+    """
+    Show target vs actual achievement for all sales reps in a period.
+
+    Args:
+        args: Tool arguments with period
+        client: Kledo API client
+
+    Returns:
+        Formatted achievement report string
+    """
+    period = args.get("period")
+    if not period:
+        return "Error: period parameter is required"
+
+    # Resolve period to YYYY-MM and date range
+    date_from, date_to, display_name = _resolve_period(period)
+
+    # Extract YYYY-MM for target lookup
+    year_month = date_from[:7]  # "2026-02-01" -> "2026-02"
+
+    # Initialize target manager
+    manager = SalesTargetManager()
+
+    # Get all targets for this month
+    targets = manager.get_all_targets(year_month)
+
+    # Fetch all paid invoices for the period
+    paid_invoices = await _fetch_all_invoices(client, date_from, date_to)
+
+    # Filter to status_id == 3 (paid) and group by sales person
+    sales_revenue = defaultdict(float)
+    for inv in paid_invoices:
+        status_id = safe_get(inv, "status_id", 1)
+        if status_id == 3:
+            subtotal = safe_get(inv, "subtotal", 0)
+            sales_person = inv.get("sales_person")
+            if sales_person and isinstance(sales_person, dict):
+                sp_name = sales_person.get("name", "(Tidak Ada Sales)")
+            else:
+                sp_name = "(Tidak Ada Sales)"
+            sales_revenue[sp_name] += subtotal
+
+    # Merge reps: those with targets + those with actual revenue
+    all_reps = set(targets.keys()) | set(sales_revenue.keys())
+
+    # Build results
+    result = []
+    result.append(f"## Target vs Actual - {display_name}\n")
+
+    # Group reps by whether they have targets
+    reps_with_targets = []
+    reps_without_targets = []
+
+    for rep_name in all_reps:
+        actual = sales_revenue.get(rep_name, 0.0)
+        target = targets.get(rep_name)
+
+        if target is not None:
+            achievement_pct = (actual / target * 100) if target > 0 else 0
+            gap = actual - target
+            reps_with_targets.append((rep_name, actual, target, achievement_pct, gap))
+        else:
+            reps_without_targets.append((rep_name, actual))
+
+    # Sort reps with targets by achievement % descending
+    reps_with_targets.sort(key=lambda x: x[3], reverse=True)
+
+    # Display reps with targets
+    if reps_with_targets:
+        for rep_name, actual, target, achievement_pct, gap in reps_with_targets:
+            progress_bar = format_progress_bar(actual, target)
+            gap_str = f"+{format_currency(gap, short=True)}" if gap >= 0 else format_currency(gap, short=True)
+
+            result.append(f"**{rep_name}:** {progress_bar} ({format_currency(actual, short=True)} / {format_currency(target, short=True)})")
+            result.append(f"Gap: {gap_str}\n")
+
+    # Display reps without targets
+    if reps_without_targets:
+        result.append("### Reps without Target:\n")
+        for rep_name, actual in sorted(reps_without_targets):
+            result.append(f"**{rep_name}:** Revenue {format_currency(actual, short=True)} -- Target belum diset\n")
+
+    if not all_reps:
+        result.append("Tidak ada data revenue atau target untuk periode ini.")
+
+    return "\n".join(result)
+
+
+async def _underperformers(args: Dict[str, Any], client: KledoAPIClient) -> str:
+    """
+    Show sales reps who are below target threshold.
+
+    Args:
+        args: Tool arguments with period, threshold
+        client: Kledo API client
+
+    Returns:
+        Formatted underperformer report string
+    """
+    period = args.get("period")
+    threshold = args.get("threshold", 0.8)
+
+    if not period:
+        return "Error: period parameter is required"
+
+    # Resolve period to YYYY-MM and date range
+    date_from, date_to, display_name = _resolve_period(period)
+
+    # Extract YYYY-MM for target lookup
+    year_month = date_from[:7]
+
+    # Initialize target manager
+    manager = SalesTargetManager()
+
+    # Get all targets for this month
+    targets = manager.get_all_targets(year_month)
+
+    if not targets:
+        return f"Tidak ada target yang diset untuk {display_name}"
+
+    # Fetch all paid invoices for the period
+    paid_invoices = await _fetch_all_invoices(client, date_from, date_to)
+
+    # Filter to status_id == 3 (paid) and group by sales person
+    sales_revenue = defaultdict(float)
+    for inv in paid_invoices:
+        status_id = safe_get(inv, "status_id", 1)
+        if status_id == 3:
+            subtotal = safe_get(inv, "subtotal", 0)
+            sales_person = inv.get("sales_person")
+            if sales_person and isinstance(sales_person, dict):
+                sp_name = sales_person.get("name", "(Tidak Ada Sales)")
+            else:
+                sp_name = "(Tidak Ada Sales)"
+            sales_revenue[sp_name] += subtotal
+
+    # Filter to reps WITH targets who are below threshold
+    underperformers = []
+    for rep_name, target in targets.items():
+        actual = sales_revenue.get(rep_name, 0.0)
+        if target > 0:
+            achievement = actual / target
+            if achievement < threshold:
+                underperformers.append((rep_name, actual, target, achievement))
+
+    # Sort by achievement ascending (worst first)
+    underperformers.sort(key=lambda x: x[3])
+
+    # Format result
+    result = []
+    result.append(f"## Sales Dibawah Target (<{threshold*100:.0f}%) - {display_name}\n")
+
+    if underperformers:
+        for rep_name, actual, target, achievement in underperformers:
+            result.append(
+                f"- **{rep_name}:** {achievement*100:.0f}% "
+                f"({format_currency(actual, short=True)} / {format_currency(target, short=True)})"
+            )
+    else:
+        result.append("Semua sales sudah mencapai target!")
+
+    return "\n".join(result)
+
+
+async def _set_target(args: Dict[str, Any], client: KledoAPIClient) -> str:
+    """
+    Set or update sales target for a sales rep.
+
+    Args:
+        args: Tool arguments with sales_person_name, period, amount
+        client: Kledo API client (not used but kept for signature consistency)
+
+    Returns:
+        Confirmation message
+    """
+    sales_person_name = args.get("sales_person_name", "").strip()
+    period = args.get("period", "").strip()
+    amount = args.get("amount")
+
+    if not sales_person_name:
+        return "Error: sales_person_name parameter is required"
+    if not period:
+        return "Error: period parameter is required"
+    if amount is None:
+        return "Error: amount parameter is required"
+
+    # Resolve period to YYYY-MM format
+    date_from, date_to, display_name = _resolve_period(period)
+    year_month = date_from[:7]  # "2026-02-01" -> "2026-02"
+
+    # Initialize target manager and set target
+    manager = SalesTargetManager()
+    manager.set_target(sales_person_name, year_month, float(amount))
+
+    return f"Target {sales_person_name} untuk {display_name}: {format_currency(amount, short=True)}"
