@@ -17,7 +17,6 @@ from src.routing.scorer import (
     extract_keywords,
     score_tool,
     load_tool_keywords,
-    STOPWORDS,
 )
 
 
@@ -434,8 +433,8 @@ def route_query(query: str) -> RoutingResult:
         second_score = scored_suggestions[1].score
         if top_score < 5.0 and (top_score - second_score) < 2.0:
             # Low confidence and close scores - suggest clarification
-            top_tool = scored_suggestions[0].tool_name
-            second_tool = scored_suggestions[1].tool_name
+            scored_suggestions[0].tool_name
+            scored_suggestions[1].tool_name
             result.clarification_needed = (
                 f"Maksudnya '{scored_suggestions[0].purpose}' "
                 f"atau '{scored_suggestions[1].purpose}'?"

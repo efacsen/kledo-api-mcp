@@ -7,7 +7,7 @@ from mcp.types import Tool
 from collections import defaultdict
 import asyncio
 import calendar
-from datetime import datetime, date
+from datetime import datetime
 
 from ..kledo_client import KledoAPIClient
 from ..utils.helpers import (
@@ -15,7 +15,6 @@ from ..utils.helpers import (
     format_currency,
     safe_get,
     get_jakarta_today,
-    JAKARTA_TZ,
     format_markdown_table,
     parse_date_range
 )

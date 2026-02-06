@@ -115,7 +115,7 @@ async def _test_connection(args: Dict[str, Any], client: KledoAPIClient) -> str:
         result.append(f"**Authentication Status**: {'✓ Authenticated' if is_auth else '✗ Not Authenticated'}")
 
         if is_auth:
-            result.append(f"**Access Token**: Present")
+            result.append("**Access Token**: Present")
             result.append(f"**Token Expiry**: {client.auth._token_expiry}")
 
         # Try a simple API call

@@ -6,7 +6,7 @@ from typing import Any, Dict
 from mcp.types import Tool
 from decimal import Decimal
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from ..kledo_client import KledoAPIClient
 from ..utils.helpers import parse_date_range, format_currency, safe_get, format_markdown_table
@@ -585,8 +585,8 @@ async def _revenue_daily_breakdown(args: Dict[str, Any], client: KledoAPIClient)
         # Overall statistics
         result.append("\n## Overall Statistics\n")
         total_net = sum(d['net_sales'] for d in daily_data.values())
-        total_tax = sum(d['tax_collected'] for d in daily_data.values())
-        total_gross = sum(d['gross_sales'] for d in daily_data.values())
+        sum(d['tax_collected'] for d in daily_data.values())
+        sum(d['gross_sales'] for d in daily_data.values())
         total_invoices = sum(len(d['invoices']) for d in daily_data.values())
 
         avg_net = total_net / total_invoices if total_invoices > 0 else Decimal(0)
@@ -894,7 +894,7 @@ async def _customer_concentration_report(args: Dict[str, Any], client: KledoAPIC
         pct_of_customers = (customers_for_80_pct / len(customer_data) * 100) if customer_data else 0
 
         result.append(f"**80% of revenue comes from**: {customers_for_80_pct} customers ({pct_of_customers:.1f}% of total customers)")
-        result.append(f"**Healthy ratio**: 20% of customers = 80% of revenue")
+        result.append("**Healthy ratio**: 20% of customers = 80% of revenue")
 
         if customers_for_80_pct <= len(customer_data) * 0.2:
             result.append("✓ This matches the ideal 80/20 ratio - Well-diversified customer base")

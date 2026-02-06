@@ -6,7 +6,6 @@ import yaml
 from pydantic import BaseModel
 
 from .models import (
-    BaseEntity,
     Contact,
     Product,
     Warehouse,

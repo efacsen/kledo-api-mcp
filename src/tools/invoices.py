@@ -1555,7 +1555,7 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
                 company = contact.get("company_name", "") or contact.get("company", "")
                 display = f"{company} ({name})" if company and name != company else (company or name)
                 result.append(f"**{i}.** {display} (ID: {contact['id']})")
-            result.append(f"\nPlease specify which vendor by using contact_id parameter or a more specific vendor_name.")
+            result.append("\nPlease specify which vendor by using contact_id parameter or a more specific vendor_name.")
             return "\n".join(result)
 
         # Single match - use resolved contact_id

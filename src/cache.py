@@ -2,7 +2,7 @@
 Caching mechanism for Kledo MCP Server
 """
 import time
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional
 from datetime import datetime
 from loguru import logger
 import yaml
