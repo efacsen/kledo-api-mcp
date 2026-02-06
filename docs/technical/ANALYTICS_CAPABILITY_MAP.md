@@ -269,7 +269,7 @@ risk_level = "High" if max_customer_share > 20 else "Moderate"
 **Reports:**
 - **Individual Rep Performance**
   ```python
-  sales_person.name: "Teuku Muda Rabian Hussein"
+  sales_person.name: "Ahmad Kurniawan"
   - Total revenue
   - Invoice count
   - Average deal size
@@ -1133,10 +1133,10 @@ REP RANKING (by Revenue)
 ┌────┬─────────────────────────┬─────────────┬───────┬─────────────┐
 │ #  │ Sales Rep               │ Revenue     │ Deals │ Avg Deal    │
 ├────┼─────────────────────────┼─────────────┼───────┼─────────────┤
-│ 1  │ Teuku Muda Rabian H.    │ Rp 45.2M    │   9   │ Rp 5,022K   │
-│ 2  │ Mono                    │ Rp 32.5M    │  12   │ Rp 2,708K   │
-│ 3  │ Elmo                    │ Rp 24.8M    │   7   │ Rp 3,543K   │
-│ 4  │ Meka                    │ Rp 18.6M    │   8   │ Rp 2,325K   │
+│ 1  │ Ahmad K.    │ Rp 45.2M    │   9   │ Rp 5,022K   │
+│ 2  │ Budi                    │ Rp 32.5M    │  12   │ Rp 2,708K   │
+│ 3  │ Sari                    │ Rp 24.8M    │   7   │ Rp 3,543K   │
+│ 4  │ Dian                    │ Rp 18.6M    │   8   │ Rp 2,325K   │
 └────┴─────────────────────────┴─────────────┴───────┴─────────────┘
 
 TEAM METRICS

@@ -153,15 +153,15 @@ def get_tools() -> list[Tool]:
             name="analytics_set_target",
             description=(
                 "Set or update sales target for a sales rep for a specific month. "
-                "Indonesian hints: 'set target Kevin bulan ini 50 juta', "
-                "'pasang target', 'target baru Elmo', 'ubah target'"
+                "Indonesian hints: 'set target Ahmad bulan ini 50 juta', "
+                "'pasang target', 'target baru Budi', 'ubah target'"
             ),
             inputSchema={
                 "type": "object",
                 "properties": {
                     "sales_person_name": {
                         "type": "string",
-                        "description": "Sales rep name (e.g., 'Kevin', 'Elmo', 'Rabian')"
+                        "description": "Sales rep name (e.g., 'Ahmad', 'Budi', 'Sari')"
                     },
                     "period": {
                         "type": "string",
@@ -298,7 +298,7 @@ def _aggregate_period_data(invoices: list, per_sales: bool = False) -> dict:
             "count": int,           # total invoice count
             "paid_count": int,      # count of status_id == 3
             "by_sales": {           # only if per_sales=True
-                "Kevin": {"revenue": float, "outstanding": float, "count": int},
+                "Ahmad": {"revenue": float, "outstanding": float, "count": int},
                 ...
             }
         }

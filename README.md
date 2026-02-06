@@ -404,9 +404,7 @@ API endpoints are configured in `config/endpoints.yaml`. All endpoints are pre-c
 ## 📖 Documentation
 
 - **[MCP_SERVER_UPDATES.md](MCP_SERVER_UPDATES.md)** - Complete changelog and update details
-- **[tests/FINAL_FIELD_MAPPING.md](tests/FINAL_FIELD_MAPPING.md)** - Complete field reference (100% verified)
-- **[tests/STATUS_ANALYSIS.md](tests/STATUS_ANALYSIS.md)** - Deep status code analysis from 1,300+ records
-- **[.planning/phases/](./planning/phases/)** - Development phases and planning documents
+- **[docs/technical/](docs/technical/)** - API architecture and technical reference
 
 ## 🧪 Testing
 

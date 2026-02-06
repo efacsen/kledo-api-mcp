@@ -368,7 +368,7 @@ async def _outstanding_receivables(args: Dict[str, Any], client: KledoAPIClient)
                 date = safe_get(inv, "trans_date", "")
                 due = float(safe_get(inv, "due", 0))
 
-                rows.append([inv_number, customer, date, format_currency(due)])
+                rows.append([inv_number, customer, date, format_currency(due, short=True)])
 
             result.append(format_markdown_table(
                 headers=["Invoice #", "Customer", "Date", "Outstanding"],
@@ -399,7 +399,7 @@ async def _outstanding_receivables(args: Dict[str, Any], client: KledoAPIClient)
                     customer,
                     date,
                     f"{paid_pct:.0f}%",
-                    format_currency(due)
+                    format_currency(due, short=True)
                 ])
 
             result.append(format_markdown_table(
@@ -485,9 +485,9 @@ async def _customer_revenue_ranking(args: Dict[str, Any], client: KledoAPIClient
                 str(i),
                 name,
                 str(cust_data["invoice_count"]),
-                f"Rp {cust_data['net_sales']:,.0f}",
-                f"Rp {cust_data['gross_sales']:,.0f}",
-                f"Rp {avg_net_sales:,.0f}"
+                format_currency(float(cust_data['net_sales']), short=True),
+                format_currency(float(cust_data['gross_sales']), short=True),
+                format_currency(float(avg_net_sales), short=True)
             ])
 
         result.append(format_markdown_table(
@@ -571,10 +571,10 @@ async def _revenue_daily_breakdown(args: Dict[str, Any], client: KledoAPIClient)
             rows.append([
                 date,
                 str(len(data_day['invoices'])),
-                f"Rp {data_day['net_sales']:,.0f}",
-                f"Rp {data_day['tax_collected']:,.0f}",
-                f"Rp {data_day['gross_sales']:,.0f}",
-                f"Rp {running_gross:,.0f}"
+                format_currency(float(data_day['net_sales']), short=True),
+                format_currency(float(data_day['tax_collected']), short=True),
+                format_currency(float(data_day['gross_sales']), short=True),
+                format_currency(float(running_gross), short=True)
             ])
 
         result.append(format_markdown_table(
@@ -718,7 +718,7 @@ async def _outstanding_aging_report(args: Dict[str, Any], client: KledoAPIClient
                     inv_number,
                     customer,
                     str(days),
-                    format_currency(float(due))
+                    format_currency(float(due), short=True)
                 ])
 
             result.append(format_markdown_table(
@@ -745,7 +745,7 @@ async def _outstanding_aging_report(args: Dict[str, Any], client: KledoAPIClient
                     inv_number,
                     customer,
                     str(days),
-                    format_currency(float(due))
+                    format_currency(float(due), short=True)
                 ])
 
             result.append(format_markdown_table(
@@ -867,7 +867,7 @@ async def _customer_concentration_report(args: Dict[str, Any], client: KledoAPIC
             rows.append([
                 str(i),
                 cust_data["name"],
-                f"Rp {cust_data['net_sales']:,.0f}",
+                format_currency(float(cust_data['net_sales']), short=True),
                 f"{pct_of_total:.1f}%",
                 f"{float(cumulative_pct):.1f}%"
             ])

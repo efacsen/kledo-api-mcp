@@ -64,13 +64,13 @@ Tools for period-over-period comparison and business analytics.
 - [analytics_compare_outstanding](docs/tools/analytics.md#analytics_compare_outstanding): Compare outstanding between periods. Use for: "outstanding bulan ini vs bulan lalu", "perbandingan piutang", "hutang bulan ini vs bulan lalu", "piutang kuartal ini vs kuartal lalu", "outstanding bulan ini" (single period). Parameters: period, compare_to, per_sales.
 - [analytics_target_achievement](docs/tools/analytics.md#analytics_target_achievement): Target vs actual per sales rep. Use for: "target vs actual per sales", "pencapaian target", "achievement per sales", "capai target bulan ini". Parameters: period.
 - [analytics_underperformers](docs/tools/analytics.md#analytics_underperformers): Sales reps below target. Use for: "sales mana yang dibawah target", "siapa yang belum capai target", "underperforming sales", "sales dibawah target". Parameters: period, threshold.
-- [analytics_set_target](docs/tools/analytics.md#analytics_set_target): Set sales target. Use for: "set target Kevin bulan ini 50 juta", "pasang target", "target baru Elmo", "ubah target". Parameters: sales_person_name, period, amount.
+- [analytics_set_target](docs/tools/analytics.md#analytics_set_target): Set sales target. Use for: "set target Ahmad bulan ini 50 juta", "pasang target", "target baru Budi", "ubah target". Parameters: sales_person_name, period, amount.
 
 ## Commission Tools
 
 Tools for sales commission calculation.
 
-- [commission_calculate](docs/tools/commission.md#commission_calculate): Calculate commission for a sales person. Use for: "komisi Kevin bulan ini", "commission sales Elmo", "komisi dengan rate 3%", "hitung komisi". Parameters: period, sales_person_name, flat_rate.
+- [commission_calculate](docs/tools/commission.md#commission_calculate): Calculate commission for a sales person. Use for: "komisi Ahmad bulan ini", "commission sales Budi", "komisi dengan rate 3%", "hitung komisi". Parameters: period, sales_person_name, flat_rate.
 - [commission_report](docs/tools/commission.md#commission_report): Commission breakdown for all sales reps. Use for: "komisi per sales bulan ini", "commission breakdown", "laporan komisi", "komisi seluruh sales". Parameters: period, flat_rate.
 
 ## System Tools

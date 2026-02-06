@@ -132,7 +132,7 @@ class MCPToolTester:
                 })
 
     async def test_sales_rep_performance(self):
-        """Test sales rep revenue analysis (Mono, Elmo, Meka)."""
+        """Test sales rep revenue analysis."""
         from src.tools import sales_analytics
 
         logger.info("\n" + "="*80)

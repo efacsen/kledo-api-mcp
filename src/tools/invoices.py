@@ -20,7 +20,7 @@ def format_customer_display(invoice: dict) -> str:
     """
     Format customer/vendor display name prioritizing company name.
     
-    For B2B context (PT CSS), company name is more important than contact person name.
+    For B2B context, company name is more important than contact person name.
     
     Args:
         invoice: Invoice dictionary with contact data

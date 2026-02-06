@@ -120,8 +120,8 @@ def get_tools() -> list[Tool]:
                 "Calculate commission for a specific sales person based on paid invoices only (cash basis). "
                 "Commission is calculated on subtotal (before tax). "
                 "Supports tiered rates (1% on first 100M, 2% on 100M-300M, 3% on 300M+) or flat rate override. "
-                "Indonesian hints: 'komisi Kevin bulan ini', 'komisi sales Elmo bulan lalu', "
-                "'komisi Kevin dengan rate 3%', 'hitung komisi Kevin'"
+                "Indonesian hints: 'komisi Ahmad bulan ini', 'komisi sales Budi bulan lalu', "
+                "'komisi Ahmad dengan rate 3%', 'hitung komisi Ahmad'"
             ),
             inputSchema={
                 "type": "object",
@@ -134,7 +134,7 @@ def get_tools() -> list[Tool]:
                     },
                     "sales_person_name": {
                         "type": "string",
-                        "description": "Sales rep name, e.g., 'Kevin', 'Elmo', 'Rabian'"
+                        "description": "Sales rep name, e.g., 'Ahmad', 'Budi', 'Sari'"
                     },
                     "flat_rate": {
                         "type": "number",
