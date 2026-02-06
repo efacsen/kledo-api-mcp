@@ -26,7 +26,7 @@ from cache import KledoCache
 from kledo_client import KledoAPIClient
 from utils.logger import setup_logger
 # Import tool handlers
-from tools import financial, invoices, orders, products, contacts, deliveries, utilities, sales_analytics, revenue
+from tools import financial, invoices, orders, products, contacts, deliveries, utilities, sales_analytics, revenue, analytics
 
 
 # Load environment variables
@@ -148,6 +148,9 @@ async def list_tools() -> list[Tool]:
     # Revenue and receivables tools
     tools.extend(revenue.get_tools())
 
+    # Analytics comparison tools
+    tools.extend(analytics.get_tools())
+
     logger.info(f"Listed {len(tools)} available tools")
     return tools
 
@@ -189,6 +192,8 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             result = await sales_analytics.handle_tool(name, arguments, api_client)
         elif name in ("revenue_summary", "outstanding_receivables", "customer_revenue_ranking"):
             result = await revenue.handle_tool(name, arguments, api_client)
+        elif name.startswith("analytics_"):
+            result = await analytics.handle_tool(name, arguments, api_client)
         else:
             raise ValueError(f"Unknown tool: {name}")
 
