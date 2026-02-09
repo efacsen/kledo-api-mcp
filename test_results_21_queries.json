@@ -1,0 +1,516 @@
+{
+  "timestamp": "2026-02-04T20:24:21.908240",
+  "summary": {
+    "total_queries": 21,
+    "successful": 20,
+    "failed": 1,
+    "avg_execution_time": 1.5668881620679582
+  },
+  "results": {
+    "Cash Flow & Collections": [
+      {
+        "query": "Siapa yang invoice-nya jatuh tempo minggu ini?",
+        "timestamp": "2026-02-04T20:23:38.486728",
+        "success": true,
+        "execution_time": 0.0009050369262695312,
+        "tool_name": "invoice_get_detail",
+        "params": {
+          "date_from": "2026-02-02",
+          "date_to": "2026-02-04"
+        },
+        "routing_result": {
+          "date_range": [
+            "2026-02-02",
+            "2026-02-04"
+          ],
+          "clarification_needed": null,
+          "matched_tools_count": 4
+        },
+        "output": "Error: invoice_id is required",
+        "error": null,
+        "bottlenecks": [
+          "Due date filtering requires date range calculations"
+        ],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      },
+      {
+        "query": "Outstanding total berapa sekarang? Breakdown per customer",
+        "timestamp": "2026-02-04T20:23:38.988467",
+        "success": true,
+        "execution_time": 1.2251060009002686,
+        "tool_name": "invoice_get_totals",
+        "params": {},
+        "routing_result": {
+          "date_range": null,
+          "clarification_needed": null,
+          "matched_tools_count": 5
+        },
+        "output": "# Invoice Totals Summary\n\n**Total Amount**: Rp 10,000,000,000.00\n**Paid**: Rp 9,500,000,000.00\n**Outstanding**: Rp 500,000,000.00",
+        "error": null,
+        "bottlenecks": [
+          "Client-side aggregation required",
+          "Outstanding calculation requires filtering unpaid invoices"
+        ],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      },
+      {
+        "query": "Customer mana yang telat bayar >30 hari?",
+        "timestamp": "2026-02-04T20:23:40.713895",
+        "success": true,
+        "execution_time": 0.0013091564178466797,
+        "tool_name": "contact_get_detail",
+        "params": {
+          "date_from": "2026-01-05",
+          "date_to": "2026-02-04"
+        },
+        "routing_result": {
+          "date_range": [
+            "2026-01-05",
+            "2026-02-04"
+          ],
+          "clarification_needed": null,
+          "matched_tools_count": 4
+        },
+        "output": "Error: contact_id is required",
+        "error": null,
+        "bottlenecks": [],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      },
+      {
+        "query": "Invoice mana yang udah >60 hari belum lunas?",
+        "timestamp": "2026-02-04T20:23:41.215955",
+        "success": true,
+        "execution_time": 0.001207590103149414,
+        "tool_name": "invoice_get_detail",
+        "params": {
+          "date_from": "2025-12-06",
+          "date_to": "2026-02-04"
+        },
+        "routing_result": {
+          "date_range": [
+            "2025-12-06",
+            "2026-02-04"
+          ],
+          "clarification_needed": null,
+          "matched_tools_count": 4
+        },
+        "output": "Error: invoice_id is required",
+        "error": null,
+        "bottlenecks": [],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      },
+      {
+        "query": "PI yang jatuh tempo bulan ini, total berapa?",
+        "timestamp": "2026-02-04T20:23:41.717921",
+        "success": true,
+        "execution_time": 1.3543407917022705,
+        "tool_name": "invoice_get_totals",
+        "params": {
+          "date_from": "2026-02-01",
+          "date_to": "2026-02-04"
+        },
+        "routing_result": {
+          "date_range": [
+            "2026-02-01",
+            "2026-02-04"
+          ],
+          "clarification_needed": null,
+          "matched_tools_count": 3
+        },
+        "output": "# Invoice Totals Summary\n\n**Period**: 2026-02-01 to 2026-02-04\n\n**Total Amount**: Rp 6,000,000.00\n**Paid**: Rp 6,000,000.00\n**Outstanding**: Rp 0.00",
+        "error": null,
+        "bottlenecks": [
+          "Client-side aggregation required",
+          "Due date filtering requires date range calculations"
+        ],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      },
+      {
+        "query": "Outstanding ke vendor X berapa?",
+        "timestamp": "2026-02-04T20:23:43.573094",
+        "success": true,
+        "execution_time": 13.371960163116455,
+        "tool_name": "financial_purchase_summary",
+        "params": {},
+        "routing_result": {
+          "date_range": null,
+          "clarification_needed": null,
+          "matched_tools_count": 3
+        },
+        "output": "# Purchase Summary by Vendor\n\n**Total Purchases**: Rp 8,000,000,000.00\n**Total Paid**: Rp 7,500,000,000.00\n**Outstanding**: Rp 500,000,000.00\n**Number of Vendors**: 29\n\n\n## Top Vendors:\n\n1. **Vendor A**: Rp 3,000,000,000.00 (438 inv) \ud83d\udd34\n2. **Vendor B**: Rp 700,000,000.00 (15 inv) \u2705\n3. **Vendor C**: Rp 650,000,000.00 (116 inv) \ud83d\udd34\n4. **Vendor D**: Rp 600,000,000.00 (55 inv) \u2705\n5. **Vendor E**: Rp 550,000,000.00 (109 inv) \ud83d\udd34\n6. **Vendor F**: Rp 500,000,000.00 (79 inv) \ud83d\udd34\n7. **Ayu**: Rp 250,000,000.00 (12 inv) \u2705\n8. *",
+        "error": null,
+        "bottlenecks": [
+          "Outstanding calculation requires filtering unpaid invoices"
+        ],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      },
+      {
+        "query": "Vendor mana yang harus dibayar minggu depan?",
+        "timestamp": "2026-02-04T20:23:57.445839",
+        "success": true,
+        "execution_time": 12.44275188446045,
+        "tool_name": "financial_purchase_summary",
+        "params": {},
+        "routing_result": {
+          "date_range": null,
+          "clarification_needed": null,
+          "matched_tools_count": 2
+        },
+        "output": "# Purchase Summary by Vendor\n\n**Total Purchases**: Rp 8,000,000,000.00\n**Total Paid**: Rp 7,500,000,000.00\n**Outstanding**: Rp 500,000,000.00\n**Number of Vendors**: 29\n\n\n## Top Vendors:\n\n1. **Vendor A**: Rp 3,000,000,000.00 (438 inv) \ud83d\udd34\n2. **Vendor B**: Rp 700,000,000.00 (15 inv) \u2705\n3. **Vendor C**: Rp 650,000,000.00 (116 inv) \ud83d\udd34\n4. **Vendor D**: Rp 600,000,000.00 (55 inv) \u2705\n5. **Vendor E**: Rp 550,000,000.00 (109 inv) \ud83d\udd34\n6. **Vendor F**: Rp 500,000,000.00 (79 inv) \ud83d\udd34\n7. **Ayu**: Rp 250,000,000.00 (12 inv) \u2705\n8. *",
+        "error": null,
+        "bottlenecks": [],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      }
+    ],
+    "Revenue Tracking": [
+      {
+        "query": "Revenue bulan ini vs bulan lalu, berapa %?",
+        "timestamp": "2026-02-04T20:24:10.389385",
+        "success": true,
+        "execution_time": 1.2662065029144287,
+        "tool_name": "financial_sales_summary",
+        "params": {
+          "date_from": "2026-02-01",
+          "date_to": "2026-02-04"
+        },
+        "routing_result": {
+          "date_range": [
+            "2026-02-01",
+            "2026-02-04"
+          ],
+          "clarification_needed": null,
+          "matched_tools_count": 4
+        },
+        "output": "# Sales Summary by Customer\n\n**Period**: 2026-02-01 to 2026-02-04\n\n**Total Revenue**: Rp 6,000,000.00\n**Total Paid**: Rp 6,000,000.00\n**Outstanding**: Rp 0.00\n**Number of Customers**: 2\n**Total Invoices**: 2\n\n\n## Top Customers:\n\n1. **Customer A**: Rp 3,500,000.00 (1 inv) \u2705\n2. **Customer B**: Rp 2,800,000.00 (1 inv) \u2705",
+        "error": null,
+        "bottlenecks": [
+          "Multi-period comparison requires multiple API calls"
+        ],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      },
+      {
+        "query": "Top 10 customer bulan ini",
+        "timestamp": "2026-02-04T20:24:12.156434",
+        "success": true,
+        "execution_time": 0.0007505416870117188,
+        "tool_name": "contact_get_detail",
+        "params": {
+          "date_from": "2026-02-01",
+          "date_to": "2026-02-04"
+        },
+        "routing_result": {
+          "date_range": [
+            "2026-02-01",
+            "2026-02-04"
+          ],
+          "clarification_needed": null,
+          "matched_tools_count": 4
+        },
+        "output": "Error: contact_id is required",
+        "error": null,
+        "bottlenecks": [],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      },
+      {
+        "query": "Project mana yang paling profitable bulan ini?",
+        "timestamp": "2026-02-04T20:24:12.657981",
+        "success": false,
+        "execution_time": 0.0010733604431152344,
+        "tool_name": null,
+        "params": {},
+        "routing_result": {
+          "date_range": [
+            "2026-02-01",
+            "2026-02-04"
+          ],
+          "clarification_needed": null,
+          "matched_tools_count": 0
+        },
+        "output": null,
+        "error": "No matching tools found",
+        "bottlenecks": [
+          "Query pattern not recognized by router"
+        ],
+        "api_calls": 0,
+        "manual_processing_needed": true
+      }
+    ],
+    "Customer Health": [
+      {
+        "query": "Customer yang biasanya bayar tapi sekarang telat, siapa aja?",
+        "timestamp": "2026-02-04T20:24:13.159870",
+        "success": true,
+        "execution_time": 0.0015745162963867188,
+        "tool_name": "contact_get_detail",
+        "params": {},
+        "routing_result": {
+          "date_range": null,
+          "clarification_needed": null,
+          "matched_tools_count": 4
+        },
+        "output": "Error: contact_id is required",
+        "error": null,
+        "bottlenecks": [],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      },
+      {
+        "query": "Customer baru yang transaksinya udah >50 juta",
+        "timestamp": "2026-02-04T20:24:13.662260",
+        "success": true,
+        "execution_time": 0.0011539459228515625,
+        "tool_name": "contact_get_detail",
+        "params": {},
+        "routing_result": {
+          "date_range": null,
+          "clarification_needed": null,
+          "matched_tools_count": 4
+        },
+        "output": "Error: contact_id is required",
+        "error": null,
+        "bottlenecks": [],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      },
+      {
+        "query": "Customer yang transaksinya turun vs 3 bulan lalu",
+        "timestamp": "2026-02-04T20:24:14.164220",
+        "success": true,
+        "execution_time": 0.0010764598846435547,
+        "tool_name": "contact_get_detail",
+        "params": {
+          "date_from": "2026-01-01",
+          "date_to": "2026-01-31"
+        },
+        "routing_result": {
+          "date_range": [
+            "2026-01-01",
+            "2026-01-31"
+          ],
+          "clarification_needed": null,
+          "matched_tools_count": 4
+        },
+        "output": "Error: contact_id is required",
+        "error": null,
+        "bottlenecks": [
+          "Multi-period comparison requires multiple API calls"
+        ],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      }
+    ],
+    "Sales Performance": [
+      {
+        "query": "Ranking sales rep bulan ini",
+        "timestamp": "2026-02-04T20:24:14.666153",
+        "success": true,
+        "execution_time": 0.00052642822265625,
+        "tool_name": "financial_sales_by_person",
+        "params": {
+          "date_from": "2026-02-01",
+          "date_to": "2026-02-04"
+        },
+        "routing_result": {
+          "date_range": [
+            "2026-02-01",
+            "2026-02-04"
+          ],
+          "clarification_needed": null,
+          "matched_tools_count": 1
+        },
+        "output": "# Sales by Sales Person\n\n**Period**: 2026-02-01 to 2026-02-04\n\n**Total Revenue**: Rp 6,000,000.00\n**Total Invoices**: 2\n\n## Performance Summary:\n\n| Sales Person | Invoices | Total | Paid | Outstanding |\n|--------------|----------|-------|------|-------------|\n| Sales Rep A | 2 | Rp 6,000,000.00 | Rp 6,000,000.00 | Rp 0.00 |\n\n## Invoice Details:\n\n\n### Sales Rep A\n- INV/26/FEB/00075 | Customer B | Rp 2,800,000.00 \u2705\n- INV/26/FEB/00074 | Customer A | Rp 3,500,000.00 \u2705",
+        "error": null,
+        "bottlenecks": [],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      },
+      {
+        "query": "Pencapaian target bulan ini per sales gimana statusnya?",
+        "timestamp": "2026-02-04T20:24:15.167474",
+        "success": true,
+        "execution_time": 0.0016622543334960938,
+        "tool_name": "financial_sales_summary",
+        "params": {
+          "date_from": "2026-02-01",
+          "date_to": "2026-02-04"
+        },
+        "routing_result": {
+          "date_range": [
+            "2026-02-01",
+            "2026-02-04"
+          ],
+          "clarification_needed": null,
+          "matched_tools_count": 4
+        },
+        "output": "# Sales Summary by Customer\n\n**Period**: 2026-02-01 to 2026-02-04\n\n**Total Revenue**: Rp 6,000,000.00\n**Total Paid**: Rp 6,000,000.00\n**Outstanding**: Rp 0.00\n**Number of Customers**: 2\n**Total Invoices**: 2\n\n\n## Top Customers:\n\n1. **Customer A**: Rp 3,500,000.00 (1 inv) \u2705\n2. **Customer B**: Rp 2,800,000.00 (1 inv) \u2705",
+        "error": null,
+        "bottlenecks": [],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      }
+    ],
+    "Auto-notify Scenarios": [
+      {
+        "query": "Invoice >Rp 50 juta telat >7 hari",
+        "timestamp": "2026-02-04T20:24:15.669908",
+        "success": true,
+        "execution_time": 0.0010106563568115234,
+        "tool_name": "invoice_get_detail",
+        "params": {
+          "date_from": "2026-01-28",
+          "date_to": "2026-02-04"
+        },
+        "routing_result": {
+          "date_range": [
+            "2026-01-28",
+            "2026-02-04"
+          ],
+          "clarification_needed": null,
+          "matched_tools_count": 4
+        },
+        "output": "Error: invoice_id is required",
+        "error": null,
+        "bottlenecks": [],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      },
+      {
+        "query": "Customer baru transaksi >Rp 20 juta",
+        "timestamp": "2026-02-04T20:24:16.171715",
+        "success": true,
+        "execution_time": 0.0009136199951171875,
+        "tool_name": "contact_get_detail",
+        "params": {},
+        "routing_result": {
+          "date_range": null,
+          "clarification_needed": null,
+          "matched_tools_count": 4
+        },
+        "output": "Error: contact_id is required",
+        "error": null,
+        "bottlenecks": [],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      },
+      {
+        "query": "Outstanding naik >20% vs minggu lalu",
+        "timestamp": "2026-02-04T20:24:16.673479",
+        "success": true,
+        "execution_time": 0.9371066093444824,
+        "tool_name": "invoice_get_totals",
+        "params": {
+          "date_from": "2026-01-26",
+          "date_to": "2026-02-01"
+        },
+        "routing_result": {
+          "date_range": [
+            "2026-01-26",
+            "2026-02-01"
+          ],
+          "clarification_needed": null,
+          "matched_tools_count": 1
+        },
+        "output": "# Invoice Totals Summary\n\n**Period**: 2026-01-26 to 2026-02-01\n\n**Total Amount**: Rp 75,000,000.00\n**Paid**: Rp 60,000,000.00\n**Outstanding**: Rp 15,000,000.00",
+        "error": null,
+        "bottlenecks": [
+          "Multi-period comparison requires multiple API calls",
+          "Outstanding calculation requires filtering unpaid invoices"
+        ],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      },
+      {
+        "query": "Vendor invoice jatuh tempo dalam 3 hari",
+        "timestamp": "2026-02-04T20:24:18.111336",
+        "success": true,
+        "execution_time": 0.927771806716919,
+        "tool_name": "invoice_list_purchase",
+        "params": {
+          "date_from": "2026-02-01",
+          "date_to": "2026-02-04"
+        },
+        "routing_result": {
+          "date_range": [
+            "2026-02-01",
+            "2026-02-04"
+          ],
+          "clarification_needed": null,
+          "matched_tools_count": 5
+        },
+        "output": "# Purchase Invoices\n\n**Total Found**: 10\n\n**Gross Amount (Total)**: Rp 100,000,000.00\n**Total Paid**: Rp 55,000,000.00\n**Total Outstanding**: Rp 45,000,000.00\n\n\n## Purchase Invoices:\n\n### PI/26/FEB/00098\n- **Vendor**: PT. SAMPLE PAINT CO (Contact Person A)\n- **Date**: 2026-02-03\n- **Gross Amount**: Rp 8,000,000.00\n- **Paid**: Rp 0.00\n- **Outstanding**: Rp 8,000,000.00\n- **Status**: Belum Dibayar (Unpaid)\n\n### PI/26/FEB/00097\n- **Vendor**: PT. COATING INDUSTRIES (Vendor A)\n- **Date**: ",
+        "error": null,
+        "bottlenecks": [
+          "Due date filtering requires date range calculations"
+        ],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      }
+    ],
+    "Commission Calculations": [
+      {
+        "query": "Komisi Vendor D bulan ini berapa? (paid invoices tgl 25-24)",
+        "timestamp": "2026-02-04T20:24:19.539895",
+        "success": true,
+        "execution_time": 0.0010535717010498047,
+        "tool_name": "invoice_get_detail",
+        "params": {
+          "date_from": "2026-02-01",
+          "date_to": "2026-02-04"
+        },
+        "routing_result": {
+          "date_range": [
+            "2026-02-01",
+            "2026-02-04"
+          ],
+          "clarification_needed": null,
+          "matched_tools_count": 4
+        },
+        "output": "Error: invoice_id is required",
+        "error": null,
+        "bottlenecks": [],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      },
+      {
+        "query": "Breakdown komisi per sales rep Q1 2026",
+        "timestamp": "2026-02-04T20:24:20.041736",
+        "success": true,
+        "execution_time": 1.3651905059814453,
+        "tool_name": "financial_sales_summary",
+        "params": {
+          "date_from": "2026-01-01",
+          "date_to": "2026-03-31"
+        },
+        "routing_result": {
+          "date_range": [
+            "2026-01-01",
+            "2026-03-31"
+          ],
+          "clarification_needed": null,
+          "matched_tools_count": 4
+        },
+        "output": "# Sales Summary by Customer\n\n**Period**: 2026-01-01 to 2026-03-31\n\n**Total Revenue**: Rp 200,000,000.00\n**Total Paid**: Rp 165,000,000.00\n**Outstanding**: Rp 35,000,000.00\n**Number of Customers**: 23\n**Total Invoices**: 32\n\n\n## Top Customers:\n\n1. **Customer C**: Rp 25,000,000.00 (4 inv) \u2705\n2. **Customer D**: Rp 22,000,000.00 (3 inv) \u2705\n3. **Customer E**: Rp 18,000,000.00 (1 inv) \u2705\n4. **Customer F**: Rp 17,500,000.00 (1 inv) \u2705\n5. **Customer G**: Rp 17,000,000.00 (3 inv) \u2705\n6. **Customer H**: Rp 14,000,000.00 (2 inv) ",
+        "error": null,
+        "bottlenecks": [],
+        "api_calls": 1,
+        "manual_processing_needed": false
+      }
+    ]
+  },
+  "bottlenecks": {
+    "Due date filtering requires date range calculations": 3,
+    "Client-side aggregation required": 2,
+    "Outstanding calculation requires filtering unpaid invoices": 3,
+    "Multi-period comparison requires multiple API calls": 3,
+    "Query pattern not recognized by router": 1
+  }
+}

@@ -113,7 +113,7 @@ async def _list_deliveries(args: Dict[str, Any], client: KledoAPIClient) -> str:
         result.append("\n## Delivery List:\n")
 
         # Status mapping
-        status_map = {1: "Draft", 2: "Pending", 3: "Shipped", 4: "Delivered", 5: "Cancelled"}
+        status_map = {5: "Open", 6: "Partial", 7: "Delivered"}
 
         for delivery in deliveries[:20]:
             delivery_number = safe_get(delivery, "ref_number", "N/A")
@@ -160,7 +160,7 @@ async def _get_delivery_detail(args: Dict[str, Any], client: KledoAPIClient) -> 
         result = ["# Delivery Details\n"]
 
         # Status mapping
-        status_map = {1: "Draft", 2: "Pending", 3: "Shipped", 4: "Delivered", 5: "Cancelled"}
+        status_map = {5: "Open", 6: "Partial", 7: "Delivered"}
         status_id = safe_get(delivery, "status_id", 0)
         status = status_map.get(status_id, f"Status-{status_id}")
 
