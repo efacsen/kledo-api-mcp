@@ -329,6 +329,53 @@ PATTERNS: list[dict[str, Any]] = [
 ]
 
 
+    # SO (Sales Order) patterns
+    {
+        "patterns": [
+            "list so",
+            "daftar so",
+            "minta so",
+            "so minggu",
+            "so bulan",
+            "sales order",
+            "order masuk",
+        ],
+        "tool": "order_list_sales",
+        "params": "auto_date_this_month",
+        "confidence": "definitive",
+    },
+    # PO (Purchase Order) patterns
+    {
+        "patterns": [
+            "list po",
+            "daftar po",
+            "minta po",
+            "po minggu",
+            "po bulan",
+            "purchase order",
+        ],
+        "tool": "order_list_purchase",
+        "params": "auto_date_this_month",
+        "confidence": "definitive",
+    },
+    # DO (Delivery Order) patterns
+    {
+        "patterns": [
+            "list do",
+            "daftar do",
+            "minta do",
+            "do minggu",
+            "do bulan",
+            "pengiriman minggu",
+            "pengiriman bulan",
+        ],
+        "tool": "delivery_list",
+        "params": "auto_date_this_month",
+        "confidence": "definitive",
+    },
+]
+
+
 def match_pattern(query: str) -> dict[str, Any] | None:
     """
     Match a query against the idiomatic pattern library.
