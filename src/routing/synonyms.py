@@ -77,8 +77,11 @@ SYNONYM_MAP: dict[str, str] = {
     # Order terms
     "orders": "order",
     "pesanan": "order",
+    "so": "order",              # Sales Order abbreviation
+    "po": "purchase_order",     # Purchase Order abbreviation
 
     # Delivery terms
+    "do": "delivery",           # Delivery Order abbreviation
     "deliveries": "delivery",
     "shipment": "delivery",
     "shipments": "delivery",
@@ -202,6 +205,10 @@ TERM_TO_TOOLS: dict[str, list[str]] = {
     ],
     "order": [
         "order_list_sales",
+        "order_list_purchase",
+        "order_get_detail",
+    ],
+    "purchase_order": [
         "order_list_purchase",
         "order_get_detail",
     ],

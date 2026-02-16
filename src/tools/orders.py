@@ -138,7 +138,7 @@ async def _list_sales_orders(args: Dict[str, Any], client: KledoAPIClient) -> st
         result.append("\n## Orders:\n")
 
         # Status mapping
-        status_map = {1: "Draft", 2: "Pending", 3: "Confirmed", 4: "Completed", 5: "Cancelled"}
+        status_map = {5: "Open", 6: "Partial", 7: "Converted"}
 
         for order in orders[:20]:
             order_number = safe_get(order, "ref_number", "N/A")
@@ -185,7 +185,7 @@ async def _get_order_detail(args: Dict[str, Any], client: KledoAPIClient) -> str
         result = ["# Sales Order Details\n"]
 
         # Status mapping
-        status_map = {1: "Draft", 2: "Pending", 3: "Confirmed", 4: "Completed", 5: "Cancelled"}
+        status_map = {5: "Open", 6: "Partial", 7: "Converted"}
         status_id = safe_get(order, "status_id", 0)
         status = status_map.get(status_id, f"Status-{status_id}")
 
@@ -260,7 +260,7 @@ async def _list_purchase_orders(args: Dict[str, Any], client: KledoAPIClient) ->
         result.append("\n## Purchase Orders:\n")
 
         # Status mapping
-        status_map = {1: "Draft", 2: "Pending", 3: "Confirmed", 4: "Completed", 5: "Cancelled"}
+        status_map = {5: "Open", 6: "Partial", 7: "Converted"}
 
         for order in orders[:20]:
             order_number = safe_get(order, "ref_number", "N/A")
