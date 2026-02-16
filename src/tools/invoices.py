@@ -1109,37 +1109,50 @@ async def _get_invoice_totals(args: Dict[str, Any], client: KledoAPIClient) -> s
         return f"Error fetching invoice totals: {str(e)}"
 
 
-async def _fetch_all_purchase_invoices(client: KledoAPIClient, date_from: str = None, date_to: str = None) -> list:
-    """Fetch all purchase invoices for a date range (handles pagination)."""
+async def _fetch_all_purchase_invoices(client: KledoAPIClient, date_from: str = None, date_to: str = None, status_ids: list = None) -> list:
+    """Fetch all purchase invoices for a date range (handles pagination).
+    
+    Args:
+        status_ids: List of status IDs to filter (e.g. [1] for unpaid only).
+                    If None, fetches all statuses.
+    """
     all_invoices = []
-    page = 1
     max_pages = 20  # Safety limit
 
-    while page <= max_pages:
-        data = await client.get(
-            "purchase_invoices",
-            "list",
-            params={
+    # If status_ids specified, fetch each separately for server-side filtering
+    filter_statuses = status_ids or [None]
+
+    for status_id in filter_statuses:
+        page = 1
+        while page <= max_pages:
+            params = {
                 "date_from": date_from,
                 "date_to": date_to,
                 "per_page": 100,
                 "page": page
-            },
-            cache_category="invoices"
-        )
+            }
+            if status_id is not None:
+                params["status_id"] = status_id
 
-        invoices = safe_get(data, "data.data", [])
-        if not invoices:
-            break
+            data = await client.get(
+                "purchase_invoices",
+                "list",
+                params=params,
+                cache_category="invoices"
+            )
 
-        all_invoices.extend(invoices)
+            invoices = safe_get(data, "data.data", [])
+            if not invoices:
+                break
 
-        current_page = safe_get(data, "data.current_page", 1)
-        last_page = safe_get(data, "data.last_page", 1)
+            all_invoices.extend(invoices)
 
-        if current_page >= last_page:
-            break
-        page += 1
+            current_page = safe_get(data, "data.current_page", 1)
+            last_page = safe_get(data, "data.last_page", 1)
+
+            if current_page >= last_page:
+                break
+            page += 1
 
     return all_invoices
 
@@ -1167,34 +1180,39 @@ async def _outstanding_by_customer(args: Dict[str, Any], client: KledoAPIClient)
         page = 1
         max_pages = 20
 
-        while page <= max_pages:
-            data = await client.get(
-                "invoices",
-                "list",
-                params={
-                    "date_from": date_from,
-                    "date_to": date_to,
-                    "per_page": 100,
-                    "page": page
-                },
-                cache_category="invoices"
-            )
+        # Fetch unpaid (status 1) and partially paid (status 2) separately
+        # Using server-side status_id filter for efficiency
+        for status_id in [1, 2]:
+            page = 1
+            while page <= max_pages:
+                data = await client.get(
+                    "invoices",
+                    "list",
+                    params={
+                        "status_id": status_id,
+                        "date_from": date_from,
+                        "date_to": date_to,
+                        "per_page": 100,
+                        "page": page
+                    },
+                    cache_category="invoices"
+                )
 
-            invoices = safe_get(data, "data.data", [])
-            if not invoices:
-                break
+                invoices = safe_get(data, "data.data", [])
+                if not invoices:
+                    break
 
-            all_invoices.extend(invoices)
+                all_invoices.extend(invoices)
 
-            current_page = safe_get(data, "data.current_page", 1)
-            last_page = safe_get(data, "data.last_page", 1)
+                current_page = safe_get(data, "data.current_page", 1)
+                last_page = safe_get(data, "data.last_page", 1)
 
-            if current_page >= last_page:
-                break
-            page += 1
+                if current_page >= last_page:
+                    break
+                page += 1
 
-        # Filter out fully paid and zero-due invoices
-        all_invoices = [inv for inv in all_invoices if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3]
+        # Safety: filter out any zero-due invoices that slipped through
+        all_invoices = [inv for inv in all_invoices if float(safe_get(inv, "due", 0)) > 0]
 
         if not all_invoices:
             return "No outstanding invoices found."
@@ -1323,11 +1341,11 @@ async def _outstanding_by_vendor(args: Dict[str, Any], client: KledoAPIClient) -
             date_to = parsed_to
 
     try:
-        # Fetch all purchase invoices
-        all_invoices = await _fetch_all_purchase_invoices(client, date_from, date_to)
+        # Fetch unpaid + partially paid purchase invoices (server-side filter)
+        all_invoices = await _fetch_all_purchase_invoices(client, date_from, date_to, status_ids=[1, 2])
 
-        # Filter out fully paid and zero-due invoices
-        all_invoices = [inv for inv in all_invoices if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3]
+        # Safety: filter out any zero-due invoices that slipped through
+        all_invoices = [inv for inv in all_invoices if float(safe_get(inv, "due", 0)) > 0]
 
         if not all_invoices:
             return "No outstanding purchase invoices found."
