@@ -1,16 +1,21 @@
 # Kledo MCP Server
 
-Model Context Protocol (MCP) server for Kledo accounting software API - enables Claude AI to interact with your Kledo data for revenue reporting, sales analytics, customer management, and commission calculation.
+Model Context Protocol (MCP) server for Kledo accounting software API - enables AI assistants to interact with your Kledo data for financial reporting, analytics, customer management, and business intelligence.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
+## What is this?
+
+An MCP server that connects AI assistants (like Claude) to the Kledo accounting API, enabling natural language queries for financial data, customer analytics, and business reporting.
+
 ## 🎯 Key Features
 
 - **28 Production-Ready Tools** - Complete coverage of Kledo API endpoints
-- **100% Verified Field Mappings** - All status codes and fields verified from real API data (1,300+ records analyzed)
-- **Dual Revenue Calculation** - Both before-tax (commission) and after-tax (actual) amounts
-- **Paid-Only Commission** - Automatically filters by status_id=3 (Lunas/Paid) for accurate commission calculation
+- **Revenue & Financial Analytics** - Invoice tracking, revenue reporting, receivables management
+- **Customer Intelligence** - Customer ranking, transaction history, contact management
+- **Product & Inventory** - Product lookup, SKU search, inventory insights
+- **Order & Delivery Tracking** - Sales orders, purchase orders, delivery status
 - **Bilingual Support** - Understands Indonesian and English queries
 - **Smart Caching** - Configurable caching for optimal performance
 - **Type-Safe** - Comprehensive type hints throughout
@@ -50,68 +55,42 @@ kledo-mcp  # Just works - no setup needed
 
 **Need help?** See [Troubleshooting](#-troubleshooting) below.
 
-## 📊 Revenue & Commission Features
-
-### Commission Calculation (Verified ✓)
-
-Commission is calculated using **revenue BEFORE tax** (subtotal) from **PAID invoices only** (status_id=3):
-
-```python
-commission_base = SUM(subtotal WHERE status_id=3 AND date_range)
-```
-
-### Status Codes (Verified from Dashboard)
-
-- **Status 1**: Belum Dibayar (Unpaid) - Not counted in commission
-- **Status 2**: Dibayar Sebagian (Partially Paid) - Not counted in commission
-- **Status 3**: Lunas (Paid) - **USE FOR COMMISSION CALCULATION**
-
-### Revenue Formula (100% Verified)
-
-```python
-amount_after_tax = subtotal + total_tax
-```
-
-All tools show BOTH revenue calculations:
-- **Before Tax** (subtotal) - For commission
-- **After Tax** (amount_after_tax) - Actual revenue
-
 ## 🛠️ Available Tools (28 Total)
 
 ### Revenue & Analytics (8 tools)
-- `revenue_summary` - Quick revenue for period (before/after tax)
-- `outstanding_receivables` - Unpaid invoices tracking (piutang)
-- `customer_revenue_ranking` - Top customers by revenue
-- `sales_rep_revenue_report` - Sales rep performance with commission
-- `sales_rep_list` - List all sales reps with revenue
-- `invoice_list_sales` - Sales invoices list
-- `invoice_get_detail` - Invoice details
-- `invoice_get_totals` - Invoice totals summary
+- `revenue_summary` - Revenue for any time period (with tax breakdown)
+- `outstanding_receivables` - Track unpaid invoices
+- `customer_revenue_ranking` - Identify top customers by revenue
+- `sales_rep_revenue_report` - Sales representative performance analysis
+- `sales_rep_list` - List all sales representatives
+- `invoice_list_sales` - List sales invoices with filters
+- `invoice_get_detail` - Detailed invoice information
+- `invoice_get_totals` - Invoice totals and summary
 
 ### Purchase/Expenses (1 tool)
-- `invoice_list_purchase` - Purchase invoices
+- `invoice_list_purchase` - List purchase invoices
 
 ### Products (3 tools)
-- `product_list` - List products
-- `product_get_detail` - Product details
-- `product_search_by_sku` - Search by SKU
+- `product_list` - List all products
+- `product_get_detail` - Detailed product information
+- `product_search_by_sku` - Search products by SKU
 
 ### Customers/Contacts (3 tools)
-- `contact_list` - List customers/vendors
-- `contact_get_detail` - Contact details
+- `contact_list` - List customers and vendors
+- `contact_get_detail` - Contact details and information
 - `contact_get_transactions` - Contact transaction history
 
 ### Orders (4 tools)
-- `order_list_sales` - Sales orders
-- `order_get_detail` - Order details
-- `order_list_purchase` - Purchase orders
+- `order_list_sales` - List sales orders
+- `order_get_detail` - Sales order details
+- `order_list_purchase` - List purchase orders
 - `order_get_purchase_detail` - Purchase order details
 
 ### Deliveries (4 tools)
-- `delivery_list` - List deliveries
+- `delivery_list` - List all deliveries
 - `delivery_get_detail` - Delivery details
 - `delivery_list_pending` - Pending deliveries
-- `delivery_get_by_order` - Deliveries by order
+- `delivery_get_by_order` - Deliveries for specific order
 
 ### Financial (1 tool)
 - `financial_get_account_list` - Chart of accounts
@@ -229,9 +208,9 @@ The server checks for configuration in this priority order:
 
 ### Deployment Scenarios
 
-**Scenario A: EC2 with SSH (Interactive)**
+**Scenario A: Interactive Server (SSH)**
 ```bash
-ssh -i key.pem ubuntu@your-ec2-instance
+ssh ubuntu@your-server
 cd ~/kledo-api-mcp
 kledo-mcp
 # Wizard prompts for API key
@@ -302,67 +281,55 @@ This means:
 
 ## 🚀 Usage Examples
 
-### Get Monthly Revenue (with Commission Base)
+### Get Monthly Revenue
 
-Ask Claude:
+Ask your AI assistant:
 ```
-"Berapa revenue bulan ini?"
 "What's this month's revenue?"
+"Berapa revenue bulan ini?"
 ```
 
-Claude will use `revenue_summary` tool and return:
-```
-Revenue Summary (PAID INVOICES ONLY)
-Period: 2026-01-01 to 2026-01-31
-Paid Invoices: 45
+The assistant will use the `revenue_summary` tool and return revenue data with tax breakdown.
 
-Revenue Calculation:
-Revenue Before Tax (for commission): Rp 96,373,250
-Tax (PPN): Rp 9,068,950
-Revenue After Tax (actual): Rp 105,442,200
-```
+### Sales Representative Performance
 
-### Sales Rep Commission Report
-
-Ask Claude:
+Ask:
 ```
 "Show sales rep performance for January"
 "Siapa sales rep dengan revenue tertinggi bulan ini?"
 ```
 
-Claude will use `sales_rep_revenue_report` tool showing:
-- Revenue Before Tax (Commission base)
-- Revenue After Tax (Actual revenue)
-- Only PAID invoices (status_id=3)
-- Monthly breakdown per rep
-- Top deals sorted by commission amount
+Get detailed performance metrics including revenue, invoice counts, and top deals per representative.
 
-### Outstanding Receivables (Piutang)
+### Outstanding Invoices
 
-Ask Claude:
+Ask:
 ```
-"Siapa yang belum bayar?"
 "Show outstanding invoices"
+"Siapa yang belum bayar?"
 ```
 
-Claude will use `outstanding_receivables` tool showing:
-- Belum Dibayar (Unpaid) - status_id=1
-- Dibayar Sebagian (Partially Paid) - status_id=2
-- Customer names, amounts, dates
+View all unpaid and partially paid invoices with customer details and amounts.
 
-### Top Customers by Revenue
+### Top Customers
 
-Ask Claude:
+Ask:
 ```
 "Who are our top 10 customers this month?"
 "Customer dengan revenue tertinggi?"
 ```
 
-Claude will use `customer_revenue_ranking` tool showing:
-- Both before-tax and after-tax revenue
-- Number of invoices
-- Average invoice value
-- Only PAID invoices
+Get customer rankings by revenue, invoice count, and average invoice value.
+
+### Product Search
+
+Ask:
+```
+"Find product with SKU ABC123"
+"Show all products in category Paint"
+```
+
+Search and filter products by SKU, name, or category.
 
 ## 🔧 Configuration
 
@@ -400,40 +367,6 @@ API endpoints are configured in `config/endpoints.yaml`. All endpoints are pre-c
 | `CACHE_ENABLED` | Enable/disable caching | `true` |
 | `LOG_LEVEL` | Logging level | `INFO` |
 | `LOG_FILE` | Log file path (optional) | - |
-
-## 📖 Documentation
-
-- **[MCP_SERVER_UPDATES.md](MCP_SERVER_UPDATES.md)** - Complete changelog and update details
-- **[docs/technical/](docs/technical/)** - API architecture and technical reference
-
-## 🧪 Testing
-
-### Run Verification Tests
-
-All field mappings have been verified with real API data:
-
-```bash
-cd tests
-python test_field_mappings.py
-```
-
-**Test Results**: 7/7 tests passed (100%)
-- ✅ Status ID mappings (1=Unpaid, 2=Partial, 3=Paid)
-- ✅ Revenue formula (amount_after_tax = subtotal + total_tax)
-- ✅ Revenue calculation (before/after tax)
-- ✅ Sales rep performance tracking
-- ✅ Customer revenue analysis
-- ✅ Outstanding receivables calculation
-- ✅ Profit margin calculation
-
-### Test API Connection
-
-Ask Claude:
-```
-"Test connection to Kledo API"
-```
-
-Claude will use `utility_test_connection` to verify authentication and API access.
 
 ## 🐛 Troubleshooting
 
@@ -555,7 +488,7 @@ pip install -r requirements.txt
 
 Clear the cache if you see stale data:
 
-Ask Claude:
+Ask your AI assistant:
 ```
 "Clear Kledo cache"
 ```
@@ -605,32 +538,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Built with [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) by Anthropic
 - Integrates with [Kledo](https://kledo.com) accounting software API
-- All field mappings verified through empirical analysis of 1,300+ real API records
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/YOUR_USERNAME/kledo-api-mcp/issues)
+- **Issues**: [GitHub Issues](https://github.com/efacsen/kledo-api-mcp/issues)
 - **Kledo API Docs**: https://api-docs.kledo.com/
 - **MCP Documentation**: https://modelcontextprotocol.io/
 
-## 🎓 For AI Models Using This MCP Server
-
-When users ask about revenue, remember:
-
-1. **For commission:** Use revenue BEFORE tax (`subtotal`)
-2. **For actual revenue:** Use revenue AFTER tax (`amount_after_tax`)
-3. **Filter by status_id=3** (Lunas/Paid) for confirmed revenue
-4. **Status codes:**
-   - 1 = Belum Dibayar (Unpaid)
-   - 2 = Dibayar Sebagian (Partially Paid)
-   - 3 = Lunas (Fully Paid) ← USE THIS
-
-**Quick Tools for Common Questions:**
-- "Revenue bulan ini?" → `revenue_summary`
-- "Siapa yang belum bayar?" → `outstanding_receivables`
-- "Top customers?" → `customer_revenue_ranking`
-- "Performance sales rep?" → `sales_rep_revenue_report`
-
 ---
 
-**Made with ❤️ for accurate revenue reporting and commission calculation**
+**Made with ❤️ for intelligent business analytics**
