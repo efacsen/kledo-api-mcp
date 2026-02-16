@@ -142,7 +142,7 @@
           "clarification_needed": null,
           "matched_tools_count": 3
         },
-        "output": "# Purchase Summary by Vendor\n\n**Total Purchases**: Rp 8,000,000,000.00\n**Total Paid**: Rp 7,500,000,000.00\n**Outstanding**: Rp 500,000,000.00\n**Number of Vendors**: 29\n\n\n## Top Vendors:\n\n1. **Vendor A**: Rp 3,000,000,000.00 (438 inv) \ud83d\udd34\n2. **Vendor B**: Rp 700,000,000.00 (15 inv) \u2705\n3. **Vendor C**: Rp 650,000,000.00 (116 inv) \ud83d\udd34\n4. **Vendor D**: Rp 600,000,000.00 (55 inv) \u2705\n5. **Vendor E**: Rp 550,000,000.00 (109 inv) \ud83d\udd34\n6. **Vendor F**: Rp 500,000,000.00 (79 inv) \ud83d\udd34\n7. **Ayu**: Rp 250,000,000.00 (12 inv) \u2705\n8. *",
+        "output": "# Purchase Summary by Vendor\n\n**Total Purchases**: Rp 8,000,000,000.00\n**Total Paid**: Rp 7,500,000,000.00\n**Outstanding**: Rp 500,000,000.00\n**Number of Vendors**: 29\n\n\n## Top Vendors:\n\n1. **Vendor A**: Rp 3,000,000,000.00 (438 inv) 🔴\n2. **Vendor B**: Rp 700,000,000.00 (15 inv) ✅\n3. **Vendor C**: Rp 650,000,000.00 (116 inv) 🔴\n4. **Vendor D**: Rp 600,000,000.00 (55 inv) ✅\n5. **Vendor E**: Rp 550,000,000.00 (109 inv) 🔴\n6. **Vendor F**: Rp 500,000,000.00 (79 inv) 🔴\n7. **Vendor G**: Rp 250,000,000.00 (12 inv) ✅\n8. *",
         "error": null,
         "bottlenecks": [
           "Outstanding calculation requires filtering unpaid invoices"
@@ -162,7 +162,7 @@
           "clarification_needed": null,
           "matched_tools_count": 2
         },
-        "output": "# Purchase Summary by Vendor\n\n**Total Purchases**: Rp 8,000,000,000.00\n**Total Paid**: Rp 7,500,000,000.00\n**Outstanding**: Rp 500,000,000.00\n**Number of Vendors**: 29\n\n\n## Top Vendors:\n\n1. **Vendor A**: Rp 3,000,000,000.00 (438 inv) \ud83d\udd34\n2. **Vendor B**: Rp 700,000,000.00 (15 inv) \u2705\n3. **Vendor C**: Rp 650,000,000.00 (116 inv) \ud83d\udd34\n4. **Vendor D**: Rp 600,000,000.00 (55 inv) \u2705\n5. **Vendor E**: Rp 550,000,000.00 (109 inv) \ud83d\udd34\n6. **Vendor F**: Rp 500,000,000.00 (79 inv) \ud83d\udd34\n7. **Ayu**: Rp 250,000,000.00 (12 inv) \u2705\n8. *",
+        "output": "# Purchase Summary by Vendor\n\n**Total Purchases**: Rp 8,000,000,000.00\n**Total Paid**: Rp 7,500,000,000.00\n**Outstanding**: Rp 500,000,000.00\n**Number of Vendors**: 29\n\n\n## Top Vendors:\n\n1. **Vendor A**: Rp 3,000,000,000.00 (438 inv) 🔴\n2. **Vendor B**: Rp 700,000,000.00 (15 inv) ✅\n3. **Vendor C**: Rp 650,000,000.00 (116 inv) 🔴\n4. **Vendor D**: Rp 600,000,000.00 (55 inv) ✅\n5. **Vendor E**: Rp 550,000,000.00 (109 inv) 🔴\n6. **Vendor F**: Rp 500,000,000.00 (79 inv) 🔴\n7. **Vendor G**: Rp 250,000,000.00 (12 inv) ✅\n8. *",
         "error": null,
         "bottlenecks": [],
         "api_calls": 1,
@@ -188,7 +188,7 @@
           "clarification_needed": null,
           "matched_tools_count": 4
         },
-        "output": "# Sales Summary by Customer\n\n**Period**: 2026-02-01 to 2026-02-04\n\n**Total Revenue**: Rp 6,000,000.00\n**Total Paid**: Rp 6,000,000.00\n**Outstanding**: Rp 0.00\n**Number of Customers**: 2\n**Total Invoices**: 2\n\n\n## Top Customers:\n\n1. **Customer A**: Rp 3,500,000.00 (1 inv) \u2705\n2. **Customer B**: Rp 2,800,000.00 (1 inv) \u2705",
+        "output": "# Sales Summary by Customer\n\n**Period**: 2026-02-01 to 2026-02-04\n\n**Total Revenue**: Rp 6,000,000.00\n**Total Paid**: Rp 6,000,000.00\n**Outstanding**: Rp 0.00\n**Number of Customers**: 2\n**Total Invoices**: 2\n\n\n## Top Customers:\n\n1. **Customer A**: Rp 3,500,000.00 (1 inv) ✅\n2. **Customer B**: Rp 2,800,000.00 (1 inv) ✅",
         "error": null,
         "bottlenecks": [
           "Multi-period comparison requires multiple API calls"
@@ -327,7 +327,7 @@
           "clarification_needed": null,
           "matched_tools_count": 1
         },
-        "output": "# Sales by Sales Person\n\n**Period**: 2026-02-01 to 2026-02-04\n\n**Total Revenue**: Rp 6,000,000.00\n**Total Invoices**: 2\n\n## Performance Summary:\n\n| Sales Person | Invoices | Total | Paid | Outstanding |\n|--------------|----------|-------|------|-------------|\n| Sales Rep A | 2 | Rp 6,000,000.00 | Rp 6,000,000.00 | Rp 0.00 |\n\n## Invoice Details:\n\n\n### Sales Rep A\n- INV/26/FEB/00075 | Customer B | Rp 2,800,000.00 \u2705\n- INV/26/FEB/00074 | Customer A | Rp 3,500,000.00 \u2705",
+        "output": "# Sales by Sales Person\n\n**Period**: 2026-02-01 to 2026-02-04\n\n**Total Revenue**: Rp 6,000,000.00\n**Total Invoices**: 2\n\n## Performance Summary:\n\n| Sales Person | Invoices | Total | Paid | Outstanding |\n|--------------|----------|-------|------|-------------|\n| Sales Rep A | 2 | Rp 6,000,000.00 | Rp 6,000,000.00 | Rp 0.00 |\n\n## Invoice Details:\n\n\n### Sales Rep A\n- INV/26/FEB/00075 | Customer B | Rp 2,800,000.00 ✅\n- INV/26/FEB/00074 | Customer A | Rp 3,500,000.00 ✅",
         "error": null,
         "bottlenecks": [],
         "api_calls": 1,
@@ -351,7 +351,7 @@
           "clarification_needed": null,
           "matched_tools_count": 4
         },
-        "output": "# Sales Summary by Customer\n\n**Period**: 2026-02-01 to 2026-02-04\n\n**Total Revenue**: Rp 6,000,000.00\n**Total Paid**: Rp 6,000,000.00\n**Outstanding**: Rp 0.00\n**Number of Customers**: 2\n**Total Invoices**: 2\n\n\n## Top Customers:\n\n1. **Customer A**: Rp 3,500,000.00 (1 inv) \u2705\n2. **Customer B**: Rp 2,800,000.00 (1 inv) \u2705",
+        "output": "# Sales Summary by Customer\n\n**Period**: 2026-02-01 to 2026-02-04\n\n**Total Revenue**: Rp 6,000,000.00\n**Total Paid**: Rp 6,000,000.00\n**Outstanding**: Rp 0.00\n**Number of Customers**: 2\n**Total Invoices**: 2\n\n\n## Top Customers:\n\n1. **Customer A**: Rp 3,500,000.00 (1 inv) ✅\n2. **Customer B**: Rp 2,800,000.00 (1 inv) ✅",
         "error": null,
         "bottlenecks": [],
         "api_calls": 1,
@@ -419,7 +419,7 @@
           "clarification_needed": null,
           "matched_tools_count": 1
         },
-        "output": "# Invoice Totals Summary\n\n**Period**: 2026-01-26 to 2026-02-01\n\n**Total Amount**: Rp 75,000,000.00\n**Paid**: Rp 60,000,000.00\n**Outstanding**: Rp 15,000,000.00",
+        "output": "# Invoice Totals Summary\n\n**Period**: 2026-01-26 to 2026-02-01\n\n**Total Amount**: Rp 75,000,000.00\n**Paid**: Rp 60,000,000.00\n**Outstanding**: Rp 12,000,000.00",
         "error": null,
         "bottlenecks": [
           "Multi-period comparison requires multiple API calls",
@@ -446,7 +446,7 @@
           "clarification_needed": null,
           "matched_tools_count": 5
         },
-        "output": "# Purchase Invoices\n\n**Total Found**: 10\n\n**Gross Amount (Total)**: Rp 100,000,000.00\n**Total Paid**: Rp 55,000,000.00\n**Total Outstanding**: Rp 45,000,000.00\n\n\n## Purchase Invoices:\n\n### PI/26/FEB/00098\n- **Vendor**: PT. SAMPLE PAINT CO (Contact Person A)\n- **Date**: 2026-02-03\n- **Gross Amount**: Rp 8,000,000.00\n- **Paid**: Rp 0.00\n- **Outstanding**: Rp 8,000,000.00\n- **Status**: Belum Dibayar (Unpaid)\n\n### PI/26/FEB/00097\n- **Vendor**: PT. COATING INDUSTRIES (Vendor A)\n- **Date**: ",
+        "output": "# Purchase Invoices\n\n**Total Found**: 10\n\n**Gross Amount (Total)**: Rp 100,000,000.00\n**Total Paid**: Rp 55,000,000.00\n**Total Outstanding**: Rp 45,000,000.00\n\n\n## Purchase Invoices:\n\n### PI/26/FEB/00098\n- **Vendor**: PT. SAMPLE PAINT CO (Vendor H)\n- **Date**: 2026-02-03\n- **Gross Amount**: Rp 8,000,000.00\n- **Paid**: Rp 0.00\n- **Outstanding**: Rp 8,000,000.00\n- **Status**: Belum Dibayar (Unpaid)\n\n### PI/26/FEB/00097\n- **Vendor**: PT. COATING INDUSTRIES (Vendor A)\n- **Date**: ",
         "error": null,
         "bottlenecks": [
           "Due date filtering requires date range calculations"
@@ -498,7 +498,7 @@
           "clarification_needed": null,
           "matched_tools_count": 4
         },
-        "output": "# Sales Summary by Customer\n\n**Period**: 2026-01-01 to 2026-03-31\n\n**Total Revenue**: Rp 200,000,000.00\n**Total Paid**: Rp 165,000,000.00\n**Outstanding**: Rp 35,000,000.00\n**Number of Customers**: 23\n**Total Invoices**: 32\n\n\n## Top Customers:\n\n1. **Customer C**: Rp 25,000,000.00 (4 inv) \u2705\n2. **Customer D**: Rp 22,000,000.00 (3 inv) \u2705\n3. **Customer E**: Rp 18,000,000.00 (1 inv) \u2705\n4. **Customer F**: Rp 17,500,000.00 (1 inv) \u2705\n5. **Customer G**: Rp 17,000,000.00 (3 inv) \u2705\n6. **Customer H**: Rp 14,000,000.00 (2 inv) ",
+        "output": "# Sales Summary by Customer\n\n**Period**: 2026-01-01 to 2026-03-31\n\n**Total Revenue**: Rp 200,000,000.00\n**Total Paid**: Rp 165,000,000.00\n**Outstanding**: Rp 35,000,000.00\n**Number of Customers**: 23\n**Total Invoices**: 32\n\n\n## Top Customers:\n\n1. **Customer C**: Rp 25,000,000.00 (4 inv) ✅\n2. **Customer D**: Rp 22,000,000.00 (3 inv) ✅\n3. **Customer E**: Rp 18,000,000.00 (1 inv) ✅\n4. **Customer F**: Rp 17,500,000.00 (1 inv) ✅\n5. **Customer G**: Rp 17,000,000.00 (3 inv) ✅\n6. **Customer H**: Rp 14,000,000.00 (2 inv) ",
         "error": null,
         "bottlenecks": [],
         "api_calls": 1,
