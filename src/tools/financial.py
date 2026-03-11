@@ -14,7 +14,7 @@ def get_tools() -> list[Tool]:
     """Get list of financial report tools."""
     return [
         Tool(
-            name="financial_activity_team_report",
+            name="financial_activity",
             description="Get team activity report for a date range. Shows what the sales/finance team has been doing.",
             inputSchema={
                 "type": "object",
@@ -32,29 +32,27 @@ def get_tools() -> list[Tool]:
             }
         ),
         Tool(
-            name="financial_sales_summary",
-            description="Get sales summary by customer for a period. Shows total sales revenue from each customer.",
+            name="financial_summary",
+            description=(
+                "Get financial summary grouped by customer, sales rep, or vendor for a period. "
+                "Use type='sales' with group_by='customer' for sales by customer, "
+                "type='sales' with group_by='sales_rep' for sales by person, "
+                "type='purchase' with group_by='vendor' for purchase by vendor. "
+                "Indonesian: 'penjualan per customer', 'omzet per sales', 'pembelian per vendor'"
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "date_from": {
+                    "type": {
                         "type": "string",
-                        "description": "Start date (YYYY-MM-DD or shortcuts like 'last_month')"
+                        "enum": ["sales", "purchase"],
+                        "description": "'sales' for sales invoices, 'purchase' for purchase invoices"
                     },
-                    "date_to": {
+                    "group_by": {
                         "type": "string",
-                        "description": "End date (YYYY-MM-DD)"
-                    }
-                },
-                "required": []
-            }
-        ),
-        Tool(
-            name="financial_sales_by_person",
-            description="Get sales summary by sales person for a period. Shows total sales per sales rep with invoice details.",
-            inputSchema={
-                "type": "object",
-                "properties": {
+                        "enum": ["customer", "sales_rep", "vendor"],
+                        "description": "'customer' = group by customer, 'sales_rep' = group by salesperson, 'vendor' = group by vendor (use with type='purchase')"
+                    },
                     "date_from": {
                         "type": "string",
                         "description": "Start date (YYYY-MM-DD or shortcuts like 'last_month', 'this_month')"
@@ -64,29 +62,11 @@ def get_tools() -> list[Tool]:
                         "description": "End date (YYYY-MM-DD)"
                     }
                 },
-                "required": []
+                "required": ["type", "group_by"]
             }
         ),
         Tool(
-            name="financial_purchase_summary",
-            description="Get purchase summary by vendor for a period. Shows total purchase expenses from each vendor.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "date_from": {
-                        "type": "string",
-                        "description": "Start date (YYYY-MM-DD or shortcuts)"
-                    },
-                    "date_to": {
-                        "type": "string",
-                        "description": "End date (YYYY-MM-DD)"
-                    }
-                },
-                "required": []
-            }
-        ),
-        Tool(
-            name="financial_bank_balances",
+            name="financial_balances",
             description="Get current balances for all bank accounts. Shows available cash across all accounts.",
             inputSchema={
                 "type": "object",
@@ -99,16 +79,26 @@ def get_tools() -> list[Tool]:
 
 async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClient) -> str:
     """Handle financial tool calls."""
-    if name == "financial_activity_team_report":
+    if name == "financial_activity" or name == "financial_activity_team_report":
         return await _activity_team_report(arguments, client)
+    elif name == "financial_summary":
+        summary_type = arguments.get("type", "sales")
+        group_by = arguments.get("group_by", "customer")
+        if summary_type == "purchase":
+            return await _purchase_summary(arguments, client)
+        elif group_by == "sales_rep":
+            return await _sales_by_person(arguments, client)
+        else:
+            return await _sales_summary(arguments, client)
+    elif name == "financial_balances" or name == "financial_bank_balances":
+        return await _bank_balances(arguments, client)
+    # Backward compatibility: old tool names
     elif name == "financial_sales_summary":
         return await _sales_summary(arguments, client)
     elif name == "financial_sales_by_person":
         return await _sales_by_person(arguments, client)
     elif name == "financial_purchase_summary":
         return await _purchase_summary(arguments, client)
-    elif name == "financial_bank_balances":
-        return await _bank_balances(arguments, client)
     else:
         return f"Unknown financial tool: {name}"
 

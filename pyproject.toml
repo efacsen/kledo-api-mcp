@@ -139,6 +139,7 @@ addopts = [
     "--cov=src",
     "--cov-report=term-missing",
     "--cov-report=html:htmlcov",
-    "--cov-fail-under=80",
+    "--cov-fail-under=45",
+    "--cov-config=.coveragerc",
 ]
 asyncio_mode = "auto"

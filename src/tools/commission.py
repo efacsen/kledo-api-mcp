@@ -110,56 +110,32 @@ def get_tools() -> list[Tool]:
     """Get list of commission calculation tools."""
     return [
         Tool(
-            name="commission_calculate",
+            name="commission_report",
             description=(
-                "Calculate commission for a specific sales person based on paid invoices only (cash basis). "
+                "Calculate commission for sales reps based on paid invoices only (cash basis). "
                 "Commission is calculated on subtotal (before tax). "
                 "Supports tiered rates (1% on first 100M, 2% on 100M-300M, 3% on 300M+) or flat rate override. "
-                "Indonesian hints: 'komisi Ahmad bulan ini', 'komisi sales Budi bulan lalu', "
-                "'komisi Ahmad dengan rate 3%', 'hitung komisi Ahmad'"
+                "\n\n"
+                "**For one person**: Provide sales_person_name to get detailed breakdown for that rep. "
+                "Indonesian: 'komisi Ahmad bulan ini', 'komisi sales Budi dengan rate 3%'"
+                "\n\n"
+                "**For all reps**: Omit sales_person_name to get commission breakdown for ALL sales reps. "
+                "Indonesian: 'komisi per sales bulan ini', 'laporan komisi seluruh sales'"
             ),
             inputSchema={
                 "type": "object",
                 "properties": {
                     "period": {
                         "type": "string",
-                        "description": (
-                            "Period phrase: 'bulan ini', 'bulan lalu', '2026-01', or YYYY-MM-DD"
-                        )
+                        "description": "Period phrase: 'bulan ini', 'bulan lalu', '2026-01', or YYYY-MM-DD"
                     },
                     "sales_person_name": {
                         "type": "string",
-                        "description": "Sales rep name, e.g., 'Ahmad', 'Budi', 'Sari'"
+                        "description": "(Optional) Sales rep name to calculate for one person. If omitted, shows all reps. E.g., 'Ahmad', 'Budi', 'Sari'"
                     },
                     "flat_rate": {
                         "type": "number",
-                        "description": (
-                            "Override tiered commission with flat rate (e.g., 0.03 for 3%). "
-                            "If provided, applies flat rate to entire revenue instead of tiered brackets."
-                        )
-                    }
-                },
-                "required": ["period", "sales_person_name"]
-            }
-        ),
-        Tool(
-            name="commission_report",
-            description=(
-                "Get commission breakdown for ALL sales reps in a period. "
-                "Shows revenue, commission, and tier breakdown for each rep. "
-                "Indonesian hints: 'komisi per sales bulan ini', 'commission breakdown bulan lalu', "
-                "'laporan komisi', 'komisi seluruh sales'"
-            ),
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "period": {
-                        "type": "string",
-                        "description": "Period phrase: 'bulan ini', 'bulan lalu', '2026-01'"
-                    },
-                    "flat_rate": {
-                        "type": "number",
-                        "description": "Override tiered commission with flat rate for all reps (e.g., 0.03 for 3%)"
+                        "description": "Override tiered commission with flat rate (e.g., 0.03 for 3%). Applies to entire revenue instead of tiered brackets."
                     }
                 },
                 "required": ["period"]
@@ -170,10 +146,18 @@ def get_tools() -> list[Tool]:
 
 async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClient) -> str:
     """Handle commission tool calls."""
-    if name == "commission_calculate":
+    if name == "commission_report":
+        # Route based on sales_person_name parameter
+        sales_person_name = arguments.get("sales_person_name", "").strip()
+        if sales_person_name:
+            # Calculate for one person
+            return await _commission_calculate(arguments, client)
+        else:
+            # Report for all reps
+            return await _commission_report(arguments, client)
+    # Backward compatibility
+    elif name == "commission_calculate":
         return await _commission_calculate(arguments, client)
-    elif name == "commission_report":
-        return await _commission_report(arguments, client)
     else:
         return f"Unknown commission tool: {name}"
 

@@ -1,0 +1,491 @@
+{
+  "success": true,
+  "data": {
+    "id": 14256,
+    "business_tran_id": null,
+    "trans_type_id": 6,
+    "trans_date": "2024-03-09",
+    "due_date": "2024-03-09",
+    "contact_id": 519,
+    "status_id": 5,
+    "ref_number": "SO/00/MAR/00000",
+    "amount": 8000000,
+    "amount_after_tax": 9000000,
+    "due": 9000000,
+    "bank_statement_id": null,
+    "bank_account_id": null,
+    "balance": null,
+    "position": null,
+    "pay_later": false,
+    "pay_from_finance_account_id": null,
+    "payment_id": null,
+    "include_tax": false,
+    "term_id": 5,
+    "attachment": [
+      "https://example.com"
+    ],
+    "memo": "Relokasi Kantin - EB9",
+    "desc": "",
+    "tax": {
+      "1": 900000
+    },
+    "warehouse_id": 1,
+    "discount_percent": 0,
+    "discount_amount": 0,
+    "additional_discount_percent": 0,
+    "additional_discount_amount": 0,
+    "total_tax": 900000,
+    "subtotal": 8000000,
+    "shipping_cost": 0,
+    "shipping_date": null,
+    "shipping_comp_id": null,
+    "shipping_tracking": null,
+    "sub_business_tran_id": null,
+    "membership_trans_type_id": 0,
+    "delivery_ids": null,
+    "witholding_percent": 0,
+    "witholding_amount": 0,
+    "witholding_account_id": null,
+    "owner_id": 218933,
+    "sales_id": 218933,
+    "currency_id": 0,
+    "currency_source_id": 0,
+    "currency_rate": 1,
+    "payment_date": null,
+    "paid_date": null,
+    "contact_shipping_address_id": null,
+    "amount_after_tax_ori": null,
+    "amount_ori": null,
+    "local_id": null,
+    "outlet_id": null,
+    "invoice_type_id": null,
+    "payment_type_id": null,
+    "pos_shift_id": null,
+    "is_stamped": 0,
+    "stamp_serial_number": null,
+    "related_id": null,
+    "related_type": null,
+    "source": 0,
+    "source_id": null,
+    "payback": 0,
+    "additional_discounts": null,
+    "total_additional_discounts": 0,
+    "items": [
+      {
+        "id": 24105,
+        "tran_id": 14256,
+        "finance_account_id": 4,
+        "trans_type_id": 6,
+        "membership_trans_type_id": 0,
+        "tax_id": 1,
+        "desc": "Kemasan 20 Liter\nWood Box NP N 1822 T",
+        "qty": 5,
+        "price": 2000000,
+        "price_after_tax": 2000000,
+        "amount": 8000000,
+        "amount_after_tax": 9000000,
+        "discount_percent": 0,
+        "discount_amount": 0,
+        "additional_discount_amount": 0,
+        "taxable": 8000000,
+        "tax": 900000,
+        "subtotal": 8000000,
+        "unit_id": 2,
+        "unit_conv": 1,
+        "discount_amount_input": "0.00000",
+        "amount_after_tax_ori": null,
+        "amount_ori": null,
+        "currency_id": 0,
+        "currency_rate": 1,
+        "local_id": null,
+        "weight_in_gram": 0,
+        "total_weight_in_gram": null,
+        "length": null,
+        "width": null,
+        "height": null,
+        "total_volume": null,
+        "price_rule": null,
+        "custom_product_name": null,
+        "product": {
+          "id": 4,
+          "name": "Name 106",
+          "is_track": true,
+          "avg_base_price": 1000000,
+          "base_price": 1000000,
+          "code": "SKU/CD/00004",
+          "bundle_type_id": 0,
+          "purchase_account_id": 131,
+          "sell_account_id": 121,
+          "unit_id": 2,
+          "pos_product_category_id": 2,
+          "wholesale_price": [],
+          "is_purchase": true,
+          "is_sell": true,
+          "sn_type": null,
+          "manage_expiry": null,
+          "price": 2000000,
+          "track_start_date": null,
+          "last_buy_price": 1000000,
+          "last_sell_price": 1000000,
+          "last_sell_price_contact": null,
+          "formatted": "Jl. Generic No. 1, Jakarta",
+          "product_units": []
+        },
+        "item_tax": {
+          "id": 1,
+          "name": "Name 107",
+          "percent": 11,
+          "is_witholding": 0,
+          "sell_account_id": 910,
+          "buy_account_id": 47,
+          "is_active": true,
+          "is_allow_manual": 0,
+          "is_group": 0,
+          "group_items": null,
+          "local_id": "bc456452-547e-4252-ac90-999562e7ce3a"
+        },
+        "custom": null
+      }
+    ],
+    "transactions": [],
+    "relations": [],
+    "have_proforma": false,
+    "is_editable": true,
+    "is_deletable": true,
+    "currency_editable": true,
+    "print_url": "Jl. Generic No. 1, Jakarta",
+    "print_tax_url": null,
+    "print_url_word": "Jl. Generic No. 1, Jakarta",
+    "print_url_approval": "Jl. Generic No. 1, Jakarta",
+    "taxes": {
+      "PPN": {
+        "value": 900000,
+        "percent": 11
+      }
+    },
+    "next": 10000,
+    "prev": null,
+    "log": {
+      "action": {
+        "id": 40542,
+        "action_type_id": 1,
+        "trans_type_id": 6,
+        "tran_id": 14256,
+        "user_id": 218933,
+        "extra": "Jl. Generic No. 1, Jakarta",
+        "remote_addr": "111.94.15.247",
+        "created_at": "2024-03-09 15:20",
+        "changes": null,
+        "user": {
+          "id": 218933,
+          "name": "Name 108",
+          "email": "user@example.com",
+          "phone_number": "021-0000000",
+          "is_active": 1,
+          "local_id": "ead6d706-80aa-48af-a973-e3998fba6e0d",
+          "token_website_id": 0
+        }
+      },
+      "print": {
+        "id": 40550,
+        "action_type_id": 24,
+        "trans_type_id": 6,
+        "tran_id": 14256,
+        "user_id": 218933,
+        "extra": "Jl. Generic No. 1, Jakarta",
+        "remote_addr": "182.0.144.186",
+        "created_at": "2024-03-10 09:27",
+        "changes": null,
+        "user": {
+          "id": 218933,
+          "name": "Name 109",
+          "email": "user@example.com",
+          "phone_number": "021-0000000",
+          "is_active": 1,
+          "local_id": "ead6d706-80aa-48af-a973-e3998fba6e0d",
+          "token_website_id": 0
+        }
+      }
+    },
+    "is_approveable": false,
+    "approval_status": {
+      "id": 1809,
+      "tran_id": 14256,
+      "level": 1,
+      "is_complete": 1,
+      "is_rejected": 0,
+      "trans_type_id": 6
+    },
+    "approval_level": 1,
+    "approval_log": [
+      {
+        "id": 3988,
+        "event_type_id": 3,
+        "trans_type_id": 6,
+        "tran_id": 14256,
+        "extra": "{\"level\":1}",
+        "remote_addr": "103.136.58.225",
+        "user_id": 352181,
+        "raw_params": "{\"status_id\":5}",
+        "created_at": "2024-03-10 09:21:48",
+        "updated_at": "2024-03-10 09:21:48",
+        "event_type": "TRAN_APPROVED",
+        "user": {
+          "id": 352181,
+          "name": "Name 110",
+          "email": "user@example.com",
+          "phone_number": "021-0000000",
+          "is_active": true,
+          "lang": null,
+          "token_website_id": 0,
+          "local_id": "41be39c4-b96a-4d6e-9016-2adb842c934f",
+          "max_receivable": null,
+          "is_2fa_active": 0,
+          "is_show_news": 1,
+          "apple_id": null,
+          "roles": [
+            {
+              "id": 1,
+              "name": "Name 111",
+              "guard_name": "web",
+              "created_at": "2024-09-06T14:20:15.000000Z",
+              "updated_at": "2024-09-06T14:20:16.000000Z",
+              "position": 1,
+              "superuser": 1,
+              "pivot": {
+                "model_type": "App\\User",
+                "model_id": 352181,
+                "role_id": 1
+              }
+            },
+            {
+              "id": 7,
+              "name": "Name 112",
+              "guard_name": "hr",
+              "created_at": "2024-09-12T06:01:41.000000Z",
+              "updated_at": "2024-09-12T06:01:41.000000Z",
+              "position": 7,
+              "superuser": 1,
+              "pivot": {
+                "model_type": "App\\User",
+                "model_id": 352181,
+                "role_id": 7
+              }
+            },
+            {
+              "id": 22,
+              "name": "Name 113",
+              "guard_name": "wa",
+              "created_at": "2024-03-06T08:03:57.000000Z",
+              "updated_at": "2024-03-06T08:03:57.000000Z",
+              "position": 22,
+              "superuser": 1,
+              "pivot": {
+                "model_type": "App\\User",
+                "model_id": 352181,
+                "role_id": 22
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": 3985,
+        "event_type_id": 2,
+        "trans_type_id": 6,
+        "tran_id": 14256,
+        "extra": "{\"level\":0}",
+        "remote_addr": "111.94.15.247",
+        "user_id": 218933,
+        "raw_params": "Jl. Generic No. 1, Jakarta",
+        "created_at": "2024-03-09 15:20:15",
+        "updated_at": "2024-03-09 15:20:15",
+        "event_type": "TRAN_CREATED",
+        "user": {
+          "id": 218933,
+          "name": "Name 114",
+          "email": "user@example.com",
+          "phone_number": "021-0000000",
+          "is_active": true,
+          "lang": "id-ID",
+          "token_website_id": 0,
+          "local_id": "ead6d706-80aa-48af-a973-e3998fba6e0d",
+          "max_receivable": null,
+          "is_2fa_active": 0,
+          "is_show_news": 1,
+          "apple_id": null,
+          "roles": [
+            {
+              "id": 10,
+              "name": "Name 115",
+              "guard_name": "hr",
+              "created_at": "2024-09-12T06:01:42.000000Z",
+              "updated_at": "2024-02-12T09:56:34.000000Z",
+              "position": 11,
+              "superuser": 0,
+              "pivot": {
+                "model_type": "App\\User",
+                "model_id": 218933,
+                "role_id": 10
+              }
+            },
+            {
+              "id": 14,
+              "name": "Name 116",
+              "guard_name": "web",
+              "created_at": "2024-11-26T09:05:41.000000Z",
+              "updated_at": "2024-11-25T07:53:37.000000Z",
+              "position": 15,
+              "superuser": 0,
+              "pivot": {
+                "model_type": "App\\User",
+                "model_id": 218933,
+                "role_id": 14
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "approval_roles_on_level": [
+      4
+    ],
+    "approval_progress": [
+      {
+        "level": 1,
+        "status": "Disetujui",
+        "status_id": 3,
+        "status_by": {
+          "at": "2024-03-10 09:21:48",
+          "user": {
+            "id": 352181,
+            "name": "Name 117",
+            "email": "user@example.com",
+            "phone_number": "021-0000000",
+            "is_active": true,
+            "lang": null,
+            "token_website_id": 0,
+            "local_id": "41be39c4-b96a-4d6e-9016-2adb842c934f",
+            "max_receivable": null,
+            "is_2fa_active": 0,
+            "is_show_news": 1,
+            "apple_id": null,
+            "roles": [
+              {
+                "id": 1,
+                "name": "Name 118",
+                "guard_name": "web",
+                "created_at": "2024-09-06T14:20:15.000000Z",
+                "updated_at": "2024-09-06T14:20:16.000000Z",
+                "position": 1,
+                "superuser": 1,
+                "pivot": {
+                  "model_type": "App\\User",
+                  "model_id": 352181,
+                  "role_id": 1
+                }
+              },
+              {
+                "id": 7,
+                "name": "Name 119",
+                "guard_name": "hr",
+                "created_at": "2024-09-12T06:01:41.000000Z",
+                "updated_at": "2024-09-12T06:01:41.000000Z",
+                "position": 7,
+                "superuser": 1,
+                "pivot": {
+                  "model_type": "App\\User",
+                  "model_id": 352181,
+                  "role_id": 7
+                }
+              },
+              {
+                "id": 22,
+                "name": "Name 120",
+                "guard_name": "wa",
+                "created_at": "2024-03-06T08:03:57.000000Z",
+                "updated_at": "2024-03-06T08:03:57.000000Z",
+                "position": 22,
+                "superuser": 1,
+                "pivot": {
+                  "model_type": "App\\User",
+                  "model_id": 352181,
+                  "role_id": 22
+                }
+              }
+            ]
+          },
+          "event_type_id": 3
+        },
+        "role_on_level": [
+          {
+            "id": 4,
+            "name": "Name 121"
+          }
+        ]
+      }
+    ],
+    "is_revertable": false,
+    "is_closeable": true,
+    "is_uncloseable": false,
+    "reason": null,
+    "currency_source": null,
+    "contact": {
+      "id": 519,
+      "name": "Name 122",
+      "email": null,
+      "phone": null,
+      "company": "PT. CIPTA SARANA SUKSES ABADI",
+      "address": "Jl. Generic No. 1, Jakarta",
+      "country_id": 1,
+      "province_id": 9,
+      "city_id": 81,
+      "district_id": null,
+      "village_id": null,
+      "group_id": 1,
+      "salutation_id": 2,
+      "ref_number": null,
+      "npwp": "021-0000000",
+      "opening_hour": null,
+      "closing_hour": null,
+      "type_ids": [],
+      "finance_contact_emails": [],
+      "salutation": "Bapak",
+      "formatted": "Jl. Generic No. 1, Jakarta",
+      "edit_address": "Jl. Generic No. 1, Jakarta",
+      "shipping_addresses": [],
+      "bank_accounts": []
+    },
+    "contact_shipping_address": null,
+    "quote": null,
+    "message": {
+      "message": "Jl. Generic No. 1, Jakarta"
+    },
+    "tags": [
+      {
+        "id": 1,
+        "name": "Name 123",
+        "color": "#000000",
+        "owner_id": 145707,
+        "local_id": "f7e9b7e8-0740-4903-9594-75a8c9ce60f6",
+        "is_archive": 0
+      }
+    ],
+    "parent_tran": null,
+    "sales": {
+      "id": 218933,
+      "name": "Name 124",
+      "email": "user@example.com"
+    },
+    "custom": {
+      "id": 4299,
+      "custom_column_alamat_kirim": null,
+      "custom_column_tanggal_kirim": null,
+      "custom_column_customer_p_o": "CSSA/2026/0565"
+    },
+    "fees": [],
+    "payment_connect": null
+  },
+  "message": "Pemesanan berhasil diambil",
+  "time": 0
+}

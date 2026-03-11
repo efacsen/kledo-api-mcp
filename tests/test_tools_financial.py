@@ -16,14 +16,13 @@ class TestFinancialTools:
         """Test get_tools returns correct tool definitions."""
         tools = financial.get_tools()
 
-        assert len(tools) == 4
+        assert len(tools) == 3
         assert all(isinstance(tool, Tool) for tool in tools)
 
         tool_names = [tool.name for tool in tools]
-        assert "financial_activity_team_report" in tool_names
-        assert "financial_sales_summary" in tool_names
-        assert "financial_purchase_summary" in tool_names
-        assert "financial_bank_balances" in tool_names
+        assert "financial_activity" in tool_names
+        assert "financial_summary" in tool_names
+        assert "financial_balances" in tool_names
 
     def test_tool_schemas(self):
         """Test that all tools have proper input schemas."""
@@ -65,9 +64,11 @@ class TestFinancialTools:
         mock_client.get = AsyncMock(return_value={
             "data": {
                 "data": [
-                    {"contact_name": "ABC Corp", "total": 100000, "count": 5},
-                    {"contact_name": "XYZ Inc", "total": 75000, "count": 3}
-                ]
+                    {"contact": {"name": "ABC Corp"}, "amount_after_tax": 100000, "status_id": 3},
+                    {"contact": {"name": "XYZ Inc"}, "amount_after_tax": 75000, "status_id": 3}
+                ],
+                "current_page": 1,
+                "last_page": 1
             }
         })
 
@@ -89,9 +90,11 @@ class TestFinancialTools:
         mock_client.get = AsyncMock(return_value={
             "data": {
                 "data": [
-                    {"contact_name": "Vendor A", "total": 50000, "count": 2},
-                    {"contact_name": "Vendor B", "total": 30000, "count": 1}
-                ]
+                    {"contact": {"name": "Vendor A"}, "amount_after_tax": 50000, "status_id": 3},
+                    {"contact": {"name": "Vendor B"}, "amount_after_tax": 30000, "status_id": 1}
+                ],
+                "current_page": 1,
+                "last_page": 1
             }
         })
 
@@ -213,9 +216,13 @@ class TestFinancialTools:
         """Test purchase summary filtered by contact."""
         mock_client = Mock(spec=KledoAPIClient)
         mock_client.get = AsyncMock(return_value={
-            "data": {"data": [
-                {"contact_name": "Specific Vendor", "total": 25000, "count": 5}
-            ]}
+            "data": {
+                "data": [
+                    {"contact": {"name": "Specific Vendor"}, "amount_after_tax": 25000, "status_id": 3}
+                ],
+                "current_page": 1,
+                "last_page": 1
+            }
         })
 
         result = await financial.handle_tool(

@@ -12,22 +12,27 @@ def get_tools() -> list[Tool]:
     """Get list of order tools."""
     return [
         Tool(
-            name="order_list_sales",
-            description="List sales orders with optional filtering.",
+            name="order_list",
+            description="List orders with optional filtering. Supports both sales and purchase orders.",
             inputSchema={
                 "type": "object",
                 "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": ["sales", "purchase"],
+                        "description": "Order type: 'sales' for customer orders, 'purchase' for vendor orders"
+                    },
                     "search": {
                         "type": "string",
                         "description": "Search term"
                     },
                     "contact_id": {
                         "type": "integer",
-                        "description": "Filter by customer ID"
+                        "description": "Filter by customer ID (for sales) or vendor ID (for purchase)"
                     },
                     "status_id": {
                         "type": "integer",
-                        "description": "Filter by status"
+                        "description": "Filter by status (for sales orders)"
                     },
                     "date_from": {
                         "type": "string",
@@ -38,47 +43,21 @@ def get_tools() -> list[Tool]:
                         "description": "End date"
                     }
                 },
-                "required": []
+                "required": ["type"]
             }
         ),
         Tool(
-            name="order_get_detail",
-            description="Get detailed information about a specific sales order.",
+            name="order_get",
+            description="Get detailed information about a specific order.",
             inputSchema={
                 "type": "object",
                 "properties": {
                     "order_id": {
                         "type": "integer",
-                        "description": "Sales order ID"
+                        "description": "Order ID"
                     }
                 },
                 "required": ["order_id"]
-            }
-        ),
-        Tool(
-            name="order_list_purchase",
-            description="List purchase orders with optional filtering.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "search": {
-                        "type": "string",
-                        "description": "Search term"
-                    },
-                    "contact_id": {
-                        "type": "integer",
-                        "description": "Filter by vendor ID"
-                    },
-                    "date_from": {
-                        "type": "string",
-                        "description": "Start date"
-                    },
-                    "date_to": {
-                        "type": "string",
-                        "description": "End date"
-                    }
-                },
-                "required": []
             }
         )
     ]
@@ -86,14 +65,38 @@ def get_tools() -> list[Tool]:
 
 async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClient) -> str:
     """Handle order tool calls."""
-    if name == "order_list_sales":
-        return await _list_sales_orders(arguments, client)
-    elif name == "order_get_detail":
-        return await _get_order_detail(arguments, client)
+    if name == "order_list":
+        return await _list_orders(arguments, client)
+    elif name == "order_get":
+        return await _get_order(arguments, client)
+    # Backward compatibility: support old tool names
+    elif name == "order_list_sales":
+        arguments["type"] = "sales"
+        return await _list_orders(arguments, client)
     elif name == "order_list_purchase":
-        return await _list_purchase_orders(arguments, client)
+        arguments["type"] = "purchase"
+        return await _list_orders(arguments, client)
+    elif name == "order_get_detail":
+        return await _get_order(arguments, client)
     else:
         return f"Unknown order tool: {name}"
+
+
+async def _list_orders(args: Dict[str, Any], client: KledoAPIClient) -> str:
+    """List orders (sales or purchase based on type parameter)."""
+    order_type = args.get("type")
+
+    if not order_type:
+        return "Error: type parameter is required. Must be 'sales' or 'purchase'."
+
+    if order_type not in ["sales", "purchase"]:
+        return f"Error: Invalid type '{order_type}'. Must be 'sales' or 'purchase'."
+
+    # Delegate to appropriate handler
+    if order_type == "sales":
+        return await _list_sales_orders(args, client)
+    else:
+        return await _list_purchase_orders(args, client)
 
 
 async def _list_sales_orders(args: Dict[str, Any], client: KledoAPIClient) -> str:
@@ -163,7 +166,7 @@ async def _list_sales_orders(args: Dict[str, Any], client: KledoAPIClient) -> st
         return f"Error fetching sales orders: {str(e)}"
 
 
-async def _get_order_detail(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _get_order(args: Dict[str, Any], client: KledoAPIClient) -> str:
     """Get order detail."""
     order_id = args.get("order_id")
 
@@ -200,8 +203,8 @@ async def _get_order_detail(args: Dict[str, Any], client: KledoAPIClient) -> str
         result.append(f"**Subtotal**: {format_currency(subtotal)}")
         result.append(f"**Total**: {format_currency(total)}\n")
 
-        # Line items
-        items = safe_get(order, "detail", [])
+        # Line items (Kledo API returns "items" in detail responses; fall back to "detail")
+        items = safe_get(order, "items", []) or safe_get(order, "detail", [])
         if items:
             result.append("\n## Items:\n")
             for item in items:

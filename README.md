@@ -11,7 +11,7 @@ An MCP server that connects AI assistants (like Claude) to the Kledo accounting 
 
 ## 🎯 Key Features
 
-- **28 Production-Ready Tools** - Complete coverage of Kledo API endpoints
+- **24 Production-Ready Tools** - Complete coverage of Kledo API endpoints
 - **Revenue & Financial Analytics** - Invoice tracking, revenue reporting, receivables management
 - **Customer Intelligence** - Customer ranking, transaction history, contact management
 - **Product & Inventory** - Product lookup, SKU search, inventory insights
@@ -55,51 +55,51 @@ kledo-mcp  # Just works - no setup needed
 
 **Need help?** See [Troubleshooting](#-troubleshooting) below.
 
-## 🛠️ Available Tools (28 Total)
+## 🛠️ Available Tools (24 Total)
 
-### Revenue & Analytics (8 tools)
-- `revenue_summary` - Revenue for any time period (with tax breakdown)
-- `outstanding_receivables` - Track unpaid invoices
-- `customer_revenue_ranking` - Identify top customers by revenue
-- `sales_rep_revenue_report` - Sales representative performance analysis
-- `sales_rep_list` - List all sales representatives
-- `invoice_list_sales` - List sales invoices with filters
-- `invoice_get_detail` - Detailed invoice information
-- `invoice_get_totals` - Invoice totals and summary
+### Revenue (3 tools)
+- `revenue_summary` - Revenue for any period (paid invoices, with tax breakdown)
+- `revenue_receivables` - Outstanding invoices: list / aging buckets / Pareto concentration
+- `revenue_ranking` - Revenue ranked by customer or by day
 
-### Purchase/Expenses (1 tool)
-- `invoice_list_purchase` - List purchase invoices
+### Invoices (3 tools)
+- `invoice_list` - List sales or purchase invoices (`type: sales|purchase`)
+- `invoice_get` - Detailed invoice information by ID
+- `invoice_summarize` - Invoice totals or outstanding breakdown by customer/vendor
 
-### Products (3 tools)
-- `product_list` - List all products
-- `product_get_detail` - Detailed product information
-- `product_search_by_sku` - Search products by SKU
+### Orders (2 tools)
+- `order_list` - List sales or purchase orders (`type: sales|purchase`)
+- `order_get` - Order details by ID
 
-### Customers/Contacts (3 tools)
+### Products (2 tools)
+- `product_list` - List products with optional search and inventory
+- `product_get` - Product detail by ID or by SKU/code
+
+### Customers/Contacts (2 tools)
 - `contact_list` - List customers and vendors
-- `contact_get_detail` - Contact details and information
-- `contact_get_transactions` - Contact transaction history
+- `contact_get` - Contact profile or transaction history (`view: detail|transactions`)
 
-### Orders (4 tools)
-- `order_list_sales` - List sales orders
-- `order_get_detail` - Sales order details
-- `order_list_purchase` - List purchase orders
-- `order_get_purchase_detail` - Purchase order details
+### Deliveries (2 tools)
+- `delivery_list` - List deliveries with date/status filters
+- `delivery_get` - Delivery detail or pending shipments (`view: detail|pending`)
 
-### Deliveries (4 tools)
-- `delivery_list` - List all deliveries
-- `delivery_get_detail` - Delivery details
-- `delivery_list_pending` - Pending deliveries
-- `delivery_get_by_order` - Deliveries for specific order
+### Financial (3 tools)
+- `financial_summary` - Sales or purchase summary by customer, sales rep, or vendor
+- `financial_balances` - Current bank account balances
+- `financial_activity` - Team activity report for a date range
 
-### Financial (1 tool)
-- `financial_get_account_list` - Chart of accounts
+### Analytics & Commission (3 tools)
+- `analytics_compare` - Compare revenue or outstanding across periods or sales reps
+- `analytics_targets` - Sales targets: report / underperformers / set target
+- `commission_report` - Commission calculation (tiered or flat rate) per rep or all reps
 
-### Utilities (4 tools)
-- `utility_cache_clear` - Clear cache
-- `utility_cache_stats` - Cache statistics
-- `utility_test_connection` - Test API connection
-- `utility_get_business_info` - Business information
+### Sales (2 tools)
+- `sales_rep_report` - Sales rep revenue breakdown for a period
+- `sales_rep_list` - List all sales representatives
+
+### Utilities (2 tools)
+- `utility_cache` - Cache stats or clear (`action: stats|clear`)
+- `utility_test_connection` - Test Kledo API connection and auth status
 
 ## 📦 Installation
 

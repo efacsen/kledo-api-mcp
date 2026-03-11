@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Kledo MCP Server — a Python MCP (Model Context Protocol) server that bridges Claude AI with the Kledo accounting software REST API. It exposes 28 read-only tools across 9 categories (revenue, invoices, products, contacts, orders, deliveries, sales analytics, financial, utilities) to Claude Desktop and other MCP clients via stdio transport. Built for a paint distribution company with bilingual (Indonesian/English) support.
+Kledo MCP Server — a Python MCP (Model Context Protocol) server that bridges Claude AI with the Kledo accounting software REST API. It exposes 24 read-only tools across 10 categories (revenue, invoices, products, contacts, orders, deliveries, sales analytics, financial, analytics/commission, utilities) to Claude Desktop and other MCP clients via stdio transport. Built for a paint distribution company with bilingual (Indonesian/English) support.
 
 ## Commands
 

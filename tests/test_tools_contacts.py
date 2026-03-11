@@ -16,13 +16,12 @@ class TestContactTools:
         """Test get_tools returns correct tool definitions."""
         tools = contacts.get_tools()
 
-        assert len(tools) == 3
+        assert len(tools) == 2
         assert all(isinstance(tool, Tool) for tool in tools)
 
         tool_names = [tool.name for tool in tools]
         assert "contact_list" in tool_names
-        assert "contact_get_detail" in tool_names
-        assert "contact_get_transactions" in tool_names
+        assert "contact_get" in tool_names
 
     def test_tool_schemas(self):
         """Test that all tools have proper input schemas."""
@@ -108,17 +107,17 @@ class TestContactTools:
                 "data": [
                     {
                         "type": "Invoice",
-                        "trans_number": "INV-001",
-                        "date": "2024-10-15",
-                        "amount": 1000000,
-                        "status": "Paid"
+                        "ref_number": "INV-001",
+                        "trans_date": "2024-10-15",
+                        "amount_after_tax": 1000000,
+                        "status_id": 3
                     },
                     {
                         "type": "Invoice",
-                        "trans_number": "INV-002",
-                        "date": "2024-10-20",
-                        "amount": 500000,
-                        "status": "Pending"
+                        "ref_number": "INV-002",
+                        "trans_date": "2024-10-20",
+                        "amount_after_tax": 500000,
+                        "status_id": 2
                     }
                 ]
             }

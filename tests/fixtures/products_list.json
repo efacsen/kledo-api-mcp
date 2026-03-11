@@ -1,0 +1,498 @@
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 213,
+        "name": "Name 176",
+        "code": "SKU/CD/00208",
+        "base_price": 0,
+        "price": 80000000,
+        "qty": 0,
+        "is_track": false,
+        "unit_id": 10,
+        "bundle_type_id": 0,
+        "variant_type_id": 0,
+        "sn_type": null,
+        "pos_product_category_id": 9,
+        "avg_base_price": 0,
+        "is_archive": 0,
+        "unit": {
+          "id": 10,
+          "name": "Name 177"
+        },
+        "warehouse_qty": []
+      },
+      {
+        "id": 308,
+        "name": "Name 178",
+        "code": "SKU/CD/00298",
+        "base_price": 1000000,
+        "price": 40000,
+        "qty": 0,
+        "is_track": false,
+        "unit_id": 8,
+        "bundle_type_id": 0,
+        "variant_type_id": 0,
+        "sn_type": null,
+        "pos_product_category_id": 9,
+        "avg_base_price": 0,
+        "is_archive": 0,
+        "unit": {
+          "id": 8,
+          "name": "Name 179"
+        },
+        "warehouse_qty": []
+      },
+      {
+        "id": 72,
+        "name": "Name 180",
+        "code": "SKU/CD/00071",
+        "base_price": 2000000,
+        "price": 20000000,
+        "qty": 0,
+        "is_track": false,
+        "unit_id": 3,
+        "bundle_type_id": 0,
+        "variant_type_id": 0,
+        "sn_type": null,
+        "pos_product_category_id": 9,
+        "avg_base_price": 0,
+        "is_archive": 0,
+        "unit": {
+          "id": 3,
+          "name": "Name 181"
+        },
+        "warehouse_qty": []
+      },
+      {
+        "id": 110,
+        "name": "Name 182",
+        "code": "SKU/CD/00105",
+        "base_price": 800000,
+        "price": 30000,
+        "qty": 0,
+        "is_track": false,
+        "unit_id": 10,
+        "bundle_type_id": 0,
+        "variant_type_id": 0,
+        "sn_type": null,
+        "pos_product_category_id": 9,
+        "avg_base_price": 0,
+        "is_archive": 0,
+        "unit": {
+          "id": 10,
+          "name": "Name 183"
+        },
+        "warehouse_qty": []
+      },
+      {
+        "id": 73,
+        "name": "Name 184",
+        "code": "SKU/CD/00072",
+        "base_price": 0,
+        "price": 5000,
+        "qty": 0,
+        "is_track": false,
+        "unit_id": 10,
+        "bundle_type_id": 0,
+        "variant_type_id": 0,
+        "sn_type": null,
+        "pos_product_category_id": 9,
+        "avg_base_price": 0,
+        "is_archive": 0,
+        "unit": {
+          "id": 10,
+          "name": "Name 185"
+        },
+        "warehouse_qty": []
+      }
+    ],
+    "first_page_url": "https://example.com",
+    "from": 1,
+    "last_page": 91,
+    "last_page_url": "https://example.com",
+    "links": [
+      {
+        "url": null,
+        "label": "&laquo; Sebelumnya",
+        "page": null,
+        "active": false
+      },
+      {
+        "url": "https://example.com",
+        "label": "1",
+        "page": 1,
+        "active": true
+      },
+      {
+        "url": "https://example.com",
+        "label": "2",
+        "page": 2,
+        "active": false
+      },
+      {
+        "url": "https://example.com",
+        "label": "3",
+        "page": 3,
+        "active": false
+      },
+      {
+        "url": "https://example.com",
+        "label": "4",
+        "page": 4,
+        "active": false
+      },
+      {
+        "url": "https://example.com",
+        "label": "5",
+        "page": 5,
+        "active": false
+      },
+      {
+        "url": "https://example.com",
+        "label": "6",
+        "page": 6,
+        "active": false
+      },
+      {
+        "url": "https://example.com",
+        "label": "7",
+        "page": 7,
+        "active": false
+      },
+      {
+        "url": "https://example.com",
+        "label": "8",
+        "page": 8,
+        "active": false
+      },
+      {
+        "url": "https://example.com",
+        "label": "9",
+        "page": 9,
+        "active": false
+      },
+      {
+        "url": "https://example.com",
+        "label": "10",
+        "page": 10,
+        "active": false
+      },
+      {
+        "url": null,
+        "label": "...",
+        "active": false
+      },
+      {
+        "url": "https://example.com",
+        "label": "90",
+        "page": 90,
+        "active": false
+      },
+      {
+        "url": "https://example.com",
+        "label": "91",
+        "page": 91,
+        "active": false
+      },
+      {
+        "url": "https://example.com",
+        "label": "Selanjutnya &raquo;",
+        "page": 2,
+        "active": false
+      }
+    ],
+    "next_page_url": "https://example.com",
+    "path": "https://example.com",
+    "per_page": 5,
+    "prev_page_url": null,
+    "to": 5,
+    "total": 500,
+    "grand_subtotal": {
+      "qty": 0,
+      "avg_base_price": 0
+    },
+    "grand_total": {
+      "qty": 600,
+      "avg_base_price": 50000000
+    },
+    "categories": [
+      {
+        "id": 1,
+        "parent_id": null,
+        "has_child": 0,
+        "pos_id": null,
+        "name": "Name 186",
+        "is_active": true,
+        "local_id": "613f81c3-12c7-4a63-b224-00dd4c606714"
+      },
+      {
+        "id": 2,
+        "parent_id": null,
+        "has_child": 0,
+        "pos_id": null,
+        "name": "Name 187",
+        "is_active": true,
+        "local_id": "d4ea292f-9c77-4e70-97b8-f3c1e0b3b2a3"
+      },
+      {
+        "id": 3,
+        "parent_id": null,
+        "has_child": 0,
+        "pos_id": null,
+        "name": "Name 188",
+        "is_active": true,
+        "local_id": "dbbca5d8-5247-4840-8484-5a0096549714"
+      },
+      {
+        "id": 4,
+        "parent_id": null,
+        "has_child": 0,
+        "pos_id": null,
+        "name": "Name 189",
+        "is_active": true,
+        "local_id": "133c0fb0-e3f2-4cd6-8063-61dc7fd2a693"
+      },
+      {
+        "id": 5,
+        "parent_id": null,
+        "has_child": 0,
+        "pos_id": null,
+        "name": "Name 190",
+        "is_active": true,
+        "local_id": "922d7b37-7614-494c-9fa4-1b24af30b306"
+      },
+      {
+        "id": 6,
+        "parent_id": null,
+        "has_child": 0,
+        "pos_id": null,
+        "name": "Name 191",
+        "is_active": true,
+        "local_id": "cd66b552-06d8-4615-b4e9-9c2dedab90cc"
+      },
+      {
+        "id": 7,
+        "parent_id": null,
+        "has_child": 0,
+        "pos_id": null,
+        "name": "Name 192",
+        "is_active": true,
+        "local_id": "1ab3ab05-4e3f-4ba1-a3eb-6a3aabdc2910"
+      },
+      {
+        "id": 8,
+        "parent_id": null,
+        "has_child": 0,
+        "pos_id": null,
+        "name": "Name 193",
+        "is_active": true,
+        "local_id": "e454490b-abba-4743-ab88-8d48c52d83a4"
+      },
+      {
+        "id": 9,
+        "parent_id": null,
+        "has_child": 0,
+        "pos_id": null,
+        "name": "Name 194",
+        "is_active": true,
+        "local_id": "e548fca8-b45c-485b-8ef9-dc0b08a65464"
+      },
+      {
+        "id": 10,
+        "parent_id": null,
+        "has_child": 0,
+        "pos_id": null,
+        "name": "Name 195",
+        "is_active": true,
+        "local_id": "21d20cd4-fdcc-41d8-83c6-83f0212cb03c"
+      },
+      {
+        "id": 11,
+        "parent_id": null,
+        "has_child": 0,
+        "pos_id": null,
+        "name": "Name 196",
+        "is_active": true,
+        "local_id": "7001b3de-12d5-4098-9460-96314ca0f0e9"
+      },
+      {
+        "id": 12,
+        "parent_id": null,
+        "has_child": 0,
+        "pos_id": null,
+        "name": "Name 197",
+        "is_active": true,
+        "local_id": "d2ade6b8-a0b1-4d5e-bbbc-77516a56c8fe"
+      }
+    ],
+    "units": [
+      {
+        "id": 2,
+        "name": "Name 198",
+        "position": "15.00000",
+        "created_at": "2024-09-08 16:13:44",
+        "updated_at": "2024-09-08 18:28:37",
+        "deleted_at": null,
+        "local_id": "5b5ce3e4-f648-414c-976c-e0b24a711dd0"
+      },
+      {
+        "id": 3,
+        "name": "Name 199",
+        "position": "25.00000",
+        "created_at": "2024-09-11 10:47:59",
+        "updated_at": "2024-09-11 10:48:13",
+        "deleted_at": null,
+        "local_id": "81d8937e-475b-45c5-99f7-9018639b4008"
+      },
+      {
+        "id": 1,
+        "name": "Name 200",
+        "position": "35.00000",
+        "created_at": "2024-01-03 20:26:14",
+        "updated_at": "2024-09-11 10:48:13",
+        "deleted_at": null,
+        "local_id": "28a87aae-d431-405d-8632-08800bd76286"
+      },
+      {
+        "id": 4,
+        "name": "Name 201",
+        "position": "45.00000",
+        "created_at": "2024-09-11 13:39:11",
+        "updated_at": "2024-09-11 13:39:11",
+        "deleted_at": null,
+        "local_id": "4d7e352f-dde0-4127-b9c8-18c7cbbf5b68"
+      },
+      {
+        "id": 8,
+        "name": "Name 202",
+        "position": "55.00000",
+        "created_at": "2024-09-11 16:36:14",
+        "updated_at": "2024-09-11 16:36:14",
+        "deleted_at": null,
+        "local_id": "3cbbfa50-9d1e-4e4c-adfb-e5394f8d5bfa"
+      },
+      {
+        "id": 9,
+        "name": "Name 203",
+        "position": "65.00000",
+        "created_at": "2024-09-11 16:36:19",
+        "updated_at": "2024-09-11 16:36:19",
+        "deleted_at": null,
+        "local_id": "1d2e46a0-c22d-4263-8e43-f287af15a8a8"
+      },
+      {
+        "id": 10,
+        "name": "Name 204",
+        "position": "75.00000",
+        "created_at": "2024-09-12 12:24:01",
+        "updated_at": "2024-09-12 12:24:01",
+        "deleted_at": null,
+        "local_id": "14487549-120d-4e02-a9e1-9d1a98e8f98b"
+      },
+      {
+        "id": 11,
+        "name": "Name 205",
+        "position": "85.00000",
+        "created_at": "2024-10-05 16:56:44",
+        "updated_at": "2024-10-05 16:56:44",
+        "deleted_at": null,
+        "local_id": "2a5eb563-dd77-4cc1-af7b-a34835b11965"
+      },
+      {
+        "id": 12,
+        "name": "Name 206",
+        "position": "95.00000",
+        "created_at": "2024-10-06 08:33:56",
+        "updated_at": "2024-10-06 08:33:56",
+        "deleted_at": null,
+        "local_id": "c642f682-7261-4564-be0c-5d5c6e6f6cea"
+      },
+      {
+        "id": 13,
+        "name": "Name 207",
+        "position": "105.00000",
+        "created_at": "2024-12-06 16:06:04",
+        "updated_at": "2024-12-06 16:06:04",
+        "deleted_at": null,
+        "local_id": "c3f0750a-3d3a-4f87-81ba-42c46b7cae7f"
+      },
+      {
+        "id": 14,
+        "name": "Name 208",
+        "position": "115.00000",
+        "created_at": "2024-04-26 10:37:08",
+        "updated_at": "2024-04-26 10:37:08",
+        "deleted_at": null,
+        "local_id": "b67271d8-2b44-46b5-a6a0-65428296431f"
+      },
+      {
+        "id": 15,
+        "name": "Name 209",
+        "position": "125.00000",
+        "created_at": "2024-06-11 19:01:40",
+        "updated_at": "2024-06-11 19:01:40",
+        "deleted_at": null,
+        "local_id": "e98c2935-628b-47c8-960e-4ec6e8820fa8"
+      },
+      {
+        "id": 16,
+        "name": "Name 210",
+        "position": "135.00000",
+        "created_at": "2024-11-01 11:49:52",
+        "updated_at": "2024-11-01 11:49:52",
+        "deleted_at": null,
+        "local_id": "46b5628f-0e0e-49e4-acca-1d16dde8d272"
+      },
+      {
+        "id": 17,
+        "name": "Name 211",
+        "position": "145.00000",
+        "created_at": "2024-11-04 17:06:54",
+        "updated_at": "2024-11-04 17:06:54",
+        "deleted_at": null,
+        "local_id": "bcce3e42-f851-49f0-9106-a8e795a9145c"
+      },
+      {
+        "id": 18,
+        "name": "Name 212",
+        "position": "155.00000",
+        "created_at": "2024-12-12 16:16:35",
+        "updated_at": "2024-12-12 16:16:35",
+        "deleted_at": null,
+        "local_id": "5e529420-b859-4e6c-b0ec-84c6de52b855"
+      },
+      {
+        "id": 19,
+        "name": "Name 213",
+        "position": "165.00000",
+        "created_at": "2024-12-24 11:42:28",
+        "updated_at": "2024-12-24 11:42:28",
+        "deleted_at": null,
+        "local_id": "aa6aa4c0-48a7-4750-8784-b21a25a27181"
+      },
+      {
+        "id": 20,
+        "name": "Name 214",
+        "position": "175.00000",
+        "created_at": "2024-06-24 11:07:34",
+        "updated_at": null,
+        "deleted_at": null,
+        "local_id": "418ba247-7c1e-4e08-8090-3cba26fa2890"
+      },
+      {
+        "id": 21,
+        "name": "Name 215",
+        "position": "185.00000",
+        "created_at": "2024-09-08 11:51:29",
+        "updated_at": "2024-09-08 11:51:29",
+        "deleted_at": null,
+        "local_id": "9caac748-1790-4f9a-b33b-8876122cbaa1"
+      }
+    ]
+  },
+  "message": "Produk berhasil diambil",
+  "time": 0
+}

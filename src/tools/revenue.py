@@ -49,183 +49,76 @@ Returns Net Sales and Gross Sales with Indonesian business terminology.""",
             }
         ),
         Tool(
-            name="outstanding_receivables",
-            description="""Get list of unpaid and partially paid invoices (piutang).
-
-Shows all invoices with outstanding payments:
-- Status 1 (Belum Dibayar / Unpaid)
-- Status 2 (Dibayar Sebagian / Partially Paid)
-
-Groups by status and shows:
-- Customer names
-- Invoice numbers
-- Outstanding amounts
-- Days overdue
-
-Perfect for answering:
-- "Siapa yang belum bayar?"
-- "Invoice yang belum dibayar"
-- "Total piutang"
-- "Outstanding receivables"
-
-Sorted by amount due (largest first).""",
+            name="revenue_receivables",
+            description=(
+                "Get outstanding receivables (piutang) data. "
+                "Use view='list' for all unpaid/partially-paid invoices (siapa yang belum bayar), "
+                "view='aging' for overdue buckets and DSO (0-30/30-60/60-90/90+ days), "
+                "view='concentration' for customer concentration Pareto analysis (80/20 risk). "
+                "Indonesian: 'piutang', 'invoice belum dibayar', 'overdue', 'customer terbesar'"
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
+                    "view": {
+                        "type": "string",
+                        "enum": ["list", "aging", "concentration"],
+                        "description": "'list' = unpaid invoices, 'aging' = overdue buckets by age, 'concentration' = Pareto/80-20 analysis"
+                    },
+                    "date_from": {
+                        "type": "string",
+                        "description": "Start date (required for 'concentration' view). YYYY-MM-DD or shortcuts."
+                    },
+                    "date_to": {
+                        "type": "string",
+                        "description": "End date (YYYY-MM-DD). Optional if using shortcuts."
+                    },
                     "status_id": {
                         "type": "integer",
-                        "description": "Filter by status: 1=Unpaid, 2=Partially Paid. Leave empty for both."
+                        "description": "For view='list': filter by status 1=Unpaid, 2=Partially Paid. Leave empty for both."
                     },
                     "min_amount": {
                         "type": "number",
-                        "description": "Show only invoices with due amount >= this value"
+                        "description": "For view='list': show only invoices with due amount >= this value"
+                    },
+                    "min_days": {
+                        "type": "integer",
+                        "description": "For view='aging': show only invoices at least this many days old (default: 0)"
                     }
                 },
-                "required": []
+                "required": ["view"]
             }
         ),
         Tool(
-            name="customer_revenue_ranking",
-            description="""Get top customers by revenue for a time period.
-
-Shows customer ranking with:
-- Net Sales (Penjualan Neto) and Gross Sales (Penjualan Bruto)
-- Number of invoices
-- Average invoice value
-- Company name (if available)
-
-**IMPORTANT:** Only counts PAID invoices (status_id=3 / Lunas)
-
-Perfect for answering:
-- "Siapa customer terbesar bulan ini?"
-- "Who are our top customers?"
-- "Customer dengan revenue tertinggi"
-
-Sorted by Net Sales (highest first).""",
+            name="revenue_ranking",
+            description=(
+                "Get revenue ranking by customer or daily breakdown. "
+                "Use group_by='customer' for top customers by paid revenue (siapa customer terbesar), "
+                "group_by='day' for daily revenue trends (revenue per hari). "
+                "Indonesian: 'ranking customer', 'revenue harian', 'hari mana paling besar'"
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
+                    "group_by": {
+                        "type": "string",
+                        "enum": ["customer", "day"],
+                        "description": "'customer' = top customers ranked by revenue, 'day' = daily breakdown with trends"
+                    },
                     "date_from": {
                         "type": "string",
-                        "description": "Start date (YYYY-MM-DD or shortcuts)"
+                        "description": "Start date (YYYY-MM-DD or shortcuts like 'this_month', 'last_month')"
                     },
                     "date_to": {
                         "type": "string",
-                        "description": "End date (YYYY-MM-DD)"
+                        "description": "End date (YYYY-MM-DD). Optional if using shortcuts."
                     },
                     "limit": {
                         "type": "integer",
-                        "description": "Number of top customers to show (default: 10)"
+                        "description": "For group_by='customer': number of top customers to show (default: 10)"
                     }
                 },
-                "required": ["date_from"]
-            }
-        ),
-        Tool(
-            name="revenue_daily_breakdown",
-            description="""Get daily revenue breakdown for a period.
-
-Shows revenue trends by day:
-- Daily Net Sales (Penjualan Neto)
-- Daily Tax Collected
-- Daily Gross Sales
-- Running totals
-- Day-over-day trends
-
-**IMPORTANT:** Only counts PAID invoices (status_id=3 / Lunas)
-
-Perfect for answering:
-- "Berapa revenue kemarin?"
-- "What was yesterday's revenue?"
-- "Daily trends for this month?"
-- "Which days had highest sales?"
-
-Returns daily breakdown with detailed analytics.""",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "date_from": {
-                        "type": "string",
-                        "description": "Start date (YYYY-MM-DD or shortcuts like 'this_month', 'last_7_days')"
-                    },
-                    "date_to": {
-                        "type": "string",
-                        "description": "End date (YYYY-MM-DD). Optional if using shortcuts."
-                    }
-                },
-                "required": ["date_from"]
-            }
-        ),
-        Tool(
-            name="outstanding_aging_report",
-            description="""Get outstanding invoices grouped by age (aging report).
-
-Shows unpaid/partially paid invoices in age buckets:
-- 0-30 days (Fresh / Current)
-- 30-60 days (Aging)
-- 60-90 days (Overdue)
-- 90+ days (CRITICAL - Way Overdue)
-
-Includes:
-- Days Sales Outstanding (DSO)
-- Priority list for collections
-- Total by bucket
-- Customer information
-
-Perfect for answering:
-- "Siapa yang overdue?"
-- "Who owes us money that's urgent?"
-- "Collections priority list"
-- "Days Sales Outstanding"
-
-Sorted by age (oldest first).""",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "min_days": {
-                        "type": "integer",
-                        "description": "Show only invoices at least this many days old (default: 0)"
-                    }
-                },
-                "required": []
-            }
-        ),
-        Tool(
-            name="customer_concentration_report",
-            description="""Get customer concentration analysis (80/20 Pareto analysis).
-
-Shows business risk assessment:
-- Percentage of revenue from top N customers
-- 80/20 Pareto breakdown
-- Concentration risk level (Green/Amber/Red)
-- Diversification metrics
-- Customer dependency analysis
-
-**IMPORTANT:** Only counts PAID invoices (status_id=3 / Lunas)
-
-Perfect for answering:
-- "What % of revenue is from top customers?"
-- "Are we too dependent on few customers?"
-- "Business risk assessment"
-- "Customer diversification status"
-
-Risk Levels:
-- GREEN: < 40% from top 5 (Healthy diversification)
-- AMBER: 40-60% from top 5 (Moderate concentration)
-- RED: > 60% from top 5 (High risk - needs diversification)""",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "date_from": {
-                        "type": "string",
-                        "description": "Start date (YYYY-MM-DD or shortcuts)"
-                    },
-                    "date_to": {
-                        "type": "string",
-                        "description": "End date (YYYY-MM-DD). Optional if using shortcuts."
-                    }
-                },
-                "required": ["date_from"]
+                "required": ["group_by", "date_from"]
             }
         )
     ]
@@ -235,6 +128,21 @@ async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClie
     """Handle revenue tool calls."""
     if name == "revenue_summary":
         return await _revenue_summary(arguments, client)
+    elif name == "revenue_receivables":
+        view = arguments.get("view", "list")
+        if view == "aging":
+            return await _outstanding_aging_report(arguments, client)
+        elif view == "concentration":
+            return await _customer_concentration_report(arguments, client)
+        else:
+            return await _outstanding_receivables(arguments, client)
+    elif name == "revenue_ranking":
+        group_by = arguments.get("group_by", "customer")
+        if group_by == "day":
+            return await _revenue_daily_breakdown(arguments, client)
+        else:
+            return await _customer_revenue_ranking(arguments, client)
+    # Backward compatibility: old tool names
     elif name == "outstanding_receivables":
         return await _outstanding_receivables(arguments, client)
     elif name == "customer_revenue_ranking":

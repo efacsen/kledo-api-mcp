@@ -1,0 +1,15 @@
+[run]
+source = src
+omit =
+    # Pure Pydantic data models — no logic to test
+    src/entities/models/*.py
+    src/entities/__init__.py
+    src/entities/loader.py
+    src/models/__init__.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
+    raise NotImplementedError
+    \.\.\.

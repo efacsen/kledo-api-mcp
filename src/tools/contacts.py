@@ -34,31 +34,26 @@ def get_tools() -> list[Tool]:
             }
         ),
         Tool(
-            name="contact_get_detail",
-            description="Get detailed information about a specific contact/customer/vendor.",
+            name="contact_get",
+            description=(
+                "Get contact details or transaction history for a specific contact/customer/vendor. "
+                "Use view='detail' for contact info, view='transactions' for invoice/payment history. "
+                "Indonesian: 'detail customer', 'riwayat transaksi customer'"
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
                     "contact_id": {
                         "type": "integer",
                         "description": "Contact ID"
+                    },
+                    "view": {
+                        "type": "string",
+                        "enum": ["detail", "transactions"],
+                        "description": "'detail' = contact profile, 'transactions' = invoice and payment history"
                     }
                 },
-                "required": ["contact_id"]
-            }
-        ),
-        Tool(
-            name="contact_get_transactions",
-            description="Get transaction history for a contact (invoices, payments, etc.).",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "contact_id": {
-                        "type": "integer",
-                        "description": "Contact ID"
-                    }
-                },
-                "required": ["contact_id"]
+                "required": ["contact_id", "view"]
             }
         )
     ]
@@ -68,6 +63,13 @@ async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClie
     """Handle contact tool calls."""
     if name == "contact_list":
         return await _list_contacts(arguments, client)
+    elif name == "contact_get":
+        view = arguments.get("view", "detail")
+        if view == "transactions":
+            return await _get_contact_transactions(arguments, client)
+        else:
+            return await _get_contact_detail(arguments, client)
+    # Backward compatibility
     elif name == "contact_get_detail":
         return await _get_contact_detail(arguments, client)
     elif name == "contact_get_transactions":

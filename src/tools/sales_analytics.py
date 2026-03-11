@@ -17,7 +17,7 @@ def get_tools() -> list[Tool]:
     """Get list of sales analytics tools."""
     return [
         Tool(
-            name="sales_rep_revenue_report",
+            name="sales_rep_report",
             description="""Calculate sales representative revenue and performance analysis.
 
 **IMPORTANT:** Only counts PAID invoices (status_id=3 / Lunas).
@@ -106,10 +106,13 @@ Use this to find sales_rep_id for filtering in sales_rep_revenue_report.""",
 async def handle_tool(name: str, arguments: dict[str, Any], client: KledoAPIClient) -> str:
     """Handle sales analytics tool calls."""
 
-    if name == "sales_rep_revenue_report":
+    if name == "sales_rep_report":
         return await _sales_rep_revenue_report(client, arguments)
     elif name == "sales_rep_list":
         return await _sales_rep_list(client, arguments)
+    # Backward compatibility
+    elif name == "sales_rep_revenue_report":
+        return await _sales_rep_revenue_report(client, arguments)
     else:
         return f"Unknown tool: {name}"
 

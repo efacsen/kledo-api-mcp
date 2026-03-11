@@ -1,0 +1,279 @@
+{
+  "success": true,
+  "data": {
+    "id": 24,
+    "name": "Name 171",
+    "company": "PT. CEPAT SERVICE STATION",
+    "address": null,
+    "email": null,
+    "phone": null,
+    "type_id": 2,
+    "deleted_at": null,
+    "shipping_address": null,
+    "receivable_account_id": 21,
+    "payable_account_id": 81,
+    "group_id": 7,
+    "npwp": null,
+    "is_archive": 0,
+    "country_id": 1,
+    "province_id": null,
+    "city_id": null,
+    "district_id": null,
+    "village_id": null,
+    "secondary_phone": null,
+    "fax": null,
+    "ref_number": null,
+    "birthday": "2024-11-21",
+    "max_payable": null,
+    "max_receivable": null,
+    "taxable": 1,
+    "photo": null,
+    "id_card_type_id": null,
+    "id_card_number": null,
+    "description": null,
+    "salutation_id": 2,
+    "receivable": {
+      "current_page": 1,
+      "data": [],
+      "first_page_url": "https://example.com",
+      "from": null,
+      "last_page": 1,
+      "last_page_url": "https://example.com",
+      "links": [
+        {
+          "url": null,
+          "label": "&laquo; Sebelumnya",
+          "page": null,
+          "active": false
+        },
+        {
+          "url": "https://example.com",
+          "label": "1",
+          "page": 1,
+          "active": true
+        },
+        {
+          "url": null,
+          "label": "Selanjutnya &raquo;",
+          "page": null,
+          "active": false
+        }
+      ],
+      "next_page_url": null,
+      "path": "https://example.com",
+      "per_page": 15,
+      "prev_page_url": null,
+      "to": null,
+      "total": 0,
+      "print_url_transaction": "Jl. Generic No. 1, Jakarta"
+    },
+    "payable": {
+      "current_page": 1,
+      "data": [],
+      "first_page_url": "https://example.com",
+      "from": null,
+      "last_page": 1,
+      "last_page_url": "https://example.com",
+      "links": [
+        {
+          "url": null,
+          "label": "&laquo; Sebelumnya",
+          "page": null,
+          "active": false
+        },
+        {
+          "url": "https://example.com",
+          "label": "1",
+          "page": 1,
+          "active": true
+        },
+        {
+          "url": null,
+          "label": "Selanjutnya &raquo;",
+          "page": null,
+          "active": false
+        }
+      ],
+      "next_page_url": null,
+      "path": "https://example.com",
+      "per_page": 15,
+      "prev_page_url": null,
+      "to": null,
+      "total": 0,
+      "print_url_transaction": "Jl. Generic No. 1, Jakarta"
+    },
+    "local_id": "703333a2-d7d5-4d39-b0ce-3f6c4ad05d4e",
+    "finance_term_id": null,
+    "notes": null,
+    "sales_id": null,
+    "opening_hour": null,
+    "closing_hour": null,
+    "latitude": null,
+    "longitude": null,
+    "type_ids": [
+      2
+    ],
+    "edit_address": null,
+    "group": {
+      "id": 7,
+      "code": null,
+      "name": "Name 172",
+      "is_active": true,
+      "local_id": "241e3355-aa29-4a19-b371-0844b436c7d9"
+    },
+    "bank_accounts": [],
+    "receivable_account": {
+      "id": 21,
+      "name": "Name 173",
+      "name_en": "Account Receivable",
+      "name_id": "Piutang Usaha",
+      "ref_code": "021-0000000",
+      "currency_id": null,
+      "parent_id": null,
+      "is_parent": 0
+    },
+    "payable_account": {
+      "id": 81,
+      "name": "Name 174",
+      "name_en": "Trade Payable",
+      "name_id": "Hutang Usaha",
+      "ref_code": "021-0000000",
+      "currency_id": null,
+      "parent_id": null,
+      "is_parent": 0
+    },
+    "term": null,
+    "address_full": "",
+    "is_deletable": false,
+    "is_type_editable": false,
+    "is_as_employee": false,
+    "finance_contact_emails": [],
+    "required_type_ids": [],
+    "transactions": {
+      "current_page": 1,
+      "data": [
+        {
+          "id": 1179,
+          "bank_account_id": 1457,
+          "trans_date": "2024-05-21",
+          "due_date": null,
+          "ref_number": null,
+          "trans_type_id": 15,
+          "desc": "Pembayaran biaya: Yadi EXP/24/MEI/00040",
+          "amount_after_tax": -300000,
+          "memo": "Sukabumi walden white",
+          "currency_id": 0,
+          "due": 0,
+          "trans_type": "Pembayaran Biaya"
+        },
+        {
+          "id": 1178,
+          "bank_account_id": null,
+          "trans_date": "2024-05-21",
+          "due_date": null,
+          "ref_number": "EXP/00/MEI/00000",
+          "trans_type_id": 1,
+          "desc": "",
+          "amount_after_tax": 300000,
+          "memo": "Sukabumi walden white",
+          "currency_id": 0,
+          "due": 0,
+          "trans_type": "Biaya"
+        },
+        {
+          "id": 775,
+          "bank_account_id": 1481,
+          "trans_date": "2024-11-11",
+          "due_date": null,
+          "ref_number": null,
+          "trans_type_id": 15,
+          "desc": "Pembayaran biaya: Yadi EXP/23/NOP/00009",
+          "amount_after_tax": -500000,
+          "memo": "Load-Unload Cat PT ACE, Dongjin 1",
+          "currency_id": 0,
+          "due": 0,
+          "trans_type": "Pembayaran Biaya"
+        },
+        {
+          "id": 774,
+          "bank_account_id": null,
+          "trans_date": "2024-11-11",
+          "due_date": null,
+          "ref_number": "EXP/00/NOP/00000",
+          "trans_type_id": 1,
+          "desc": "",
+          "amount_after_tax": 500000,
+          "memo": "Load-Unload Cat PT ACE, Dongjin 1",
+          "currency_id": 0,
+          "due": 0,
+          "trans_type": "Biaya"
+        }
+      ],
+      "first_page_url": "https://example.com",
+      "from": 1,
+      "last_page": 1,
+      "last_page_url": "https://example.com",
+      "links": [
+        {
+          "url": null,
+          "label": "&laquo; Sebelumnya",
+          "page": null,
+          "active": false
+        },
+        {
+          "url": "https://example.com",
+          "label": "1",
+          "page": 1,
+          "active": true
+        },
+        {
+          "url": null,
+          "label": "Selanjutnya &raquo;",
+          "page": null,
+          "active": false
+        }
+      ],
+      "next_page_url": null,
+      "path": "https://example.com",
+      "per_page": 15,
+      "prev_page_url": null,
+      "to": 4,
+      "total": 4,
+      "print_url_transaction": "Jl. Generic No. 1, Jakarta"
+    },
+    "receivable_account_editable": true,
+    "payable_account_editable": true,
+    "total": {
+      "receivable": 0,
+      "payable": 0,
+      "receivable_due": 0,
+      "payable_due": 0,
+      "payment_received": 0,
+      "payment_sent": 800000
+    },
+    "count": {
+      "receivable": 0,
+      "payable": 0,
+      "receivable_due": 0,
+      "payable_due": 0,
+      "payment_received": 0,
+      "payment_sent": 2
+    },
+    "province": null,
+    "country": {
+      "id": 1,
+      "name": "Name 175"
+    },
+    "city": null,
+    "district": null,
+    "village": null,
+    "id_card_type": null,
+    "next": 23,
+    "prev": 25,
+    "print_url_reporting_account": "Jl. Generic No. 1, Jakarta",
+    "photos": [],
+    "shipping_addresses": []
+  },
+  "message": "Kontak berhasil diambil",
+  "time": 0
+}

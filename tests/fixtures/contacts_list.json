@@ -1,0 +1,223 @@
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "company": "PT. CEPAT SERVICE STATION",
+        "description": null,
+        "finance_term_id": null,
+        "name": "Name 161",
+        "payable": "0.00000",
+        "receivable": "0.00000",
+        "id": 24,
+        "local_id": "703333a2-d7d5-4d39-b0ce-3f6c4ad05d4e",
+        "receivable_account_id": 21,
+        "payable_account_id": 81,
+        "is_archive": 0,
+        "type_id": 2,
+        "group_id": 7,
+        "type_ids": [
+          2
+        ],
+        "edit_address": null,
+        "group": {
+          "id": 7,
+          "code": null,
+          "name": "Name 162",
+          "is_active": true,
+          "local_id": "241e3355-aa29-4a19-b371-0844b436c7d9"
+        },
+        "term": null,
+        "finance_contact_emails": [],
+        "country": null,
+        "province": null,
+        "city": null,
+        "district": null,
+        "village": null
+      },
+      {
+        "company": "PT. CEPAT SERVICE STATION",
+        "description": null,
+        "finance_term_id": null,
+        "name": "Name 163",
+        "payable": "0.00000",
+        "receivable": "0.00000",
+        "id": 25,
+        "local_id": "54fe5640-663b-40d2-ae08-1d045a95776e",
+        "receivable_account_id": 21,
+        "payable_account_id": 81,
+        "is_archive": 0,
+        "type_id": 2,
+        "group_id": 7,
+        "type_ids": [
+          2
+        ],
+        "edit_address": null,
+        "group": {
+          "id": 7,
+          "code": null,
+          "name": "Name 164",
+          "is_active": true,
+          "local_id": "241e3355-aa29-4a19-b371-0844b436c7d9"
+        },
+        "term": null,
+        "finance_contact_emails": [],
+        "country": null,
+        "province": null,
+        "city": null,
+        "district": null,
+        "village": null
+      },
+      {
+        "company": "PT. CEPAT SERVICE STATION",
+        "description": null,
+        "finance_term_id": null,
+        "name": "Name 165",
+        "payable": "0.00000",
+        "receivable": "0.00000",
+        "id": 51,
+        "local_id": "ffafc691-b888-4ace-bebd-346140a35053",
+        "receivable_account_id": 21,
+        "payable_account_id": 81,
+        "is_archive": 0,
+        "type_id": 2,
+        "group_id": 8,
+        "type_ids": [
+          2
+        ],
+        "edit_address": null,
+        "group": {
+          "id": 8,
+          "code": null,
+          "name": "Name 166",
+          "is_active": true,
+          "local_id": "ffa4bda5-ee13-46c4-a240-2ccb85bccbc5"
+        },
+        "term": null,
+        "finance_contact_emails": [],
+        "country": null,
+        "province": null,
+        "city": null,
+        "district": null,
+        "village": null
+      },
+      {
+        "company": "PT. CEPAT SERVICE STATION",
+        "description": null,
+        "finance_term_id": null,
+        "name": "Name 167",
+        "payable": "0.00000",
+        "receivable": "0.00000",
+        "id": 58,
+        "local_id": "60648eb1-0257-45dc-91a6-de3f1d3e0058",
+        "receivable_account_id": 21,
+        "payable_account_id": 81,
+        "is_archive": 0,
+        "type_id": 2,
+        "group_id": 9,
+        "type_ids": [
+          2
+        ],
+        "edit_address": null,
+        "group": {
+          "id": 9,
+          "code": null,
+          "name": "Name 168",
+          "is_active": true,
+          "local_id": "901042e5-3590-4b2d-a4c5-038ce360fd4a"
+        },
+        "term": null,
+        "finance_contact_emails": [],
+        "country": null,
+        "province": null,
+        "city": null,
+        "district": null,
+        "village": null
+      },
+      {
+        "company": "PT. CEPAT SERVICE STATION",
+        "description": null,
+        "finance_term_id": null,
+        "name": "Name 169",
+        "payable": "0.00000",
+        "receivable": "50000000.00000",
+        "id": 60,
+        "local_id": "df716c1a-3c47-461b-9e3f-fd7a883df90a",
+        "receivable_account_id": 1460,
+        "payable_account_id": 1461,
+        "is_archive": 0,
+        "type_id": 2,
+        "group_id": 5,
+        "type_ids": [
+          2
+        ],
+        "edit_address": null,
+        "group": {
+          "id": 5,
+          "code": null,
+          "name": "Name 170",
+          "is_active": true,
+          "local_id": "4b316f80-31c9-40ad-aad6-92a9be74c44f"
+        },
+        "term": null,
+        "finance_contact_emails": [],
+        "country": null,
+        "province": null,
+        "city": null,
+        "district": null,
+        "village": null
+      }
+    ],
+    "first_page_url": "https://example.com",
+    "from": 1,
+    "last_page": 4,
+    "last_page_url": "https://example.com",
+    "links": [
+      {
+        "url": null,
+        "label": "&laquo; Sebelumnya",
+        "page": null,
+        "active": false
+      },
+      {
+        "url": "https://example.com",
+        "label": "1",
+        "page": 1,
+        "active": true
+      },
+      {
+        "url": "https://example.com",
+        "label": "2",
+        "page": 2,
+        "active": false
+      },
+      {
+        "url": "https://example.com",
+        "label": "3",
+        "page": 3,
+        "active": false
+      },
+      {
+        "url": "https://example.com",
+        "label": "4",
+        "page": 4,
+        "active": false
+      },
+      {
+        "url": "https://example.com",
+        "label": "Selanjutnya &raquo;",
+        "page": 2,
+        "active": false
+      }
+    ],
+    "next_page_url": "https://example.com",
+    "path": "https://example.com",
+    "per_page": 5,
+    "prev_page_url": null,
+    "to": 5,
+    "total": 17
+  },
+  "message": "Kontak berhasil diambil",
+  "time": 0
+}

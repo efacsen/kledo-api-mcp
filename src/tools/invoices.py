@@ -244,33 +244,47 @@ def get_tools() -> list[Tool]:
     """Get list of invoice tools."""
     return [
         Tool(
-            name="invoice_list_sales",
-            description="""List sales invoices with optional filtering.
+            name="invoice_list",
+            description="""List invoices with optional filtering. Supports both sales and purchase invoices.
 
+**For sales invoices (type="sales"):**
 Shows invoice details including Net Sales (Penjualan Neto), Gross Sales (Penjualan Bruto), payment status, and customer info.
-
 Displays company name prominently for B2B customers (e.g., 'PT Nippon Paint Indonesia (Darma)').
-
 Supports due date filtering and overdue analysis with aging buckets.
+Status codes: 1=Belum Dibayar (Unpaid), 2=Dibayar Sebagian (Partial), 3=Lunas (Paid - use for revenue)
 
-Status codes (VERIFIED):
-- 1 = Belum Dibayar (Unpaid)
-- 2 = Dibayar Sebagian (Partially Paid)
-- 3 = Lunas (Fully Paid) - Use this for revenue calculation""",
+**For purchase invoices (type="purchase"):**
+Displays vendor company name prominently for B2B vendors.
+Supports filtering by due date range, overdue threshold, vendor name with fuzzy matching, minimum outstanding amount per vendor.
+Aging buckets for overdue invoices (1-30, 31-60, 60+ days).
+Status codes: 1=Belum Dibayar (Unpaid), 3=Lunas (Paid)""",
             inputSchema={
                 "type": "object",
                 "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": ["sales", "purchase"],
+                        "description": "Invoice type: 'sales' for customer invoices, 'purchase' for vendor bills"
+                    },
                     "search": {
                         "type": "string",
-                        "description": "Search invoice number, customer name, or company name. Supports fuzzy search for both invoice numbers (e.g., '1153' → 'INV/26/JAN/01153') and company names (e.g., 'CoatingCo' → 'PT Nippon Paint Indonesia')"
+                        "description": "Search invoice number, customer/vendor name, or company name. Supports fuzzy search for both invoice numbers (e.g., '1153' → 'INV/26/JAN/01153') and company names (e.g., 'CoatingCo' → 'PT Nippon Paint Indonesia')"
+                    },
+                    "vendor_name": {
+                        "type": "string",
+                        "description": "(Purchase only) Filter by vendor name using fuzzy matching (e.g., 'Nippon', 'CoatingCo'). Resolves to vendor contact_id automatically."
                     },
                     "contact_id": {
                         "type": "integer",
-                        "description": "Filter by customer ID"
+                        "description": "Filter by customer ID (sales) or vendor ID (purchase)"
+                    },
+                    "min_outstanding": {
+                        "type": "number",
+                        "description": "(Purchase only) Minimum total outstanding amount per vendor (IDR). E.g., 10000000 for '10 juta'. Applied after vendor aggregation."
                     },
                     "status_id": {
                         "type": "integer",
-                        "description": "Filter by status: 1=Belum Dibayar (Unpaid), 2=Dibayar Sebagian (Partial), 3=Lunas (Paid)"
+                        "description": "Filter by status: 1=Unpaid, 2=Partial (sales only), 3=Paid"
                     },
                     "date_from": {
                         "type": "string",
@@ -282,7 +296,7 @@ Status codes (VERIFIED):
                     },
                     "due_date_from": {
                         "type": "string",
-                        "description": "Start date for due_date filter (YYYY-MM-DD or Indonesian phrase like 'minggu ini', 'bulan lalu'). Use for 'jatuh tempo' queries."
+                        "description": "Start date for due_date filter (YYYY-MM-DD or Indonesian phrase like 'minggu ini', 'bulan lalu')"
                     },
                     "due_date_to": {
                         "type": "string",
@@ -290,11 +304,11 @@ Status codes (VERIFIED):
                     },
                     "overdue_days": {
                         "type": "integer",
-                        "description": "Filter invoices overdue by at least this many days. E.g., 30 for 'telat lebih dari 30 hari'. Use 0 for any overdue invoice."
+                        "description": "Filter invoices overdue by at least this many days. E.g., 30 for 'telat >30 hari'. Use 0 for any overdue."
                     },
                     "overdue_only": {
                         "type": "boolean",
-                        "description": "If true, show only overdue invoices (due_date < today Jakarta time). Shortcut for overdue_days=0."
+                        "description": "If true, show only overdue invoices (due_date < today Jakarta time)"
                     },
                     "per_page": {
                         "type": "integer",
@@ -302,14 +316,14 @@ Status codes (VERIFIED):
                     },
                     "invoice_selection": {
                         "type": "string",
-                        "description": "When fuzzy search returns multiple matches, use this to select invoice(s). Supports: single number ('1'), multiple ('1,2,3'), range ('1-5'), or 'all' for all matches, 'summary' for aggregate only."
+                        "description": "(Sales only) When fuzzy search returns multiple matches: single number ('1'), multiple ('1,2,3'), range ('1-5'), 'all', or 'summary'"
                     }
                 },
-                "required": []
+                "required": ["type"]
             }
         ),
         Tool(
-            name="invoice_get_detail",
+            name="invoice_get",
             description="Get detailed information about a specific invoice including line items.",
             inputSchema={
                 "type": "object",
@@ -323,168 +337,43 @@ Status codes (VERIFIED):
             }
         ),
         Tool(
-            name="invoice_get_totals",
-            description="Get summary totals for sales invoices (total outstanding, paid, overdue, etc.).",
+            name="invoice_summarize",
+            description="""Get invoice summary with different views: totals, by customer, or by vendor.
+
+**view="totals"**: Summary totals for sales invoices (total outstanding, paid, overdue, etc.)
+**view="by_customer"**: Outstanding amounts grouped by customer. Shows which customers owe money with totals and individual invoices. Default sort: highest outstanding first. Top 10. Uses type_id=3 (Customer).
+**view="by_vendor"**: Outstanding amounts grouped by vendor (supplier). Shows which vendors we owe money to. Default sort: highest outstanding first. Top 10. Uses type_id=1 (Vendor).""",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "date_from": {
+                    "view": {
                         "type": "string",
-                        "description": "Start date filter"
-                    },
-                    "date_to": {
-                        "type": "string",
-                        "description": "End date filter"
-                    }
-                },
-                "required": []
-            }
-        ),
-        Tool(
-            name="invoice_list_purchase",
-            description="""List purchase invoices (bills from vendors) with optional filtering.
-
-Displays vendor company name prominently for B2B vendors.
-
-Supports filtering:
-- Due date range (e.g., "purchase invoice yang jatuh tempo minggu ini")
-- Overdue threshold (e.g., "purchase invoice yang telat lebih dari 30 hari")
-- Vendor name with fuzzy matching (e.g., "purchase invoice dari vendor Nippon")
-- Minimum outstanding amount per vendor (e.g., "vendor dengan outstanding diatas 10 juta")
-- Aging buckets for overdue invoices (1-30, 31-60, 60+ days)
-
-Status codes: 1=Belum Dibayar (Unpaid), 3=Lunas (Paid)""",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "search": {
-                        "type": "string",
-                        "description": "Search term for vendor name or company name. Supports fuzzy matching (e.g., 'CoatingCo' → 'PT Nippon Paint Indonesia')"
-                    },
-                    "vendor_name": {
-                        "type": "string",
-                        "description": "Filter by vendor name using fuzzy matching (e.g., 'Nippon', 'CoatingCo'). Resolves to vendor contact_id automatically. If multiple vendors match, returns disambiguation list."
-                    },
-                    "contact_id": {
-                        "type": "integer",
-                        "description": "Filter by vendor ID"
+                        "enum": ["totals", "by_customer", "by_vendor"],
+                        "description": "Summary view: 'totals' for overall totals, 'by_customer' for customer grouping, 'by_vendor' for vendor grouping"
                     },
                     "min_outstanding": {
                         "type": "number",
-                        "description": "Minimum total outstanding amount per vendor. Only returns vendors with total outstanding >= this amount. Amount is in IDR (e.g., 10000000 for 10 juta). Applied AFTER vendor-level aggregation."
-                    },
-                    "status_id": {
-                        "type": "integer",
-                        "description": "Filter by status: 1=Belum Dibayar (Unpaid), 3=Lunas (Paid)"
-                    },
-                    "date_from": {
-                        "type": "string",
-                        "description": "Start date for invoice date filter (YYYY-MM-DD or 'last_month', 'this_month', etc.)"
-                    },
-                    "date_to": {
-                        "type": "string",
-                        "description": "End date for invoice date filter (YYYY-MM-DD)"
-                    },
-                    "due_date_from": {
-                        "type": "string",
-                        "description": "Start date for due_date filter (YYYY-MM-DD or Indonesian phrase like 'minggu ini', 'bulan lalu'). Use for 'jatuh tempo' queries."
-                    },
-                    "due_date_to": {
-                        "type": "string",
-                        "description": "End date for due_date filter (YYYY-MM-DD or Indonesian phrase)"
+                        "description": "(by_customer/by_vendor only) Minimum total outstanding (IDR). Applied after grouping."
                     },
                     "overdue_days": {
                         "type": "integer",
-                        "description": "Filter purchase invoices overdue by at least this many days. E.g., 30 for 'telat lebih dari 30 hari'. Use 0 for any overdue invoice."
-                    },
-                    "overdue_only": {
-                        "type": "boolean",
-                        "description": "If true, show only overdue purchase invoices (due_date < today Jakarta time). Shortcut for overdue_days=0."
-                    },
-                    "per_page": {
-                        "type": "integer",
-                        "description": "Results per page (default: 50, max: 100)"
-                    }
-                },
-                "required": []
-            }
-        ),
-        Tool(
-            name="outstanding_by_customer",
-            description="""Get outstanding amounts grouped by customer.
-
-Shows which customers owe money, with totals per customer and individual invoice details.
-Each invoice shows age in days overdue (e.g., "45 hari overdue") using Jakarta timezone.
-
-Default sort: highest outstanding first. Capped at top 10 for readability.
-Supports filtering by minimum outstanding amount and overdue threshold.
-
-Contact type: Uses type_id=3 (Customer/pelanggan) from Kledo contacts.""",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "min_outstanding": {
-                        "type": "number",
-                        "description": "Minimum total outstanding per customer (IDR). Applied AFTER grouping (HAVING semantics). E.g., 10000000 for '>10 juta'."
-                    },
-                    "overdue_days": {
-                        "type": "integer",
-                        "description": "Only include invoices overdue by at least this many days. E.g., 30 for '>30 hari overdue'. Applied BEFORE grouping (WHERE semantics)."
+                        "description": "(by_customer/by_vendor only) Only include invoices overdue by at least this many days. Applied before grouping."
                     },
                     "sort_by": {
                         "type": "string",
                         "enum": ["amount", "count", "overdue"],
-                        "description": "Sort results by: 'amount' (total outstanding, default), 'count' (invoice count), 'overdue' (max overdue days)"
+                        "description": "(by_customer/by_vendor only) Sort by: 'amount' (outstanding, default), 'count' (invoice count), 'overdue' (max overdue days)"
                     },
                     "date_from": {
                         "type": "string",
-                        "description": "Start date filter for invoice date (YYYY-MM-DD or 'last_month', 'this_month')"
+                        "description": "Start date filter (YYYY-MM-DD or 'last_month', 'this_month')"
                     },
                     "date_to": {
                         "type": "string",
-                        "description": "End date filter for invoice date (YYYY-MM-DD)"
+                        "description": "End date filter (YYYY-MM-DD)"
                     }
                 },
-                "required": []
-            }
-        ),
-        Tool(
-            name="outstanding_by_vendor",
-            description="""Get outstanding amounts grouped by vendor (supplier).
-
-Shows which vendors we owe money to, with totals per vendor and individual invoice details.
-Each invoice shows age in days overdue using Jakarta timezone.
-
-Default sort: highest outstanding first. Capped at top 10 for readability.
-Supports filtering by minimum outstanding amount and overdue threshold.
-
-Contact type: Uses type_id=1 (Vendor/pemasok) from Kledo contacts.""",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "min_outstanding": {
-                        "type": "number",
-                        "description": "Minimum total outstanding per vendor (IDR). Applied AFTER grouping (HAVING semantics). E.g., 5000000 for '>5 juta'."
-                    },
-                    "overdue_days": {
-                        "type": "integer",
-                        "description": "Only include invoices overdue by at least this many days. Applied BEFORE grouping (WHERE semantics)."
-                    },
-                    "sort_by": {
-                        "type": "string",
-                        "enum": ["amount", "count", "overdue"],
-                        "description": "Sort results by: 'amount' (total outstanding, default), 'count' (invoice count), 'overdue' (max overdue days)"
-                    },
-                    "date_from": {
-                        "type": "string",
-                        "description": "Start date filter for invoice date (YYYY-MM-DD or 'last_month', 'this_month')"
-                    },
-                    "date_to": {
-                        "type": "string",
-                        "description": "End date filter for invoice date (YYYY-MM-DD)"
-                    }
-                },
-                "required": []
+                "required": ["view"]
             }
         )
     ]
@@ -492,14 +381,40 @@ Contact type: Uses type_id=1 (Vendor/pemasok) from Kledo contacts.""",
 
 async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClient) -> str:
     """Handle invoice tool calls."""
-    if name == "invoice_list_sales":
+    # New consolidated tools
+    if name == "invoice_list":
+        invoice_type = arguments.get("type")
+        if not invoice_type:
+            return "Error: type parameter is required. Must be 'sales' or 'purchase'."
+        if invoice_type == "sales":
+            return await _list_sales_invoices(arguments, client)
+        elif invoice_type == "purchase":
+            return await _list_purchase_invoices(arguments, client)
+        else:
+            return f"Error: Invalid type '{invoice_type}'. Must be 'sales' or 'purchase'."
+    elif name == "invoice_get":
+        return await _get_invoice_detail(arguments, client)
+    elif name == "invoice_summarize":
+        view = arguments.get("view")
+        if not view:
+            return "Error: view parameter is required. Must be 'totals', 'by_customer', or 'by_vendor'."
+        if view == "totals":
+            return await _get_invoice_totals(arguments, client)
+        elif view == "by_customer":
+            return await _outstanding_by_customer(arguments, client)
+        elif view == "by_vendor":
+            return await _outstanding_by_vendor(arguments, client)
+        else:
+            return f"Error: Invalid view '{view}'. Must be 'totals', 'by_customer', or 'by_vendor'."
+    # Backward compatibility: support old tool names
+    elif name == "invoice_list_sales":
         return await _list_sales_invoices(arguments, client)
+    elif name == "invoice_list_purchase":
+        return await _list_purchase_invoices(arguments, client)
     elif name == "invoice_get_detail":
         return await _get_invoice_detail(arguments, client)
     elif name == "invoice_get_totals":
         return await _get_invoice_totals(arguments, client)
-    elif name == "invoice_list_purchase":
-        return await _list_purchase_invoices(arguments, client)
     elif name == "outstanding_by_customer":
         return await _outstanding_by_customer(arguments, client)
     elif name == "outstanding_by_vendor":
@@ -974,19 +889,23 @@ async def _get_invoice_detail(args: Dict[str, Any], client: KledoAPIClient) -> s
 
         result = ["# Invoice Details\n"]
 
+        # Status mapping (consistent with list view)
+        status_map = {1: "Belum Dibayar (Unpaid)", 2: "Dibayar Sebagian (Partial)", 3: "Lunas (Paid)"}
+
         # Header info
-        result.append(f"**Invoice Number**: {safe_get(invoice, 'trans_number', 'N/A')}")
-        result.append(f"**Customer**: {safe_get(invoice, 'contact_name', 'Unknown')}")
+        result.append(f"**Invoice Number**: {safe_get(invoice, 'ref_number', 'N/A')}")
+        result.append(f"**Customer**: {format_customer_display(invoice)}")
         result.append(f"**Date**: {safe_get(invoice, 'trans_date', '')}")
         result.append(f"**Due Date**: {safe_get(invoice, 'due_date', '')}")
-        result.append(f"**Status**: {safe_get(invoice, 'status_name', 'Unknown')}\n")
+        status_id = safe_get(invoice, "status_id", 0)
+        result.append(f"**Status**: {status_map.get(status_id, f'Status-{status_id}')}\n")
 
         # Amounts
         subtotal = safe_get(invoice, "subtotal", 0)
-        tax = safe_get(invoice, "tax_amount", 0)
-        total = safe_get(invoice, "grand_total", 0)
-        paid = safe_get(invoice, "amount_paid", 0)
-        due = total - paid
+        tax = safe_get(invoice, "total_tax", 0)
+        total = safe_get(invoice, "amount_after_tax", 0)
+        due = safe_get(invoice, "due", 0)
+        paid = float(total) - float(due)
 
         result.append(f"**Subtotal**: {format_currency(subtotal)}")
         result.append(f"**Tax**: {format_currency(tax)}")
@@ -994,8 +913,8 @@ async def _get_invoice_detail(args: Dict[str, Any], client: KledoAPIClient) -> s
         result.append(f"**Paid**: {format_currency(paid)}")
         result.append(f"**Due**: {format_currency(due)}\n")
 
-        # Line items
-        items = safe_get(invoice, "detail", [])
+        # Line items (Kledo API returns "items" in detail responses; fall back to "detail")
+        items = safe_get(invoice, "items", []) or safe_get(invoice, "detail", [])
         if items:
             result.append("\n## Line Items:\n")
             for item in items:

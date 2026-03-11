@@ -34,31 +34,26 @@ def get_tools() -> list[Tool]:
             }
         ),
         Tool(
-            name="product_get_detail",
-            description="Get detailed information about a specific product including pricing and inventory.",
+            name="product_get",
+            description=(
+                "Get detailed product info by ID or by SKU/code. "
+                "Provide product_id to look up by database ID, or sku to look up by product code. "
+                "Returns pricing and inventory details. "
+                "Indonesian: 'detail produk', 'harga produk', 'cari produk by kode'"
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
                     "product_id": {
                         "type": "integer",
-                        "description": "Product ID"
-                    }
-                },
-                "required": ["product_id"]
-            }
-        ),
-        Tool(
-            name="product_search_by_sku",
-            description="Search for a product by its SKU/code and get current price.",
-            inputSchema={
-                "type": "object",
-                "properties": {
+                        "description": "Product ID (use this OR sku)"
+                    },
                     "sku": {
                         "type": "string",
-                        "description": "Product SKU/code"
+                        "description": "Product SKU/code (use this OR product_id)"
                     }
                 },
-                "required": ["sku"]
+                "required": []
             }
         )
     ]
@@ -68,6 +63,12 @@ async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClie
     """Handle product tool calls."""
     if name == "product_list":
         return await _list_products(arguments, client)
+    elif name == "product_get":
+        if arguments.get("sku"):
+            return await _search_by_sku(arguments, client)
+        else:
+            return await _get_product_detail(arguments, client)
+    # Backward compatibility
     elif name == "product_get_detail":
         return await _get_product_detail(arguments, client)
     elif name == "product_search_by_sku":

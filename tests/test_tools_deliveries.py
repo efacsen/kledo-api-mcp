@@ -16,13 +16,12 @@ class TestDeliveryTools:
         """Test get_tools returns correct tool definitions."""
         tools = deliveries.get_tools()
 
-        assert len(tools) == 3
+        assert len(tools) == 2
         assert all(isinstance(tool, Tool) for tool in tools)
 
         tool_names = [tool.name for tool in tools]
         assert "delivery_list" in tool_names
-        assert "delivery_get_detail" in tool_names
-        assert "delivery_get_pending" in tool_names
+        assert "delivery_get" in tool_names
 
     def test_tool_schemas(self):
         """Test that all tools have proper input schemas."""
@@ -41,18 +40,18 @@ class TestDeliveryTools:
             "data": {
                 "data": [
                     {
-                        "trans_number": "DEL-001",
-                        "contact_name": "Customer A",
+                        "ref_number": "DEL-001",
+                        "contact": {"name": "Customer A"},
                         "trans_date": "2024-10-15",
-                        "status_name": "Delivered",
-                        "shipping_company_name": "JNE"
+                        "status_id": 3,
+                        "shipping_company": {"name": "JNE"}
                     },
                     {
-                        "trans_number": "DEL-002",
-                        "contact_name": "Customer B",
+                        "ref_number": "DEL-002",
+                        "contact": {"name": "Customer B"},
                         "trans_date": "2024-10-16",
-                        "status_name": "In Transit",
-                        "shipping_company_name": "JNT"
+                        "status_id": 2,
+                        "shipping_company": {"name": "JNT"}
                     }
                 ]
             }
@@ -77,14 +76,13 @@ class TestDeliveryTools:
         mock_client.get = AsyncMock(return_value={
             "data": {
                 "data": {
-                    "trans_number": "DEL-123",
-                    "contact_name": "ABC Corp",
+                    "ref_number": "DEL-123",
+                    "contact": {"name": "ABC Corp"},
                     "trans_date": "2024-10-20",
-                    "status_name": "Delivered",
+                    "status_id": 3,
                     "shipping_company_name": "JNE Express",
                     "tracking_number": "JNE123456789",
                     "shipping_address": "Jl. Sudirman No. 123, Jakarta",
-                    "ref_number": "INV-456",
                     "memo": "Handle with care",
                     "detail": [
                         {
@@ -119,13 +117,13 @@ class TestDeliveryTools:
             "data": {
                 "data": [
                     {
-                        "trans_number": "DEL-001",
-                        "contact_name": "Customer X",
+                        "ref_number": "DEL-001",
+                        "contact": {"name": "Customer X"},
                         "trans_date": "2024-10-18"
                     },
                     {
-                        "trans_number": "DEL-002",
-                        "contact_name": "Customer Y",
+                        "ref_number": "DEL-002",
+                        "contact": {"name": "Customer Y"},
                         "trans_date": "2024-10-19"
                     }
                 ]
@@ -217,8 +215,8 @@ class TestDeliveryTools:
         mock_client = Mock(spec=KledoAPIClient)
         mock_client.get = AsyncMock(return_value={
             "data": {"data": [
-                {"trans_number": "DEL-100", "contact_name": "Test Customer",
-                 "trans_date": "2024-10-15", "status_name": "Delivered",
+                {"ref_number": "DEL-100", "contact": {"name": "Test Customer"},
+                 "trans_date": "2024-10-15", "status_id": 3,
                  "shipping_company_name": "JNE"}
             ]}
         })
@@ -237,8 +235,8 @@ class TestDeliveryTools:
         mock_client = Mock(spec=KledoAPIClient)
         mock_client.get = AsyncMock(return_value={
             "data": {"data": [
-                {"trans_number": "DEL-999", "contact_name": "ABC", "trans_date": "2024-10-20",
-                 "status_name": "Delivered", "shipping_company_name": "JNE"}
+                {"ref_number": "DEL-999", "contact": {"name": "ABC"}, "trans_date": "2024-10-20",
+                 "status_id": 3, "shipping_company_name": "JNE"}
             ]}
         })
 
@@ -254,8 +252,8 @@ class TestDeliveryTools:
     async def test_list_deliveries_limits_display(self):
         """Test that listing limits display to 20 deliveries."""
         mock_deliveries = [
-            {"trans_number": f"DEL-{i:03d}", "contact_name": f"Customer {i}",
-             "trans_date": "2024-10-01", "status_name": "Delivered",
+            {"ref_number": f"DEL-{i:03d}", "contact": {"name": f"Customer {i}"},
+             "trans_date": "2024-10-01", "status_id": 3,
              "shipping_company_name": "JNE"}
             for i in range(25)
         ]
@@ -277,14 +275,13 @@ class TestDeliveryTools:
         mock_client = Mock(spec=KledoAPIClient)
         mock_client.get = AsyncMock(return_value={
             "data": {"data": {
-                "trans_number": "DEL-FULL",
-                "contact_name": "Full Test",
+                "ref_number": "DEL-FULL",
+                "contact": {"name": "Full Test"},
                 "trans_date": "2024-10-20",
-                "status_name": "Delivered",
+                "status_id": 3,
                 "shipping_company_name": "Express Co",
                 "tracking_number": "TRACK123",
                 "shipping_address": "Full Address",
-                "ref_number": "REF-123",
                 "memo": "Test memo",
                 "detail": [{"desc": "Item 1", "qty": 1}]
             }}
@@ -296,7 +293,7 @@ class TestDeliveryTools:
             mock_client
         )
 
-        assert all(x in result for x in ["DEL-FULL", "TRACK123", "Full Address", "REF-123", "Test memo"])
+        assert all(x in result for x in ["DEL-FULL", "TRACK123", "Full Address", "Test memo"])
 
     @pytest.mark.asyncio
     async def test_list_deliveries_error_handling(self):

@@ -16,13 +16,12 @@ class TestOrderTools:
         """Test get_tools returns correct tool definitions."""
         tools = orders.get_tools()
 
-        assert len(tools) == 3
+        assert len(tools) == 2
         assert all(isinstance(tool, Tool) for tool in tools)
 
         tool_names = [tool.name for tool in tools]
-        assert "order_list_sales" in tool_names
-        assert "order_get_detail" in tool_names
-        assert "order_list_purchase" in tool_names
+        assert "order_list" in tool_names
+        assert "order_get" in tool_names
 
     def test_tool_schemas(self):
         """Test that all tools have proper input schemas."""
@@ -41,18 +40,18 @@ class TestOrderTools:
             "data": {
                 "data": [
                     {
-                        "trans_number": "SO-001",
-                        "contact_name": "Customer A",
+                        "ref_number": "SO-001",
+                        "contact": {"name": "Customer A"},
                         "trans_date": "2024-10-15",
-                        "grand_total": 50000,
-                        "status_name": "Pending"
+                        "amount_after_tax": 50000,
+                        "status_id": 5
                     },
                     {
-                        "trans_number": "SO-002",
-                        "contact_name": "Customer B",
+                        "ref_number": "SO-002",
+                        "contact": {"name": "Customer B"},
                         "trans_date": "2024-10-16",
-                        "grand_total": 75000,
-                        "status_name": "Approved"
+                        "amount_after_tax": 75000,
+                        "status_id": 7
                     }
                 ]
             }
@@ -76,12 +75,12 @@ class TestOrderTools:
         mock_client.get = AsyncMock(return_value={
             "data": {
                 "data": {
-                    "trans_number": "SO-123",
-                    "contact_name": "ABC Corp",
+                    "ref_number": "SO-123",
+                    "contact": {"name": "ABC Corp"},
                     "trans_date": "2024-10-20",
-                    "status_name": "Approved",
+                    "status_id": 7,
                     "subtotal": 100000,
-                    "grand_total": 110000,
+                    "amount_after_tax": 110000,
                     "detail": [
                         {
                             "desc": "Product A",
@@ -113,10 +112,11 @@ class TestOrderTools:
             "data": {
                 "data": [
                     {
-                        "trans_number": "PO-001",
-                        "contact_name": "Vendor X",
+                        "ref_number": "PO-001",
+                        "contact": {"name": "Vendor X"},
                         "trans_date": "2024-10-10",
-                        "grand_total": 25000
+                        "amount_after_tax": 25000,
+                        "status_id": 5
                     }
                 ]
             }
@@ -191,8 +191,8 @@ class TestOrderTools:
         mock_client = Mock(spec=KledoAPIClient)
         mock_client.get = AsyncMock(return_value={
             "data": {"data": [
-                {"trans_number": "SO-100", "contact_name": "Test",
-                 "trans_date": "2024-10-15", "grand_total": 10000, "status_name": "Pending"}
+                {"ref_number": "SO-100", "contact": {"name": "Test"},
+                 "trans_date": "2024-10-15", "amount_after_tax": 10000, "status_id": 5}
             ]}
         })
 
@@ -210,10 +210,10 @@ class TestOrderTools:
         mock_client = Mock(spec=KledoAPIClient)
         mock_client.get = AsyncMock(return_value={
             "data": {"data": [
-                {"trans_number": "SO-1", "contact_name": "A", "trans_date": "2024-10-01",
-                 "grand_total": 50000, "status_name": "Pending"},
-                {"trans_number": "SO-2", "contact_name": "B", "trans_date": "2024-10-02",
-                 "grand_total": 75000, "status_name": "Approved"}
+                {"ref_number": "SO-1", "contact": {"name": "A"}, "trans_date": "2024-10-01",
+                 "amount_after_tax": 50000, "status_id": 5},
+                {"ref_number": "SO-2", "contact": {"name": "B"}, "trans_date": "2024-10-02",
+                 "amount_after_tax": 75000, "status_id": 7}
             ]}
         })
 
@@ -229,8 +229,8 @@ class TestOrderTools:
     async def test_list_sales_orders_limits_display(self):
         """Test that listing limits display to 20 orders."""
         mock_orders = [
-            {"trans_number": f"SO-{i:03d}", "contact_name": f"Customer {i}",
-             "trans_date": "2024-10-01", "grand_total": 10000, "status_name": "Pending"}
+            {"ref_number": f"SO-{i:03d}", "contact": {"name": f"Customer {i}"},
+             "trans_date": "2024-10-01", "amount_after_tax": 10000, "status_id": 5}
             for i in range(25)
         ]
 

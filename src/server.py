@@ -11,21 +11,48 @@ from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
 from loguru import logger
 
-# Dynamic imports to handle both module execution and entry point execution
 import sys
 
-# Add src directory to Python path when running via entry point
-if not __package__:
+if __package__:
+    from .auth import KledoAuthenticator
+    from .cache import KledoCache
+    from .kledo_client import KledoAPIClient
+    from .utils.logger import setup_logger
+    from .tools import (
+        analytics,
+        commission,
+        contacts,
+        deliveries,
+        financial,
+        invoices,
+        orders,
+        products,
+        revenue,
+        sales_analytics,
+        utilities,
+    )
+else:
     src_dir = Path(__file__).parent
     if str(src_dir) not in sys.path:
         sys.path.insert(0, str(src_dir))
 
-from auth import KledoAuthenticator
-from cache import KledoCache
-from kledo_client import KledoAPIClient
-from utils.logger import setup_logger
-# Import tool handlers
-from tools import financial, invoices, orders, products, contacts, deliveries, utilities, sales_analytics, revenue, analytics, commission
+    from auth import KledoAuthenticator
+    from cache import KledoCache
+    from kledo_client import KledoAPIClient
+    from utils.logger import setup_logger
+    from tools import (
+        analytics,
+        commission,
+        contacts,
+        deliveries,
+        financial,
+        invoices,
+        orders,
+        products,
+        revenue,
+        sales_analytics,
+        utilities,
+    )
 
 
 # Load environment variables
@@ -192,7 +219,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             result = await utilities.handle_tool(name, arguments, api_client)
         elif name.startswith("sales_rep_"):
             result = await sales_analytics.handle_tool(name, arguments, api_client)
-        elif name in ("revenue_summary", "outstanding_receivables", "customer_revenue_ranking", "revenue_daily_breakdown", "outstanding_aging_report", "customer_concentration_report"):
+        elif name.startswith("revenue_") or name in ("outstanding_receivables", "customer_revenue_ranking", "outstanding_aging_report", "customer_concentration_report"):
             result = await revenue.handle_tool(name, arguments, api_client)
         elif name.startswith("analytics_"):
             result = await analytics.handle_tool(name, arguments, api_client)

@@ -16,13 +16,12 @@ class TestProductTools:
         """Test get_tools returns correct tool definitions."""
         tools = products.get_tools()
 
-        assert len(tools) == 3
+        assert len(tools) == 2
         assert all(isinstance(tool, Tool) for tool in tools)
 
         tool_names = [tool.name for tool in tools]
         assert "product_list" in tool_names
-        assert "product_get_detail" in tool_names
-        assert "product_search_by_sku" in tool_names
+        assert "product_get" in tool_names
 
     def test_tool_schemas(self):
         """Test that all tools have proper input schemas."""

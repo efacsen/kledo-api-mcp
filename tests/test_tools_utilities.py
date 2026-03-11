@@ -17,12 +17,11 @@ class TestUtilityTools:
         """Test get_tools returns correct tool definitions."""
         tools = utilities.get_tools()
 
-        assert len(tools) == 3
+        assert len(tools) == 2
         assert all(isinstance(tool, Tool) for tool in tools)
 
         tool_names = [tool.name for tool in tools]
-        assert "utility_clear_cache" in tool_names
-        assert "utility_get_cache_stats" in tool_names
+        assert "utility_cache" in tool_names
         assert "utility_test_connection" in tool_names
 
     def test_tool_schemas(self):

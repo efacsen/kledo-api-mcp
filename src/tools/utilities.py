@@ -11,21 +11,22 @@ def get_tools() -> list[Tool]:
     """Get list of utility tools."""
     return [
         Tool(
-            name="utility_clear_cache",
-            description="Clear all cached data and force fresh data retrieval on next requests.",
+            name="utility_cache",
+            description=(
+                "Manage the API response cache. "
+                "Use action='stats' to see hit rate, size, and performance metrics. "
+                "Use action='clear' to invalidate all cached data and force fresh API calls."
+            ),
             inputSchema={
                 "type": "object",
-                "properties": {},
-                "required": []
-            }
-        ),
-        Tool(
-            name="utility_get_cache_stats",
-            description="Get cache statistics including hit rate, size, and performance metrics.",
-            inputSchema={
-                "type": "object",
-                "properties": {},
-                "required": []
+                "properties": {
+                    "action": {
+                        "type": "string",
+                        "enum": ["stats", "clear"],
+                        "description": "'stats' = view cache performance, 'clear' = invalidate all cached entries"
+                    }
+                },
+                "required": ["action"]
             }
         ),
         Tool(
@@ -42,12 +43,19 @@ def get_tools() -> list[Tool]:
 
 async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClient) -> str:
     """Handle utility tool calls."""
-    if name == "utility_clear_cache":
+    if name == "utility_cache":
+        action = arguments.get("action", "stats")
+        if action == "clear":
+            return await _clear_cache(arguments, client)
+        else:
+            return await _get_cache_stats(arguments, client)
+    elif name == "utility_test_connection":
+        return await _test_connection(arguments, client)
+    # Backward compatibility
+    elif name == "utility_clear_cache":
         return await _clear_cache(arguments, client)
     elif name == "utility_get_cache_stats":
         return await _get_cache_stats(arguments, client)
-    elif name == "utility_test_connection":
-        return await _test_connection(arguments, client)
     else:
         return f"Unknown utility tool: {name}"
 

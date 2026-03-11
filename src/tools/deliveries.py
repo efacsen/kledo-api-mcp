@@ -38,26 +38,27 @@ def get_tools() -> list[Tool]:
             }
         ),
         Tool(
-            name="delivery_get_detail",
-            description="Get detailed information about a specific delivery including tracking status.",
+            name="delivery_get",
+            description=(
+                "Get delivery details or list of pending deliveries. "
+                "Use view='detail' with delivery_id for a specific delivery's tracking status, "
+                "view='pending' for all undelivered orders that need to be shipped. "
+                "Indonesian: 'detail pengiriman', 'pengiriman yang belum dikirim'"
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
+                    "view": {
+                        "type": "string",
+                        "enum": ["detail", "pending"],
+                        "description": "'detail' = specific delivery info (requires delivery_id), 'pending' = list of unshipped orders"
+                    },
                     "delivery_id": {
                         "type": "integer",
-                        "description": "Delivery ID"
+                        "description": "Delivery ID (required for view='detail')"
                     }
                 },
-                "required": ["delivery_id"]
-            }
-        ),
-        Tool(
-            name="delivery_get_pending",
-            description="Get list of pending/undelivered orders that need to be shipped.",
-            inputSchema={
-                "type": "object",
-                "properties": {},
-                "required": []
+                "required": ["view"]
             }
         )
     ]
@@ -67,6 +68,13 @@ async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClie
     """Handle delivery tool calls."""
     if name == "delivery_list":
         return await _list_deliveries(arguments, client)
+    elif name == "delivery_get":
+        view = arguments.get("view", "detail")
+        if view == "pending":
+            return await _get_pending_deliveries(arguments, client)
+        else:
+            return await _get_delivery_detail(arguments, client)
+    # Backward compatibility
     elif name == "delivery_get_detail":
         return await _get_delivery_detail(arguments, client)
     elif name == "delivery_get_pending":
@@ -183,8 +191,8 @@ async def _get_delivery_detail(args: Dict[str, Any], client: KledoAPIClient) -> 
         if shipping_address:
             result.append(f"\n**Shipping Address**: {shipping_address}")
 
-        # Items
-        items = safe_get(delivery, "detail", [])
+        # Items (Kledo API returns "items" in detail responses; fall back to "detail")
+        items = safe_get(delivery, "items", []) or safe_get(delivery, "detail", [])
         if items:
             result.append("\n## Items Being Delivered:\n")
             for item in items:
