@@ -1,7 +1,13 @@
 """
 Test Script - Verify All Field Mappings with Real API Data
 Tests all findings from the field mapping analysis
+
+NOTE: This is an integration test that requires live Kledo API credentials.
+Run manually with a configured .env file — skipped in automated test runs.
 """
+import pytest
+pytestmark = pytest.mark.skip(reason="Integration test requires live Kledo API credentials")
+
 import asyncio
 import os
 from pathlib import Path

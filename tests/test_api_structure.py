@@ -1,7 +1,13 @@
 """
 API Structure Testing Script
 Tests actual Kledo API responses to validate entity model mappings
+
+NOTE: This is an integration test that requires live Kledo API credentials.
+Run manually with a configured .env file — skipped in automated test runs.
 """
+import pytest
+pytestmark = pytest.mark.skip(reason="Integration test requires live Kledo API credentials")
+
 import asyncio
 import json
 import os

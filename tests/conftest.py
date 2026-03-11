@@ -1,8 +1,10 @@
 """
 Pytest configuration and shared fixtures for Kledo MCP Server tests
 """
+import json
 import pytest
 import asyncio
+from pathlib import Path
 from typing import Dict, Any
 from unittest.mock import AsyncMock, Mock, MagicMock
 from datetime import datetime, timedelta
@@ -10,6 +12,14 @@ from datetime import datetime, timedelta
 from src.auth import KledoAuthenticator
 from src.cache import KledoCache
 from src.kledo_client import KledoAPIClient
+
+FIXTURES_DIR = Path(__file__).parent / "fixtures"
+
+
+def load_fixture(name: str) -> dict:
+    """Load a JSON fixture file from tests/fixtures/."""
+    with open(FIXTURES_DIR / f"{name}.json") as f:
+        return json.load(f)
 
 
 @pytest.fixture(scope="session")
@@ -62,124 +72,64 @@ def mock_login_response():
 
 @pytest.fixture
 def mock_invoice_list_response():
-    """Mock invoice list response."""
-    return {
-        "data": {
-            "data": [
-                {
-                    "id": 1,
-                    "trans_number": "INV-001",
-                    "contact_name": "Customer A",
-                    "trans_date": "2024-01-15",
-                    "due_date": "2024-02-15",
-                    "grand_total": 1000.0,
-                    "amount_paid": 500.0,
-                    "status_name": "Partially Paid"
-                },
-                {
-                    "id": 2,
-                    "trans_number": "INV-002",
-                    "contact_name": "Customer B",
-                    "trans_date": "2024-01-20",
-                    "due_date": "2024-02-20",
-                    "grand_total": 2000.0,
-                    "amount_paid": 2000.0,
-                    "status_name": "Paid"
-                }
-            ],
-            "pagination": {
-                "current_page": 1,
-                "total_pages": 1,
-                "total": 2
-            }
-        }
-    }
+    """Mock invoice list response loaded from real API fixture (3 statuses: unpaid/partial/paid)."""
+    return load_fixture("invoices_list")
 
 
 @pytest.fixture
 def mock_invoice_detail_response():
-    """Mock invoice detail response."""
-    return {
-        "data": {
-            "data": {
-                "id": 1,
-                "trans_number": "INV-001",
-                "contact_name": "Customer A",
-                "trans_date": "2024-01-15",
-                "due_date": "2024-02-15",
-                "grand_total": 1000.0,
-                "amount_paid": 500.0,
-                "subtotal": 900.0,
-                "tax_amount": 100.0,
-                "status_name": "Partially Paid",
-                "memo": "Test invoice memo",
-                "detail": [
-                    {
-                        "desc": "Product A",
-                        "qty": 2,
-                        "price": 250.0,
-                        "amount": 500.0
-                    },
-                    {
-                        "desc": "Product B",
-                        "qty": 1,
-                        "price": 400.0,
-                        "amount": 400.0
-                    }
-                ]
-            }
-        }
-    }
+    """Mock invoice detail response loaded from real API fixture."""
+    # Wrap in data.data structure that tools expect
+    detail_data = load_fixture("invoice_detail")
+    return {"data": {"data": detail_data["data"]}}
+
+
+@pytest.fixture
+def mock_purchase_invoice_list_response():
+    """Mock purchase invoice list response loaded from real API fixture."""
+    return load_fixture("purchase_invoices_list")
+
+
+@pytest.fixture
+def mock_order_list_response():
+    """Mock order list response loaded from real API fixture (statuses: open/partial/converted)."""
+    return load_fixture("orders_list")
+
+
+@pytest.fixture
+def mock_order_detail_response():
+    """Mock order detail response loaded from real API fixture."""
+    return load_fixture("order_detail")
+
+
+@pytest.fixture
+def mock_delivery_list_response():
+    """Mock delivery list response loaded from real API fixture."""
+    return load_fixture("deliveries_list")
+
+
+@pytest.fixture
+def mock_delivery_detail_response():
+    """Mock delivery detail response loaded from real API fixture."""
+    return load_fixture("delivery_detail")
+
+
+@pytest.fixture
+def mock_contact_detail_response():
+    """Mock contact detail response loaded from real API fixture."""
+    return load_fixture("contact_detail")
 
 
 @pytest.fixture
 def mock_product_list_response():
-    """Mock product list response."""
-    return {
-        "data": {
-            "data": [
-                {
-                    "id": 1,
-                    "name": "Product A",
-                    "sku": "SKU-001",
-                    "price": 100.0,
-                    "stock_qty": 50
-                },
-                {
-                    "id": 2,
-                    "name": "Product B",
-                    "sku": "SKU-002",
-                    "price": 200.0,
-                    "stock_qty": 25
-                }
-            ]
-        }
-    }
+    """Mock product list response loaded from real API fixture."""
+    return load_fixture("products_list")
 
 
 @pytest.fixture
 def mock_contact_list_response():
-    """Mock contact list response."""
-    return {
-        "data": {
-            "data": [
-                {
-                    "id": 1,
-                    "name": "Customer A",
-                    "email": "customer-a@example.com",
-                    "phone": "+1234567890",
-                    "type_name": "Customer"
-                },
-                {
-                    "id": 2,
-                    "name": "Vendor A",
-                    "email": "vendor-a@example.com",
-                    "phone": "+0987654321",
-                    "type_name": "Vendor"
-                }
-            ]
-        }
-    }
+    """Mock contact list response loaded from real API fixture."""
+    return load_fixture("contacts_list")
 
 
 @pytest.fixture
