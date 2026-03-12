@@ -43,7 +43,7 @@ classDiagram
 
 ## Related Tools
 
-- `financial_bank_balances` - Get all bank account balances
+- `financial_balances` - Get all bank account balances
 
 ## Example
 

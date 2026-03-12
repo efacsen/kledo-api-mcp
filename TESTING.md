@@ -35,7 +35,7 @@ npx @modelcontextprotocol/inspector python -m src.server
 
 **Example tests to try:**
 - Click on `utility_test_connection` → Execute (no arguments needed)
-- Click on `financial_bank_balances` → Execute
+- Click on `financial_balances` → Execute
 - Click on `contact_list` → Add parameters → Execute
 - Click on `product_list` → Execute
 
@@ -152,7 +152,7 @@ Expected: Authentication status and API connection test results
 ### Test 2: Bank Balances
 ```bash
 # In Inspector or Claude:
-# Tool: financial_bank_balances
+# Tool: financial_balances
 # No parameters needed
 ```
 
@@ -161,15 +161,15 @@ Expected: List of all bank accounts with current balances
 ### Test 3: List Invoices
 ```bash
 # In Inspector:
-# Tool: invoice_list_sales
-# Parameters: {"per_page": 5, "page": 1}
+# Tool: invoice_list
+# Parameters: {"type": "sales", "per_page": 5, "page": 1}
 ```
 
 Expected: First 5 sales invoices
 
 ### Test 4: Search Product
 ```bash
-# Tool: product_search_by_sku
+# Tool: product_get
 # Parameters: {"sku": "YOUR-SKU-CODE"}
 ```
 
@@ -177,8 +177,8 @@ Expected: Product details with price and stock
 
 ### Test 5: Contact Transactions
 ```bash
-# Tool: contact_get_transactions
-# Parameters: {"contact_id": 123}
+# Tool: contact_get
+# Parameters: {"contact_id": 123, "view": "transactions"}
 ```
 
 Expected: Transaction history for that contact
@@ -251,11 +251,11 @@ tail -f ~/Library/Logs/Claude/mcp*.log
    ```
 
 2. **Clear cache when needed:**
-   - Use `utility_clear_cache` tool
+   - Use `utility_cache` tool with `action="clear"`
    - Or restart the server
 
 3. **Monitor cache stats:**
-   - Use `utility_get_cache_stats` tool
+   - Use `utility_cache` tool with `action="stats"`
    - Shows hit rate and performance
 
 4. **Adjust cache TTLs:**

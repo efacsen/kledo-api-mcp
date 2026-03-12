@@ -2,7 +2,7 @@
 
 Tools for financial reporting in Kledo. These tools provide summaries and analytics for business performance.
 
-## financial_activity_team_report
+## financial_activity
 
 Get team activity report for a date range. Shows what the sales/finance team has been doing.
 
@@ -29,23 +29,26 @@ Get team activity report for a date range. Shows what the sales/finance team has
 
 ---
 
-## financial_sales_summary
+## financial_summary
 
-Get sales summary by contact for a period. Shows total sales revenue from each customer.
+Get sales or purchase summary by contact for a period. Use `type` to select sales or purchase data, and optionally `group_by` to control grouping.
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
+| type | string | **Yes** | Summary type: `"sales"` or `"purchase"` |
 | date_from | string | No | Start date (YYYY-MM-DD or shortcuts like 'last_month') |
 | date_to | string | No | End date (YYYY-MM-DD) |
 | contact_id | integer | No | Filter by specific contact/customer ID (optional) |
+| group_by | string | No | Grouping: `"sales_rep"` to break down by sales representative |
 
-### Example
+### Example — Sales Summary
 
 **Request:**
 ```json
 {
+  "type": "sales",
   "date_from": "2024-01-01",
   "date_to": "2024-12-31"
 }
@@ -56,25 +59,26 @@ Get sales summary by contact for a period. Shows total sales revenue from each c
 - Number of customers
 - Top customers ranked by revenue with invoice counts
 
----
-
-## financial_purchase_summary
-
-Get purchase summary by vendor for a period. Shows total purchase expenses from each vendor.
-
-### Parameters
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| date_from | string | No | Start date (YYYY-MM-DD or shortcuts) |
-| date_to | string | No | End date (YYYY-MM-DD) |
-| contact_id | integer | No | Filter by specific vendor ID (optional) |
-
-### Example
+### Example — Sales by Sales Rep
 
 **Request:**
 ```json
 {
+  "type": "sales",
+  "group_by": "sales_rep",
+  "date_from": "2024-01-01",
+  "date_to": "2024-12-31"
+}
+```
+
+**Response:** Returns sales breakdown per sales representative.
+
+### Example — Purchase Summary
+
+**Request:**
+```json
+{
+  "type": "purchase",
   "date_from": "2024-01-01",
   "date_to": "2024-12-31"
 }
@@ -87,7 +91,7 @@ Get purchase summary by vendor for a period. Shows total purchase expenses from 
 
 ---
 
-## financial_bank_balances
+## financial_balances
 
 Get current balances for all bank accounts. Shows available cash across all accounts.
 

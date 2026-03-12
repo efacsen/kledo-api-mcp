@@ -2,84 +2,70 @@
 
 > MCP Server connecting AI agents to Kledo accounting software. Provides read-only access to invoices, contacts, products, orders, deliveries, and financial reports.
 
-This server exposes 32 tools organized by business domain. Use this file to find the right tool for querying Kledo business data.
+This server exposes 24 tools organized by business domain. Use this file to find the right tool for querying Kledo business data.
 
 ## Invoice Tools
 
-Tools for sales and purchase invoice operations.
-
-- [invoice_list_sales](docs/tools/sales/invoices.md#invoice_list_sales): List sales invoices. Use for: "show me invoices", "customer billing", "unpaid invoices", "accounts receivable", "recent sales", "invoice list". Parameters: search, contact_id, status_id, date_from, date_to, per_page.
-- [invoice_get_detail](docs/tools/sales/invoices.md#invoice_get_detail): Get invoice details with line items. Use for: "invoice details", "show invoice INV-001", "line items on invoice", "what's on this invoice". Required: invoice_id.
-- [invoice_get_totals](docs/tools/sales/invoices.md#invoice_get_totals): Get invoice summary totals. Use for: "total outstanding", "overdue amount", "receivables summary", "how much are we owed". Parameters: date_from, date_to.
-- [invoice_list_purchase](docs/tools/purchases/invoices.md#invoice_list_purchase): List purchase invoices (vendor bills). Use for: "bills from vendors", "purchase invoices", "accounts payable", "what do we owe", "vendor bills". Parameters: search, contact_id, status_id, date_from, date_to.
-- [outstanding_by_customer](docs/tools/sales/invoices.md#outstanding_by_customer): Outstanding grouped by customer. Use for: "outstanding per customer", "siapa yang hutang", "piutang per pelanggan", "customer mana yang paling banyak outstanding", "daftar outstanding customer". Parameters: min_outstanding, overdue_days, sort_by, date_from, date_to.
-- [outstanding_by_vendor](docs/tools/sales/invoices.md#outstanding_by_vendor): Outstanding grouped by vendor. Use for: "outstanding per vendor", "hutang ke vendor", "utang per pemasok", "siapa aja yang kita hutangi", "daftar outstanding vendor". Parameters: min_outstanding, overdue_days, sort_by, date_from, date_to.
+- [invoice_list](docs/tools/sales/invoices.md): List invoices. Use `type="sales"` for sales invoices (accounts receivable, unpaid invoices, recent sales), `type="purchase"` for purchase invoices (vendor bills, accounts payable). Parameters: type (required), search, contact_id, status_id, date_from, date_to, per_page.
+- [invoice_get](docs/tools/sales/invoices.md): Get invoice details with line items. Use for: "invoice details", "show invoice INV-001", "line items on invoice". Required: invoice_id.
+- [invoice_summarize](docs/tools/sales/invoices.md): Summarize invoices. Use `view="totals"` for total outstanding/overdue summary, `view="by_customer"` for outstanding grouped by customer (siapa yang hutang, piutang per pelanggan), `view="by_vendor"` for outstanding grouped by vendor. Required: view.
 
 ## Contact Tools
 
-Tools for customer and vendor CRM operations.
-
-- [contact_list](docs/tools/crm/contacts.md#contact_list): List customers and vendors. Use for: "show customers", "find vendor", "contact list", "who do we sell to", "list suppliers", "our clients". Parameters: search, type_id (1=Customer, 2=Vendor, 3=Both).
-- [contact_get_detail](docs/tools/crm/contacts.md#contact_get_detail): Get contact details. Use for: "customer info", "vendor details", "contact address", "contact phone number", "customer email". Required: contact_id.
-- [contact_get_transactions](docs/tools/crm/contacts.md#contact_get_transactions): Get contact transaction history. Use for: "customer purchases", "transaction history", "what did this customer buy", "vendor payment history", "contact invoices". Required: contact_id.
+- [contact_list](docs/tools/crm/contacts.md): List customers and vendors with search. Use for: "find customer", "list vendors", "search contact by name". Parameters: search, type_id, per_page.
+- [contact_get](docs/tools/crm/contacts.md): Get contact details or transaction history. Use `view="detail"` for contact profile (address, phone, email), `view="transactions"` for invoice/payment history. Required: contact_id, view.
 
 ## Product Tools
 
-Tools for product catalog and inventory.
-
-- [product_list](docs/tools/inventory/products.md#product_list): List products with prices. Use for: "product catalog", "show inventory", "what do we sell", "list items", "our products". Parameters: search, include_inventory, per_page.
-- [product_get_detail](docs/tools/inventory/products.md#product_get_detail): Get product details. Use for: "product info", "check stock", "product price", "item details", "how much do we have". Required: product_id.
-- [product_search_by_sku](docs/tools/inventory/products.md#product_search_by_sku): Find product by SKU. Use for: "lookup SKU", "product by code", "find item ABC123", "search by product code", "SKU lookup". Required: sku.
+- [product_list](docs/tools/inventory/products.md): List products with optional search and inventory. Use for: "show all products", "search product by name", "product catalog". Parameters: search, include_inventory, per_page.
+- [product_get](docs/tools/inventory/products.md): Get product details by ID or by SKU/code. Provide `product_id` for lookup by database ID, or `sku` for lookup by product code. Use for: "product price", "check stock", "find item ABC123", "cari produk by kode".
 
 ## Order Tools
 
-Tools for sales and purchase orders.
-
-- [order_list_sales](docs/tools/sales/orders.md#order_list_sales): List sales orders. Use for: "pending orders", "customer orders", "sales orders", "order list", "what orders do we have". Parameters: search, contact_id, status_id, date_from, date_to.
-- [order_get_detail](docs/tools/sales/orders.md#order_get_detail): Get order details. Use for: "order info", "order items", "what's in this order", "order line items", "show order details". Required: order_id.
-- [order_list_purchase](docs/tools/purchases/orders.md#order_list_purchase): List purchase orders. Use for: "POs", "orders to vendors", "purchase orders", "what did we order", "vendor orders". Parameters: search, contact_id, date_from, date_to.
+- [order_list](docs/tools/sales/orders.md): List orders. Use `type="sales"` for sales orders (pending customer orders), `type="purchase"` for purchase orders. Required: type. Parameters: search, contact_id, status_id, date_from, date_to.
+- [order_get](docs/tools/sales/orders.md): Get order details with line items. Use for: "order info", "what's in this order", "order line items". Required: order_id.
 
 ## Delivery Tools
 
-Tools for shipment tracking.
+- [delivery_list](docs/tools/inventory/deliveries.md): List deliveries with filters. Use for: "show all deliveries", "deliveries this week". Parameters: search, date_from, date_to, status_id.
+- [delivery_get](docs/tools/inventory/deliveries.md): Get delivery details or pending shipments. Use `view="detail"` with delivery_id for tracking info, `view="pending"` for all unshipped orders (backlog, what needs to ship). Required: view.
 
-- [delivery_list](docs/tools/inventory/deliveries.md#delivery_list): List deliveries. Use for: "shipments", "delivery status", "what shipped", "recent deliveries", "shipping list". Parameters: search, date_from, date_to, status_id.
-- [delivery_get_detail](docs/tools/inventory/deliveries.md#delivery_get_detail): Get delivery details. Use for: "tracking info", "shipment details", "delivery contents", "what's in this shipment". Required: delivery_id.
-- [delivery_get_pending](docs/tools/inventory/deliveries.md#delivery_get_pending): Get pending deliveries. Use for: "unshipped orders", "pending shipments", "what needs to ship", "orders awaiting delivery", "backlog".
+## Revenue Tools
+
+- [revenue_summary](docs/tools/finance/reports.md): Revenue summary for a period. Only counts PAID invoices (status=Lunas). Shows net sales (before tax), PPN collected, gross sales. Use for: "revenue this month", "berapa omzet bulan ini". Required: date_from.
+- [revenue_receivables](docs/tools/finance/reports.md): Outstanding receivables analysis. Use `view="list"` for all unpaid/partial invoices (siapa yang belum bayar, total piutang), `view="aging"` for overdue buckets 0-30/30-60/60-90/90+ days with DSO, `view="concentration"` for Pareto/80-20 customer concentration risk. Required: view.
+- [revenue_ranking](docs/tools/finance/reports.md): Revenue ranking. Use `group_by="customer"` for top customers by paid revenue (siapa customer terbesar), `group_by="day"` for daily revenue trends (revenue harian). Required: group_by, date_from.
 
 ## Financial Tools
 
-Tools for financial reports.
+- [financial_summary](docs/tools/finance/reports.md): Financial summary grouped by entity. Use `type="sales"` + `group_by="customer"` for sales by customer, `type="sales"` + `group_by="sales_rep"` for sales by salesperson (omzet per sales), `type="purchase"` + `group_by="vendor"` for purchases by vendor. Required: type, group_by.
+- [financial_balances](docs/tools/finance/reports.md): Current bank account balances. Use for: "cash on hand", "bank balances", "available funds", "berapa saldo kas".
+- [financial_activity](docs/tools/finance/reports.md): Team activity report for a date range. Shows what the sales/finance team has been doing. Parameters: date_from, date_to.
 
-- [financial_activity_team_report](docs/tools/finance/reports.md#financial_activity_team_report): Team activity report. Use for: "what did team do", "activity log", "user actions", "audit trail", "who did what". Parameters: date_from, date_to.
-- [financial_sales_summary](docs/tools/finance/reports.md#financial_sales_summary): Sales by customer. Use for: "top customers", "sales report", "revenue by customer", "customer revenue", "sales breakdown". Parameters: date_from, date_to, contact_id.
-- [financial_purchase_summary](docs/tools/finance/reports.md#financial_purchase_summary): Purchases by vendor. Use for: "vendor spending", "purchase report", "costs by vendor", "supplier costs", "what did we spend". Parameters: date_from, date_to, contact_id.
-- [financial_bank_balances](docs/tools/finance/reports.md#financial_bank_balances): Bank account balances. Use for: "cash on hand", "bank balances", "available funds", "how much money do we have", "account balances".
+## Analytics & Commission Tools
 
-## Analytics Tools
+- [analytics_compare](docs/tools/finance/reports.md): Compare metrics across periods or sales reps. Use `metric="revenue"` to compare revenue (bulan ini vs bulan lalu), `metric="outstanding"` to compare outstanding receivables. Required: metric, period.
+- [analytics_targets](docs/tools/finance/reports.md): Sales target management. Use `action="report"` for achievement vs target, `action="underperformers"` for reps below threshold, `action="set"` to set a new target (requires sales_person_name, amount). Required: action, period.
+- [commission_report](docs/tools/finance/reports.md): Commission calculation with tiered rates. Provide `sales_person_name` to calculate for one rep, omit for all reps. Parameters: period (required), sales_person_name, flat_rate.
 
-Tools for period-over-period comparison and business analytics.
+## Sales Rep Tools
 
-- [analytics_compare_revenue](docs/tools/analytics.md#analytics_compare_revenue): Compare revenue between periods. Use for: "revenue bulan ini vs bulan lalu", "perbandingan revenue", "penjualan bulan ini dibanding bulan lalu", "revenue kuartal ini vs kuartal lalu", "revenue bulan ini" (single period). Parameters: period, compare_to, per_sales.
-- [analytics_compare_outstanding](docs/tools/analytics.md#analytics_compare_outstanding): Compare outstanding between periods. Use for: "outstanding bulan ini vs bulan lalu", "perbandingan piutang", "hutang bulan ini vs bulan lalu", "piutang kuartal ini vs kuartal lalu", "outstanding bulan ini" (single period). Parameters: period, compare_to, per_sales.
-- [analytics_target_achievement](docs/tools/analytics.md#analytics_target_achievement): Target vs actual per sales rep. Use for: "target vs actual per sales", "pencapaian target", "achievement per sales", "capai target bulan ini". Parameters: period.
-- [analytics_underperformers](docs/tools/analytics.md#analytics_underperformers): Sales reps below target. Use for: "sales mana yang dibawah target", "siapa yang belum capai target", "underperforming sales", "sales dibawah target". Parameters: period, threshold.
-- [analytics_set_target](docs/tools/analytics.md#analytics_set_target): Set sales target. Use for: "set target Ahmad bulan ini 50 juta", "pasang target", "target baru Budi", "ubah target". Parameters: sales_person_name, period, amount.
+- [sales_rep_report](docs/tools/finance/reports.md): Sales rep revenue breakdown for a period. Shows invoices, revenue, and top deals per rep. Required: date_from.
+- [sales_rep_list](docs/tools/finance/reports.md): List all sales representatives. Use for: "who are our sales reps", "daftar sales".
 
-## Commission Tools
+## Utility Tools
 
-Tools for sales commission calculation.
+- [utility_cache](docs/tools/system/utilities.md): Manage API cache. Use `action="stats"` for cache hit rate and performance metrics, `action="clear"` to invalidate all cached data (force fresh API calls). Required: action.
+- [utility_test_connection](docs/tools/system/utilities.md): Test Kledo API connection and verify authentication status.
 
-- [commission_calculate](docs/tools/commission.md#commission_calculate): Calculate commission for a sales person. Use for: "komisi Ahmad bulan ini", "commission sales Budi", "komisi dengan rate 3%", "hitung komisi". Parameters: period, sales_person_name, flat_rate.
-- [commission_report](docs/tools/commission.md#commission_report): Commission breakdown for all sales reps. Use for: "komisi per sales bulan ini", "commission breakdown", "laporan komisi", "komisi seluruh sales". Parameters: period, flat_rate.
+## Status Codes
 
-## System Tools
+- Status 1 = Belum Dibayar (Unpaid)
+- Status 2 = Dibayar Sebagian (Partially Paid)
+- Status 3 = Lunas (Paid / Settled)
 
-- [utility_clear_cache](docs/tools/system/utilities.md#utility_clear_cache): Clear cached data. Use for: "refresh data", "clear cache", "reset cache", "force refresh".
-- [utility_get_cache_stats](docs/tools/system/utilities.md#utility_get_cache_stats): Cache performance metrics. Use for: "cache stats", "performance info", "cache hit rate", "cache size".
-- [utility_test_connection](docs/tools/system/utilities.md#utility_test_connection): Test API connection. Use for: "test connection", "is API working", "check connection", "API status".
+## Date Shortcuts
 
-## Optional
-
-- [Full Documentation](docs/index.md): Complete MkDocs site with entity schemas, ERD diagrams, and API reference
-- [Entity Registry](docs/entities/index.md): Pydantic model schemas and relationships
+Use these as values for date_from / date_to parameters:
+- `this_month`, `last_month`, `this_year`, `last_7_days`
+- Or ISO format: `YYYY-MM-DD` or `YYYY-MM`

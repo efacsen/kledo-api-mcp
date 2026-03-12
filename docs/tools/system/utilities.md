@@ -2,38 +2,34 @@
 
 Utility tools for managing the Kledo MCP Server. These tools help with cache management and connection testing.
 
-## utility_clear_cache
+## utility_cache
 
-Clear all cached data and force fresh data retrieval on next requests.
+Manage the server cache. Use the `action` parameter to clear the cache or retrieve statistics.
 
 ### Parameters
 
-This tool takes no parameters.
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| action | string | **Yes** | Cache operation: `"clear"` or `"stats"` |
 
-### Example
+### Example — Clear Cache
 
 **Request:**
 ```json
-{}
+{
+  "action": "clear"
+}
 ```
 
 **Response:** Returns confirmation message with number of cache entries cleared.
 
----
-
-## utility_get_cache_stats
-
-Get cache statistics including hit rate, size, and performance metrics.
-
-### Parameters
-
-This tool takes no parameters.
-
-### Example
+### Example — Cache Stats
 
 **Request:**
 ```json
-{}
+{
+  "action": "stats"
+}
 ```
 
 **Response:** Returns cache statistics including:

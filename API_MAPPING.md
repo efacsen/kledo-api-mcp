@@ -20,7 +20,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
 ## Financial Reports
 
 ### Team Activity Report
-- **Tool**: `financial_activity_team_report`
+- **Tool**: `financial_activity`
 - **Endpoint**: `GET /reportings/activity-team`
 - **Parameters**:
   - `date_from` (YYYY-MM) - Start month
@@ -32,7 +32,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
   ```
 
 ### Sales Summary by Contact
-- **Tool**: `financial_sales_summary`
+- **Tool**: `financial_summary` (with `type="sales"`)
 - **Endpoint**: `GET /reportings/sales-by-contact`
 - **Parameters**:
   - `date_from` (YYYY-MM-DD)
@@ -45,7 +45,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
   ```
 
 ### Purchase Summary by Vendor
-- **Tool**: `financial_purchase_summary`
+- **Tool**: `financial_summary` (with `type="purchase"`)
 - **Endpoint**: `GET /reportings/purchase-by-contact`
 - **Parameters**:
   - `date_from` (YYYY-MM-DD)
@@ -58,7 +58,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
   ```
 
 ### Bank Balances
-- **Tool**: `financial_bank_balances`
+- **Tool**: `financial_balances`
 - **Endpoint**: `GET /finance/bank/balances`
 - **Parameters**: None
 - **Cache**: 5 minutes (real-time tier)
@@ -72,7 +72,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
 ## Invoices
 
 ### List Sales Invoices
-- **Tool**: `invoice_list_sales`
+- **Tool**: `invoice_list` (with `type="sales"`)
 - **Endpoint**: `GET /finance/invoices`
 - **Parameters**:
   - `search` - Search term
@@ -87,7 +87,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
   ```
 
 ### Get Invoice Detail
-- **Tool**: `invoice_get_detail`
+- **Tool**: `invoice_get`
 - **Endpoint**: `GET /finance/invoices/{id}`
 - **Parameters**:
   - `invoice_id` (required)
@@ -98,7 +98,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
   ```
 
 ### Invoice Totals
-- **Tool**: `invoice_get_totals`
+- **Tool**: `invoice_summarize` (with `view="totals"`)
 - **Endpoint**: `GET /finance/invoices/totals`
 - **Parameters**:
   - `date_from` / `date_to` - Date range
@@ -109,7 +109,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
   ```
 
 ### List Purchase Invoices
-- **Tool**: `invoice_list_purchase`
+- **Tool**: `invoice_list` (with `type="purchase"`)
 - **Endpoint**: `GET /finance/purchaseInvoices`
 - **Parameters**: Same as sales invoices
 - **Cache**: 30 minutes
@@ -123,7 +123,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
 ## Orders
 
 ### List Sales Orders
-- **Tool**: `order_list_sales`
+- **Tool**: `order_list` (with `type="sales"`)
 - **Endpoint**: `GET /finance/orders`
 - **Parameters**:
   - `search`
@@ -137,7 +137,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
   ```
 
 ### Get Order Detail
-- **Tool**: `order_get_detail`
+- **Tool**: `order_get`
 - **Endpoint**: `GET /finance/orders/{id}`
 - **Parameters**:
   - `order_id` (required)
@@ -148,7 +148,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
   ```
 
 ### List Purchase Orders
-- **Tool**: `order_list_purchase`
+- **Tool**: `order_list` (with `type="purchase"`)
 - **Endpoint**: `GET /finance/purchaseOrders`
 - **Parameters**: Same as sales orders
 - **Cache**: 30 minutes
@@ -175,7 +175,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
   ```
 
 ### Get Product Detail
-- **Tool**: `product_get_detail`
+- **Tool**: `product_get`
 - **Endpoint**: `GET /finance/products/{id}`
 - **Parameters**:
   - `product_id` (required)
@@ -186,7 +186,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
   ```
 
 ### Search by SKU
-- **Tool**: `product_search_by_sku`
+- **Tool**: `product_get` (with `sku` param)
 - **Endpoint**: `GET /finance/products?code={sku}`
 - **Parameters**:
   - `sku` (required)
@@ -214,7 +214,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
   ```
 
 ### Get Contact Detail
-- **Tool**: `contact_get_detail`
+- **Tool**: `contact_get` (with `view="detail"`)
 - **Endpoint**: `GET /finance/contacts/{id}`
 - **Parameters**:
   - `contact_id` (required)
@@ -225,7 +225,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
   ```
 
 ### Get Contact Transactions
-- **Tool**: `contact_get_transactions`
+- **Tool**: `contact_get` (with `view="transactions"`)
 - **Endpoint**: `GET /finance/contacts/{id}/transactions`
 - **Parameters**:
   - `contact_id` (required)
@@ -253,7 +253,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
   ```
 
 ### Get Delivery Detail
-- **Tool**: `delivery_get_detail`
+- **Tool**: `delivery_get` (with `view="detail"`)
 - **Endpoint**: `GET /finance/deliveries/{id}`
 - **Parameters**:
   - `delivery_id` (required)
@@ -264,7 +264,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
   ```
 
 ### Get Pending Deliveries
-- **Tool**: `delivery_get_pending`
+- **Tool**: `delivery_get` (with `view="pending"`)
 - **Endpoint**: `GET /finance/deliveries?status_id=1`
 - **Parameters**: None (filtered to pending status)
 - **Cache**: 15 minutes (force refresh)
@@ -278,7 +278,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
 ## Utilities
 
 ### Clear Cache
-- **Tool**: `utility_clear_cache`
+- **Tool**: `utility_cache` (with `action="clear"`)
 - **No API call** - Local operation
 - **Example**:
   ```
@@ -286,7 +286,7 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
   ```
 
 ### Get Cache Stats
-- **Tool**: `utility_get_cache_stats`
+- **Tool**: `utility_cache` (with `action="stats"`)
 - **No API call** - Local operation
 - **Returns**: Hit rate, size, hits, misses, etc.
 - **Example**:
@@ -418,12 +418,12 @@ Tools return user-friendly error messages:
 ### Force Refresh
 
 Some tools always fetch fresh data:
-- `financial_bank_balances` (force_refresh=True)
-- `delivery_get_pending` (force_refresh=True)
+- `financial_balances` (force_refresh=True)
+- `delivery_get` with `view="pending"` (force_refresh=True)
 
 ### Manual Cache Control
 
-Use `utility_clear_cache` to invalidate all cached data.
+Use `utility_cache` with `action="clear"` to invalidate all cached data.
 
 ---
 
@@ -440,12 +440,12 @@ Kledo API rate limits (if any) are handled by:
 
 | User Query | Selected Tool | Parameters |
 |------------|---------------|------------|
-| "Show unpaid invoices" | `invoice_list_sales` | `status_id=2` (Pending) |
-| "Top customers this year" | `financial_sales_summary` | `date_from=this_year` |
-| "Product info for SKU-123" | `product_search_by_sku` | `sku=SKU-123` |
-| "Pending deliveries" | `delivery_get_pending` | (none) |
-| "Bank balance" | `financial_bank_balances` | (none) |
-| "Customer XYZ transactions" | Contact lookup → `contact_get_transactions` | `contact_id={found_id}` |
+| "Show unpaid invoices" | `invoice_list` | `type="sales"`, `status_id=2` (Pending) |
+| "Top customers this year" | `financial_summary` | `type="sales"`, `date_from=this_year` |
+| "Product info for SKU-123" | `product_get` | `sku=SKU-123` |
+| "Pending deliveries" | `delivery_get` | `view="pending"` |
+| "Bank balance" | `financial_balances` | (none) |
+| "Customer XYZ transactions" | Contact lookup → `contact_get` | `contact_id={found_id}`, `view="transactions"` |
 
 ---
 

@@ -67,8 +67,7 @@ Stock location with quantity. Embedded within Product.
 ## Related Tools
 
 - `product_list` - List products with prices and inventory
-- `product_get_detail` - Get product details by ID
-- `product_search_by_sku` - Find product by SKU code
+- `product_get` - Get product details by ID or SKU code
 
 ## Example
 

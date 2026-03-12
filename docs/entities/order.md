@@ -75,9 +75,9 @@ Line item within an order. Embedded within Order.
 
 ## Related Tools
 
-- `order_list_sales` - List sales orders with filtering
-- `order_list_purchase` - List purchase orders
-- `order_get_detail` - Get order details with line items
+- `order_list` (with `type="sales"`) - List sales orders with filtering
+- `order_list` (with `type="purchase"`) - List purchase orders
+- `order_get` - Get order details with line items
 
 ## Example
 

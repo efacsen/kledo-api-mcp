@@ -125,6 +125,14 @@ An MCP server that connects AI assistants (like Claude) to the Kledo accounting 
 
 ### Standard Install
 
+With `uv` (recommended):
+```bash
+git clone https://github.com/efacsen/kledo-api-mcp.git
+cd kledo-api-mcp
+uv pip install -e .
+```
+
+With `pip`:
 ```bash
 git clone https://github.com/efacsen/kledo-api-mcp.git
 cd kledo-api-mcp
@@ -151,31 +159,6 @@ kledo-mcp --show-config
 ```
 
 This displays your Claude Desktop configuration with the correct paths. Just copy and paste!
-
-**Manual Configuration (Advanced):**
-
-If you prefer to configure manually, edit your Claude Desktop config file:
-
-```json
-{
-  "mcpServers": {
-    "kledo-crm": {
-      "command": "kledo-mcp",
-      "env": {
-        "KLEDO_API_KEY": "your_api_key_here",
-        "KLEDO_BASE_URL": "https://api.kledo.com/api/v1",
-        "CACHE_ENABLED": "true",
-        "LOG_LEVEL": "INFO"
-      }
-    }
-  }
-}
-```
-
-**Config file locations:**
-- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
-- Linux: `~/.config/Claude/claude_desktop_config.json`
 
 **Security Note**: Never commit your API key to version control.
 
@@ -529,19 +512,16 @@ Contributions are welcome! Please:
 git clone https://github.com/YOUR_USERNAME/kledo-api-mcp.git
 cd kledo-api-mcp
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install in development mode with dev dependencies
-pip install -e ".[dev]"
+# Install with dev dependencies (uv recommended)
+uv pip install -e ".[dev]"
+# or: pip install -e ".[dev]"
 
 # Run tests
-pytest tests/
+uv run pytest tests/
 
 # Run linters
-ruff check src/
-mypy src/
+uv run ruff check src/
+uv run mypy src/
 ```
 
 ## 📄 License

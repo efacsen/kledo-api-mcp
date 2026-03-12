@@ -13,25 +13,25 @@ When multiple tools seem applicable, this page helps you pick the right one. Eac
 
 ## Choosing Between Sales Tools
 
-### invoice_list_sales vs financial_sales_summary
+### invoice_list (type="sales") vs financial_summary (type="sales")
 
 Both tools show sales data, but they serve different purposes.
 
-| Aspect | invoice_list_sales | financial_sales_summary |
-|--------|-------------------|------------------------|
+| Aspect | `invoice_list` (type="sales") | `financial_summary` (type="sales") |
+|--------|-------------------------------|-------------------------------------|
 | **Returns** | Individual invoice records | Aggregated totals by customer |
 | **Grouping** | Flat list | Ranked by revenue |
 | **Detail level** | Each invoice with status | Customer totals only |
 | **Use case** | Finding specific invoices | Analyzing customer performance |
 
-**Use `invoice_list_sales` when:**
+**Use `invoice_list` with `type="sales"` when:**
 
 - You need to see specific invoice details (invoice number, items, status)
 - You want to filter by invoice status (draft, pending, paid)
 - You need to find unpaid or overdue invoices
 - The user is asking about a particular invoice or date range
 
-**Use `financial_sales_summary` when:**
+**Use `financial_summary` with `type="sales"` when:**
 
 - You want to see top customers ranked by revenue
 - You need total sales figures for a period
@@ -40,23 +40,23 @@ Both tools show sales data, but they serve different purposes.
 
 ---
 
-### invoice_list_sales vs invoice_get_totals
+### invoice_list (type="sales") vs invoice_summarize (view="totals")
 
 Both provide sales invoice information, but at different aggregation levels.
 
-| Aspect | invoice_list_sales | invoice_get_totals |
-|--------|-------------------|-------------------|
+| Aspect | `invoice_list` (type="sales") | `invoice_summarize` (view="totals") |
+|--------|-------------------------------|--------------------------------------|
 | **Returns** | List of invoices | Summary numbers only |
 | **Detail** | Individual records | Totals (count, amount, paid, outstanding) |
 | **Data volume** | Potentially large | Single summary object |
 
-**Use `invoice_list_sales` when:**
+**Use `invoice_list` with `type="sales"` when:**
 
 - You need to see individual invoice records
 - You want to browse or search invoices
 - You need invoice numbers or line items
 
-**Use `invoice_get_totals` when:**
+**Use `invoice_summarize` with `view="totals"` when:**
 
 - You only need aggregate numbers (total amount, count)
 - You want to know total outstanding or overdue amounts
@@ -66,12 +66,12 @@ Both provide sales invoice information, but at different aggregation levels.
 
 ## Choosing Between Contact Tools
 
-### contact_list vs financial_sales_summary (for customer questions)
+### contact_list vs financial_summary (type="sales") for customer questions
 
 Both can answer "Who are my customers?" but from different angles.
 
-| Aspect | contact_list | financial_sales_summary |
-|--------|-------------|------------------------|
+| Aspect | `contact_list` | `financial_summary` (type="sales") |
+|--------|----------------|-------------------------------------|
 | **Returns** | Contact information | Sales performance data |
 | **Ranking** | Alphabetical/search order | By revenue |
 | **Data type** | Name, email, phone | Sales amount, invoice count |
@@ -82,7 +82,7 @@ Both can answer "Who are my customers?" but from different angles.
 - You need contact information (address, phone)
 - You want to find a specific contact ID
 
-**Use `financial_sales_summary` when:**
+**Use `financial_summary` with `type="sales"` when:**
 
 - You want to know top customers by revenue
 - You're analyzing sales performance by customer
@@ -90,23 +90,23 @@ Both can answer "Who are my customers?" but from different angles.
 
 ---
 
-### contact_get_transactions vs invoice_list_sales with contact_id
+### contact_get (view="transactions") vs invoice_list (type="sales") with contact_id
 
 Both show a customer's transaction history, but with different scope.
 
-| Aspect | contact_get_transactions | invoice_list_sales + contact_id |
-|--------|-------------------------|--------------------------------|
+| Aspect | `contact_get` (view="transactions") | `invoice_list` (type="sales") + contact_id |
+|--------|--------------------------------------|---------------------------------------------|
 | **Scope** | All transaction types | Only sales invoices |
 | **Includes** | Invoices, payments, credits, adjustments | Invoices only |
 | **Summary** | Yes (total count, amount) | No built-in summary |
 
-**Use `contact_get_transactions` when:**
+**Use `contact_get` with `view="transactions"` when:**
 
 - You want the full transaction history (invoices AND payments AND credits)
 - You need to see all interactions with a customer
 - The user asks "What's the history with this customer?"
 
-**Use `invoice_list_sales` with `contact_id` when:**
+**Use `invoice_list` with `type="sales"` and `contact_id` when:**
 
 - You only want sales invoices for that customer
 - You need to filter by invoice status
@@ -116,12 +116,12 @@ Both show a customer's transaction history, but with different scope.
 
 ## Choosing Between Product Tools
 
-### product_list vs product_search_by_sku
+### product_list vs product_get (with sku param)
 
 Both find products, but optimized for different lookup patterns.
 
-| Aspect | product_list | product_search_by_sku |
-|--------|-------------|----------------------|
+| Aspect | `product_list` | `product_get` (with `sku` param) |
+|--------|----------------|-----------------------------------|
 | **Lookup method** | Name, description, or browse | Exact SKU match |
 | **Results** | Multiple products | Single product |
 | **Inventory** | Optional (use include_inventory) | Included |
@@ -133,7 +133,7 @@ Both find products, but optimized for different lookup patterns.
 - You don't have the exact SKU
 - The user says "Find products like..."
 
-**Use `product_search_by_sku` when:**
+**Use `product_get` with `sku` param when:**
 
 - You have the exact SKU/product code
 - You want a quick single-product lookup
@@ -143,23 +143,23 @@ Both find products, but optimized for different lookup patterns.
 
 ## Choosing Between Order and Invoice Tools
 
-### order_list_sales vs invoice_list_sales
+### order_list (type="sales") vs invoice_list (type="sales")
 
 Orders and invoices represent different stages in the sales process.
 
-| Aspect | order_list_sales | invoice_list_sales |
-|--------|-----------------|-------------------|
+| Aspect | `order_list` (type="sales") | `invoice_list` (type="sales") |
+|--------|------------------------------|--------------------------------|
 | **Stage** | Pre-billing (quotations, confirmed orders) | Post-billing (bills sent) |
 | **Status** | Draft, Confirmed, Delivered | Draft, Pending, Paid, Overdue |
 | **Payment tracking** | No payment info | Tracks payments |
 
-**Use `order_list_sales` when:**
+**Use `order_list` with `type="sales"` when:**
 
 - You're looking at confirmed orders not yet invoiced
 - You want to see what's in the pipeline before billing
 - The user asks about orders or quotations
 
-**Use `invoice_list_sales` when:**
+**Use `invoice_list` with `type="sales"` when:**
 
 - You're looking at billed transactions
 - You need payment status (paid, pending, overdue)
@@ -172,12 +172,12 @@ Orders and invoices represent different stages in the sales process.
 
 ## Choosing Between Delivery Tools
 
-### delivery_list vs delivery_get_pending
+### delivery_list vs delivery_get (view="pending")
 
 Both show deliveries, but with different filters.
 
-| Aspect | delivery_list | delivery_get_pending |
-|--------|--------------|---------------------|
+| Aspect | `delivery_list` | `delivery_get` (view="pending") |
+|--------|-----------------|----------------------------------|
 | **Scope** | All deliveries (filterable) | Only pending/unshipped |
 | **Parameters** | date_from, date_to, status_id | None |
 | **Use case** | Browse history | Quick action list |
@@ -188,7 +188,7 @@ Both show deliveries, but with different filters.
 - You need to filter by specific status
 - You're reviewing delivery history
 
-**Use `delivery_get_pending` when:**
+**Use `delivery_get` with `view="pending"` when:**
 
 - You want to see what needs to be shipped today
 - You're answering "What deliveries are pending?"
@@ -202,26 +202,26 @@ Both show deliveries, but with different filters.
 Is the user asking about...
 
 Revenue/Sales totals?
-├── By customer? → financial_sales_summary
-├── Total amounts? → invoice_get_totals
-└── Specific invoices? → invoice_list_sales
+├── By customer? → financial_summary (type="sales")
+├── Total amounts? → invoice_summarize (view="totals")
+└── Specific invoices? → invoice_list (type="sales")
 
 Customer information?
-├── Contact details? → contact_list or contact_get_detail
-├── Top customers by revenue? → financial_sales_summary
-└── Transaction history? → contact_get_transactions
+├── Contact details? → contact_list or contact_get (view="detail")
+├── Top customers by revenue? → financial_summary (type="sales")
+└── Transaction history? → contact_get (view="transactions")
 
 Product information?
-├── Have exact SKU? → product_search_by_sku
+├── Have exact SKU? → product_get (with sku param)
 └── Searching by name? → product_list
 
 Invoice vs Order?
-├── Already billed? → invoice_list_sales
-└── Not yet invoiced? → order_list_sales
+├── Already billed? → invoice_list (type="sales")
+└── Not yet invoiced? → order_list (type="sales")
 
 Pending items?
-├── Overdue invoices? → invoice_get_totals
-└── Pending deliveries? → delivery_get_pending
+├── Overdue invoices? → invoice_summarize (view="totals")
+└── Pending deliveries? → delivery_get (view="pending")
 ```
 
 ---

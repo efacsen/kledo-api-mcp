@@ -63,8 +63,8 @@ classDiagram
 ## Related Tools
 
 - `contact_list` - List customers and vendors with filtering
-- `contact_get_detail` - Get contact details by ID
-- `contact_get_transactions` - Get transaction history for a contact
+- `contact_get` (with `view="detail"`) - Get contact details by ID
+- `contact_get` (with `view="transactions"`) - Get transaction history for a contact
 
 ## Example
 

@@ -72,10 +72,10 @@ Line item within an invoice. Embedded within Invoice.
 
 ## Related Tools
 
-- `invoice_list_sales` - List sales invoices with filtering
-- `invoice_list_purchase` - List purchase invoices (vendor bills)
-- `invoice_get_detail` - Get invoice details with line items
-- `invoice_get_totals` - Get invoice summary totals
+- `invoice_list` (with `type="sales"`) - List sales invoices with filtering
+- `invoice_list` (with `type="purchase"`) - List purchase invoices (vendor bills)
+- `invoice_get` - Get invoice details with line items
+- `invoice_summarize` (with `view="totals"`) - Get invoice summary totals
 
 ## Example
 

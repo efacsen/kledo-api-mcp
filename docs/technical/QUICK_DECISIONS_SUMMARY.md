@@ -109,8 +109,8 @@ amount_after_tax = Revenue INCLUDING tax (Penjualan Bruto)
 
 ### Most Used Tools (from testing):
 1. `revenue_summary` (3× calls)
-2. `invoice_list_sales` (3× calls)
-3. `sales_rep_revenue_report` (2× calls)
+2. `invoice_list` with `type="sales"` (3× calls)
+3. `sales_rep_report` (2× calls)
 
 ### Missing Data (for future):
 - ❌ Sales targets (for commissions)

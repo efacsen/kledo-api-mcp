@@ -36,22 +36,24 @@ List customers and vendors with optional search and filtering.
 
 ---
 
-## contact_get_detail
+## contact_get
 
-Get detailed information about a specific contact/customer/vendor.
+Get detailed information or transaction history for a specific contact. Use the `view` parameter to control output.
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | contact_id | integer | **Yes** | Contact ID |
+| view | string | No | Output mode: `"detail"` (default) or `"transactions"` |
 
-### Example
+### Example — Detail View
 
 **Request:**
 ```json
 {
-  "contact_id": 123
+  "contact_id": 123,
+  "view": "detail"
 }
 ```
 
@@ -62,26 +64,13 @@ Get detailed information about a specific contact/customer/vendor.
 - Address
 - Financial summary (receivables, payables)
 
-**Related Entity:** [Contact](../../entities/contact.md)
-
----
-
-## contact_get_transactions
-
-Get transaction history for a contact (invoices, payments, etc.).
-
-### Parameters
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| contact_id | integer | **Yes** | Contact ID |
-
-### Example
+### Example — Transactions View
 
 **Request:**
 ```json
 {
-  "contact_id": 123
+  "contact_id": 123,
+  "view": "transactions"
 }
 ```
 

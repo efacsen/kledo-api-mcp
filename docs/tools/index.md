@@ -4,7 +4,7 @@ This page provides a complete catalog of all MCP tools available in the Kledo MC
 
 ## Overview
 
-The Kledo MCP Server exposes **23 tools** across **6 business domains**:
+The Kledo MCP Server exposes **24 tools** across **6 business domains**:
 
 | Domain | Tools | Description |
 |--------|-------|-------------|
@@ -19,28 +19,28 @@ The Kledo MCP Server exposes **23 tools** across **6 business domains**:
 
 | Tool | Domain | Description | Entity |
 |------|--------|-------------|--------|
-| [invoice_list_sales](sales/invoices.md#invoice_list_sales) | Sales | List sales invoices with optional filtering | [Invoice](../entities/invoice.md) |
-| [invoice_get_detail](sales/invoices.md#invoice_get_detail) | Sales | Get detailed information about a specific invoice | [Invoice](../entities/invoice.md) |
-| [invoice_get_totals](sales/invoices.md#invoice_get_totals) | Sales | Get summary totals for sales invoices | [Invoice](../entities/invoice.md) |
-| [order_list_sales](sales/orders.md#order_list_sales) | Sales | List sales orders with optional filtering | [Order](../entities/order.md) |
-| [order_get_detail](sales/orders.md#order_get_detail) | Sales | Get detailed information about a specific sales order | [Order](../entities/order.md) |
-| [invoice_list_purchase](purchases/invoices.md#invoice_list_purchase) | Purchases | List purchase invoices (bills from vendors) | [Invoice](../entities/invoice.md) |
-| [order_list_purchase](purchases/orders.md#order_list_purchase) | Purchases | List purchase orders with optional filtering | [Order](../entities/order.md) |
+| [invoice_list](sales/invoices.md#invoice_list) (with `type="sales"`) | Sales | List sales invoices with optional filtering | [Invoice](../entities/invoice.md) |
+| [invoice_get](sales/invoices.md#invoice_get) | Sales | Get detailed information about a specific invoice | [Invoice](../entities/invoice.md) |
+| [invoice_summarize](sales/invoices.md#invoice_summarize) (with `view="totals"`) | Sales | Get summary totals for sales invoices | [Invoice](../entities/invoice.md) |
+| [order_list](sales/orders.md#order_list) (with `type="sales"`) | Sales | List sales orders with optional filtering | [Order](../entities/order.md) |
+| [order_get](sales/orders.md#order_get) | Sales | Get detailed information about a specific sales order | [Order](../entities/order.md) |
+| [invoice_list](purchases/invoices.md#invoice_list) (with `type="purchase"`) | Purchases | List purchase invoices (bills from vendors) | [Invoice](../entities/invoice.md) |
+| [order_list](purchases/orders.md#order_list) (with `type="purchase"`) | Purchases | List purchase orders with optional filtering | [Order](../entities/order.md) |
 | [product_list](inventory/products.md#product_list) | Inventory | List products with prices and inventory | [Product](../entities/product.md) |
-| [product_get_detail](inventory/products.md#product_get_detail) | Inventory | Get detailed information about a specific product | [Product](../entities/product.md) |
-| [product_search_by_sku](inventory/products.md#product_search_by_sku) | Inventory | Search for a product by its SKU/code | [Product](../entities/product.md) |
+| [product_get](inventory/products.md#product_get) | Inventory | Get detailed information about a specific product | [Product](../entities/product.md) |
+| [product_get](inventory/products.md#product_get) (with `sku` param) | Inventory | Search for a product by its SKU/code | [Product](../entities/product.md) |
 | [delivery_list](inventory/deliveries.md#delivery_list) | Inventory | List deliveries/shipments | [Delivery](../entities/delivery.md) |
-| [delivery_get_detail](inventory/deliveries.md#delivery_get_detail) | Inventory | Get detailed information about a specific delivery | [Delivery](../entities/delivery.md) |
-| [delivery_get_pending](inventory/deliveries.md#delivery_get_pending) | Inventory | Get list of pending/undelivered orders | [Delivery](../entities/delivery.md) |
-| [financial_activity_team_report](finance/reports.md#financial_activity_team_report) | Finance | Get team activity report for a date range | - |
-| [financial_sales_summary](finance/reports.md#financial_sales_summary) | Finance | Get sales summary by contact for a period | - |
-| [financial_purchase_summary](finance/reports.md#financial_purchase_summary) | Finance | Get purchase summary by vendor for a period | - |
-| [financial_bank_balances](finance/reports.md#financial_bank_balances) | Finance | Get current balances for all bank accounts | [Account](../entities/account.md) |
+| [delivery_get](inventory/deliveries.md#delivery_get) (with `view="detail"`) | Inventory | Get detailed information about a specific delivery | [Delivery](../entities/delivery.md) |
+| [delivery_get](inventory/deliveries.md#delivery_get) (with `view="pending"`) | Inventory | Get list of pending/undelivered orders | [Delivery](../entities/delivery.md) |
+| [financial_activity](finance/reports.md#financial_activity) | Finance | Get team activity report for a date range | - |
+| [financial_summary](finance/reports.md#financial_summary) (with `type="sales"`) | Finance | Get sales summary by contact for a period | - |
+| [financial_summary](finance/reports.md#financial_summary) (with `type="purchase"`) | Finance | Get purchase summary by vendor for a period | - |
+| [financial_balances](finance/reports.md#financial_balances) | Finance | Get current balances for all bank accounts | [Account](../entities/account.md) |
 | [contact_list](crm/contacts.md#contact_list) | CRM | List customers and vendors | [Contact](../entities/contact.md) |
-| [contact_get_detail](crm/contacts.md#contact_get_detail) | CRM | Get detailed information about a contact | [Contact](../entities/contact.md) |
-| [contact_get_transactions](crm/contacts.md#contact_get_transactions) | CRM | Get transaction history for a contact | [Contact](../entities/contact.md) |
-| [utility_clear_cache](system/utilities.md#utility_clear_cache) | System | Clear all cached data | - |
-| [utility_get_cache_stats](system/utilities.md#utility_get_cache_stats) | System | Get cache statistics and performance metrics | - |
+| [contact_get](crm/contacts.md#contact_get) (with `view="detail"`) | CRM | Get detailed information about a contact | [Contact](../entities/contact.md) |
+| [contact_get](crm/contacts.md#contact_get) (with `view="transactions"`) | CRM | Get transaction history for a contact | [Contact](../entities/contact.md) |
+| [utility_cache](system/utilities.md#utility_cache) (with `action="clear"`) | System | Clear all cached data | - |
+| [utility_cache](system/utilities.md#utility_cache) (with `action="stats"`) | System | Get cache statistics and performance metrics | - |
 | [utility_test_connection](system/utilities.md#utility_test_connection) | System | Test connection to Kledo API | - |
 
 ## Domain Pages

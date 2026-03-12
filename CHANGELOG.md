@@ -6,7 +6,7 @@
 - Genericized "For AI Models" section to be platform-agnostic
 - Removed reference to specific record counts from internal deployments
 - Removed deep-dive revenue formula details (internal business logic)
-- Kept Quick Start, all 28 tools, configuration, deployment, troubleshooting
+- Kept Quick Start, all 24 tools, configuration, deployment, troubleshooting
 - Professional open-source tone focused on what the MCP server does, not business operations
 
 ### [DOCS] Sanitize test data (09:39 UTC)
@@ -16,6 +16,6 @@
 - Updated `CLAUDE.md` to remove company name
 
 ### [FIX] Use server-side status_id filter for outstanding queries (09:33 UTC)
-- outstanding_by_customer/vendor now use Kledo API status_id param instead of fetching all invoices
+- invoice_summarize (view="by_customer"/"by_vendor") now use Kledo API status_id param instead of fetching all invoices
 - ~8-18x fewer invoices fetched per query (38 instead of 701 AR, 127 instead of 987 AP)
 - Verified: totals match exactly with Kledo UI

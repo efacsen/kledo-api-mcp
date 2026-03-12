@@ -2,14 +2,15 @@
 
 Tools for managing purchase invoices (vendor bills) in Kledo. Purchase invoices represent bills received from vendors for goods or services.
 
-## invoice_list_purchase
+## invoice_list (type="purchase")
 
-List purchase invoices (bills from vendors) with optional filtering.
+List purchase invoices (bills from vendors) with optional filtering. Use `type="purchase"`.
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
+| type | string | **Yes** | Must be `"purchase"` for purchase invoices |
 | search | string | No | Search term |
 | contact_id | integer | No | Filter by vendor ID |
 | status_id | integer | No | Filter by status |
@@ -22,6 +23,7 @@ List purchase invoices (bills from vendors) with optional filtering.
 **Request:**
 ```json
 {
+  "type": "purchase",
   "contact_id": 456,
   "status_id": 2,
   "date_from": "2024-01-01"

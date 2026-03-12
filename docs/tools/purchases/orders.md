@@ -2,14 +2,15 @@
 
 Tools for managing purchase orders in Kledo. Purchase orders represent orders placed with vendors.
 
-## order_list_purchase
+## order_list (type="purchase")
 
-List purchase orders with optional filtering.
+List purchase orders with optional filtering. Use `type="purchase"`.
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
+| type | string | **Yes** | Must be `"purchase"` for purchase orders |
 | search | string | No | Search term |
 | contact_id | integer | No | Filter by vendor ID |
 | date_from | string | No | Start date |
@@ -20,6 +21,7 @@ List purchase orders with optional filtering.
 **Request:**
 ```json
 {
+  "type": "purchase",
   "contact_id": 789,
   "date_from": "2024-01-01"
 }

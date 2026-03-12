@@ -37,21 +37,23 @@ List deliveries/shipments with optional filtering by date or status.
 
 ---
 
-## delivery_get_detail
+## delivery_get
 
-Get detailed information about a specific delivery including tracking status.
+Get detailed information about a specific delivery, or retrieve pending deliveries. Use the `view` parameter to control output.
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| delivery_id | integer | **Yes** | Delivery ID |
+| view | string | No | Output mode: `"detail"` (default) or `"pending"` |
+| delivery_id | integer | No | Delivery ID (required when view="detail") |
 
-### Example
+### Example — Detail View
 
 **Request:**
 ```json
 {
+  "view": "detail",
   "delivery_id": 456
 }
 ```
@@ -65,23 +67,13 @@ Get detailed information about a specific delivery including tracking status.
 - Reference to related order/invoice
 - Delivery notes
 
-**Related Entity:** [Delivery](../../entities/delivery.md)
-
----
-
-## delivery_get_pending
-
-Get list of pending/undelivered orders that need to be shipped.
-
-### Parameters
-
-This tool takes no parameters.
-
-### Example
+### Example — Pending View
 
 **Request:**
 ```json
-{}
+{
+  "view": "pending"
+}
 ```
 
 **Response:** Returns a list of pending deliveries that need to be shipped, including:

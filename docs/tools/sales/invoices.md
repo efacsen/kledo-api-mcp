@@ -2,14 +2,15 @@
 
 Tools for managing sales invoices in Kledo. Sales invoices represent bills sent to customers for goods or services.
 
-## invoice_list_sales
+## invoice_list
 
-List sales invoices with optional filtering by customer, status, date range, or search term.
+List sales invoices with optional filtering by customer, status, date range, or search term. Use `type="sales"` for sales invoices.
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
+| type | string | **Yes** | Invoice type: `"sales"` or `"purchase"` |
 | search | string | No | Search term for invoice number or details |
 | contact_id | integer | No | Filter by customer ID |
 | status_id | integer | No | Filter by status (1=Draft, 2=Pending, 3=Paid, etc.) |
@@ -22,6 +23,7 @@ List sales invoices with optional filtering by customer, status, date range, or 
 **Request:**
 ```json
 {
+  "type": "sales",
   "contact_id": 123,
   "status_id": 2,
   "date_from": "2024-01-01",
@@ -35,7 +37,7 @@ List sales invoices with optional filtering by customer, status, date range, or 
 
 ---
 
-## invoice_get_detail
+## invoice_get
 
 Get detailed information about a specific invoice including line items.
 
@@ -65,14 +67,15 @@ Get detailed information about a specific invoice including line items.
 
 ---
 
-## invoice_get_totals
+## invoice_summarize
 
-Get summary totals for sales invoices (total outstanding, paid, overdue, etc.).
+Get summary totals or breakdowns for invoices. Use the `view` parameter to control output.
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
+| view | string | **Yes** | Summary type: `"totals"`, `"by_customer"`, or `"by_vendor"` |
 | date_from | string | No | Start date filter |
 | date_to | string | No | End date filter |
 
@@ -81,6 +84,7 @@ Get summary totals for sales invoices (total outstanding, paid, overdue, etc.).
 **Request:**
 ```json
 {
+  "view": "totals",
   "date_from": "2024-01-01",
   "date_to": "2024-12-31"
 }

@@ -240,35 +240,32 @@ top_customers = sorted(
 
 ---
 
-## Current Tool Architecture (25 Tools)
+## Current Tool Architecture (24 Tools)
 
-### 1. Financial Reports (4 tools) - ❌ UNUSED
+### 1. Financial Reports (3 tools) - ❌ UNUSED
 ```python
-financial_activity_team_report(date_from, date_to)
-financial_sales_summary(date_from, date_to)
-financial_purchase_summary(date_from, date_to)
-financial_bank_balances()
+financial_activity(date_from, date_to)
+financial_summary(type, date_from, date_to)   # type="sales" or "purchase"
+financial_balances()
 ```
 
 **Status:** Implemented but not called in real workflows.
 
 ---
 
-### 2. Products (3 tools) - ❌ UNUSED
+### 2. Products (2 tools) - ❌ UNUSED
 ```python
 product_list(page=1, per_page=50, search=None)
-product_get_detail(product_id)
-product_search_by_sku(sku)
+product_get(product_id=None, sku=None)
 ```
 
 **Status:** Ready but not needed for current queries.
 
 ---
 
-### 3. Utilities (3 tools) - ❌ UNUSED
+### 3. Utilities (2 tools) - ❌ UNUSED
 ```python
-utility_clear_cache()
-utility_get_cache_stats()
+utility_cache(action)   # action="clear" or "stats"
 utility_test_connection()
 ```
 
@@ -276,11 +273,10 @@ utility_test_connection()
 
 ---
 
-### 4. Contacts (3 tools) - ⚠️ LOW USAGE
+### 4. Contacts (2 tools) - ⚠️ LOW USAGE
 ```python
 contact_list(page=1, per_page=50, search=None)
-contact_get_detail(contact_id)
-contact_get_transactions(contact_id)  # ✅ Used 1× in tests
+contact_get(contact_id, view="detail")   # view="transactions" ✅ Used 1× in tests
 ```
 
 **Usage:** Only transactions endpoint used (customer analysis).
@@ -288,22 +284,20 @@ contact_get_transactions(contact_id)  # ✅ Used 1× in tests
 
 ---
 
-### 5. Deliveries (3 tools) - ❌ UNUSED
+### 5. Deliveries (2 tools) - ❌ UNUSED
 ```python
 delivery_list(date_from=None, date_to=None, status_id=None)
-delivery_get_detail(delivery_id)
-delivery_get_pending()
+delivery_get(delivery_id=None, view="detail")   # view="pending" for pending deliveries
 ```
 
 **Status:** Not needed for current financial workflows.
 
 ---
 
-### 6. Orders (3 tools) - ❌ UNUSED
+### 6. Orders (2 tools) - ❌ UNUSED
 ```python
-order_list_sales(date_from=None, date_to=None)
-order_get_detail(order_id)
-order_list_purchase(date_from=None, date_to=None)
+order_list(type, date_from=None, date_to=None)   # type="sales" or "purchase"
+order_get(order_id)
 ```
 
 **Status:** Not queried in revenue/commission workflows.
@@ -312,8 +306,8 @@ order_list_purchase(date_from=None, date_to=None)
 
 ### 7. Sales Analytics (2 tools) - 🔥 HIGH USAGE
 ```python
-sales_rep_revenue_report(date_from, date_to)  # ✅ Used 2× in tests
-sales_rep_list()                               # ✅ Used 1× in tests
+sales_rep_report(date_from, date_to)  # ✅ Used 2× in tests
+sales_rep_list()                       # ✅ Used 1× in tests
 ```
 
 **Status:** CRITICAL for commission calculations.
@@ -326,9 +320,9 @@ sales_rep_list()                               # ✅ Used 1× in tests
 
 ### 8. Revenue & Receivables (3 tools) - 🔥 HIGH USAGE
 ```python
-revenue_summary(date_from, date_to)                    # ✅ Used 3× in tests
-outstanding_receivables(status_id=None, min_amount=0)
-customer_revenue_ranking(date_from, date_to, top_n=10) # ✅ Used 1× in tests
+revenue_summary(date_from, date_to)                          # ✅ Used 3× in tests
+revenue_receivables(view="list", status_id=None, min_amount=0)
+revenue_ranking(group_by="customer", date_from, date_to, top_n=10)  # ✅ Used 1× in tests
 ```
 
 **Status:** CORE tools for financial analysis.
@@ -342,16 +336,15 @@ Paid Invoices: 16
 
 ---
 
-### 9. Invoices (4 tools) - 🔥 HIGH USAGE
+### 9. Invoices (3 tools) - 🔥 HIGH USAGE
 ```python
-invoice_list_sales(date_from, date_to, status=None)  # ✅ Used 3× in tests
-invoice_get_detail(invoice_id)
-invoice_get_totals(date_from, date_to, status=None)
-invoice_list_purchase(date_from, date_to, status=None)
+invoice_list(type, date_from, date_to, status=None)  # type="sales" ✅ Used 3× in tests
+invoice_get(invoice_id)
+invoice_summarize(view, date_from, date_to)           # view="totals"/"by_customer"/"by_vendor"
 ```
 
 **Status:** ESSENTIAL for all revenue and invoice queries.
-**Most Used Tool:** `invoice_list_sales` (3 calls for different status filters).
+**Most Used Tool:** `invoice_list` with `type="sales"` (3 calls for different status filters).
 
 ---
 
@@ -363,22 +356,22 @@ invoice_list_purchase(date_from, date_to, status=None)
 | Tool Name | Call Count | Purpose | Status |
 |-----------|-----------|---------|--------|
 | `revenue_summary` | 3× | Monthly/weekly/daily revenue | ✅ CRITICAL |
-| `invoice_list_sales` | 3× | Created/paid/outstanding invoices | ✅ CRITICAL |
-| `sales_rep_revenue_report` | 2× | Commission calculations | ✅ CRITICAL |
-| `customer_revenue_ranking` | 1× | Top customer identification | ✅ IMPORTANT |
+| `invoice_list` (type="sales") | 3× | Created/paid/outstanding invoices | ✅ CRITICAL |
+| `sales_rep_report` | 2× | Commission calculations | ✅ CRITICAL |
+| `revenue_ranking` (group_by="customer") | 1× | Top customer identification | ✅ IMPORTANT |
 | `sales_rep_list` | 1× | Sales rep enumeration | ✅ IMPORTANT |
-| **All other tools (20)** | 0× | - | ❌ UNUSED |
+| **All other tools (19)** | 0× | - | ❌ UNUSED |
 
 ### Coverage Statistics
-- **Tools Used:** 5 / 25 (20%)
-- **Tools Unused:** 20 / 25 (80%)
+- **Tools Used:** 5 / 24 (21%)
+- **Tools Unused:** 19 / 24 (79%)
 - **Token Overhead:** ~4,000-6,000 tokens/request wasted on unused tool definitions
 
 ---
 
 ## Consolidation Recommendation
 
-### Proposed Architecture: 25 → 6 Tools
+### Proposed Architecture: 24 → 6 Tools
 
 #### **Tool 1: `kledo_revenue`** (replaces 3 tools)
 ```python
@@ -486,11 +479,11 @@ kledo_utility(
 
 ## Token Economics
 
-### Current Architecture (25 Tools)
+### Current Architecture (24 Tools)
 ```
 Average tool definition: 200-300 tokens
-Total per request: 5,000-7,500 tokens
-Over 10-turn conversation: 50,000-75,000 tokens
+Total per request: 4,800-7,200 tokens
+Over 10-turn conversation: 48,000-72,000 tokens
 ```
 
 ### Proposed Architecture (6 Tools)
@@ -512,8 +505,8 @@ SAVINGS: ~62,000 tokens (75% reduction)
 | Tool | Current Params | Should Be |
 |------|----------------|-----------|
 | `revenue_summary` | `date_from`, `date_to` | ✅ Correct |
-| `sales_rep_revenue_report` | `date_from`, `date_to` | ✅ Correct |
-| `invoice_list_sales` | `date_from`, `date_to` | ✅ Correct |
+| `sales_rep_report` | `date_from`, `date_to` | ✅ Correct |
+| `invoice_list` | `type`, `date_from`, `date_to` | ✅ Correct |
 
 **Good news:** Already standardized! No changes needed.
 

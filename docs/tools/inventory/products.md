@@ -36,17 +36,20 @@ List products with optional search and filtering. Shows product prices and inven
 
 ---
 
-## product_get_detail
+## product_get
 
-Get detailed information about a specific product including pricing and inventory.
+Get detailed information about a specific product, or look up a product by SKU.
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| product_id | integer | **Yes** | Product ID |
+| product_id | integer | No | Product ID (use when looking up by ID) |
+| sku | string | No | Product SKU/code (use when looking up by SKU) |
 
-### Example
+Either `product_id` or `sku` must be provided.
+
+### Example — By ID
 
 **Request:**
 ```json
@@ -62,21 +65,7 @@ Get detailed information about a specific product including pricing and inventor
 - Current stock quantity
 - Stock by warehouse breakdown
 
-**Related Entity:** [Product](../../entities/product.md)
-
----
-
-## product_search_by_sku
-
-Search for a product by its SKU/code and get current price.
-
-### Parameters
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| sku | string | **Yes** | Product SKU/code |
-
-### Example
+### Example — By SKU
 
 **Request:**
 ```json

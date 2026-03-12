@@ -29,13 +29,15 @@ revenue_summary(date_from="this_year")
 ### Invoice Listing
 ```python
 # All invoices this month
-invoice_list_sales(
+invoice_list(
+    type="sales",
     date_from="2026-01-01",
     date_to="2026-01-31"
 )
 
 # Only paid invoices
-invoice_list_sales(
+invoice_list(
+    type="sales",
     date_from="2026-01-01",
     date_to="2026-01-31",
     status="paid"  # or "unpaid", "partial"
@@ -50,7 +52,7 @@ invoice_list_sales(
 sales_rep_list()
 
 # Revenue by sales rep
-sales_rep_revenue_report(
+sales_rep_report(
     date_from="2026-01-01",
     date_to="2026-01-31"
 )
@@ -67,7 +69,8 @@ sales_rep_revenue_report(
 ### Top Customers
 ```python
 # Get top 10 customers by revenue
-customer_revenue_ranking(
+revenue_ranking(
+    group_by="customer",
     date_from="2026-01-01",
     date_to="2026-01-31",
     top_n=10
@@ -197,18 +200,19 @@ date_to="2026-01-31"
 ### By Status
 ```python
 # Paid only
-invoice_list_sales(status="paid")
+invoice_list(type="sales", status="paid")
 
 # Unpaid only
-invoice_list_sales(status="unpaid")
+invoice_list(type="sales", status="unpaid")
 
 # Partially paid
-invoice_list_sales(status="partial")
+invoice_list(type="sales", status="partial")
 ```
 
 ### By Date Range
 ```python
-invoice_list_sales(
+invoice_list(
+    type="sales",
     date_from="2026-01-01",
     date_to="2026-01-31"
 )
@@ -216,7 +220,7 @@ invoice_list_sales(
 
 ### By Customer
 ```python
-invoice_list_sales(contact_id=489)
+invoice_list(type="sales", contact_id=489)
 ```
 
 ---
@@ -230,12 +234,13 @@ revenue_summary(date_from="last_month")
 
 ### "Show unpaid invoices"
 ```python
-outstanding_receivables(status_id=1)  # 1 = Unpaid only
+revenue_receivables(view="list", status_id=1)  # 1 = Unpaid only
 ```
 
 ### "Top 5 customers this month"
 ```python
-customer_revenue_ranking(
+revenue_ranking(
+    group_by="customer",
     date_from="this_month",
     top_n=5
 )
@@ -243,12 +248,13 @@ customer_revenue_ranking(
 
 ### "Sales rep performance this month"
 ```python
-sales_rep_revenue_report(date_from="this_month")
+sales_rep_report(date_from="this_month")
 ```
 
 ### "How many invoices were paid this week?"
 ```python
-invoice_list_sales(
+invoice_list(
+    type="sales",
     date_from="2026-01-17",  # 7 days ago
     date_to="2026-01-24",     # today
     status="paid"
@@ -262,7 +268,7 @@ invoice_list_sales(
 ### Available Data
 ```python
 # Get revenue per sales rep
-sales_rep_revenue_report(date_from="this_month")
+sales_rep_report(date_from="this_month")
 
 # Returns:
 {
@@ -294,7 +300,8 @@ client.list_invoices(force_refresh=True)
 ### Pagination
 ```python
 # Get large datasets
-invoice_list_sales(
+invoice_list(
+    type="sales",
     per_page=100,  # Max items per page
     page=1          # Page number
 )
@@ -304,14 +311,15 @@ invoice_list_sales(
 Always filter by date range and status to reduce data transfer:
 ```python
 # Good - specific filters
-invoice_list_sales(
+invoice_list(
+    type="sales",
     date_from="2026-01-01",
     date_to="2026-01-31",
     status="paid"
 )
 
 # Avoid - fetching everything
-invoice_list_sales()  # Gets all invoices (slow!)
+invoice_list(type="sales")  # Gets all invoices (slow!)
 ```
 
 ---
@@ -325,29 +333,29 @@ utility_test_connection()
 
 ### Check Cache Stats
 ```python
-utility_get_cache_stats()
+utility_cache(action="stats")
 ```
 
 ### Clear Cache
 ```python
-utility_clear_cache()
+utility_cache(action="clear")
 ```
 
 ---
 
 ## 📈 Token Usage Guide
 
-### Current (25 Tools)
+### Current (24 Tools)
 - ~250 tokens per tool definition
-- 25 tools = ~6,250 tokens per request
-- 10-turn conversation = ~62,500 tokens
+- 24 tools = ~6,000 tokens per request
+- 10-turn conversation = ~60,000 tokens
 
 ### After Consolidation (6 Tools)
 - ~250 tokens per tool definition
 - 6 tools = ~1,500 tokens per request
 - 10-turn conversation = ~15,000 tokens
 
-**Savings: 47,500 tokens (76%) per 10-turn conversation**
+**Savings: 45,000 tokens (75%) per 10-turn conversation**
 
 ---
 

@@ -71,8 +71,8 @@ Item being delivered. Embedded within Delivery.
 ## Related Tools
 
 - `delivery_list` - List deliveries with filtering
-- `delivery_get_detail` - Get delivery details
-- `delivery_get_pending` - Get pending (unshipped) deliveries
+- `delivery_get` (with `view="detail"`) - Get delivery details
+- `delivery_get` (with `view="pending"`) - Get pending (unshipped) deliveries
 
 ## Example
 

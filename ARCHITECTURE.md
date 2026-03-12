@@ -229,13 +229,13 @@ async def handle_tool(name: str, args: Dict, client: KledoAPIClient) -> str:
 
 ### Tool Naming Convention
 
-Format: `{category}_{action}_{target}`
+Format: `{category}_{action}`
 
 Examples:
-- `financial_sales_summary`
-- `invoice_list_sales`
-- `product_search_by_sku`
-- `delivery_get_pending`
+- `financial_summary` (with `type="sales"`)
+- `invoice_list` (with `type="sales"`)
+- `product_get` (with `sku` param)
+- `delivery_get` (with `view="pending"`)
 
 ### Tool Response Format
 
@@ -358,7 +358,7 @@ Track these metrics:
 - API error rate
 - Authentication failures
 
-Access via: `utility_get_cache_stats` tool
+Access via: `utility_cache` tool with `action="stats"`
 
 ## Testing Strategy
 

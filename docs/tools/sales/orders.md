@@ -2,14 +2,15 @@
 
 Tools for managing sales orders in Kledo. Sales orders represent customer orders before they are invoiced.
 
-## order_list_sales
+## order_list
 
-List sales orders with optional filtering.
+List sales orders with optional filtering. Use `type="sales"` for sales orders.
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
+| type | string | **Yes** | Order type: `"sales"` or `"purchase"` |
 | search | string | No | Search term |
 | contact_id | integer | No | Filter by customer ID |
 | status_id | integer | No | Filter by status |
@@ -21,6 +22,7 @@ List sales orders with optional filtering.
 **Request:**
 ```json
 {
+  "type": "sales",
   "contact_id": 123,
   "date_from": "2024-01-01"
 }
@@ -32,7 +34,7 @@ List sales orders with optional filtering.
 
 ---
 
-## order_get_detail
+## order_get
 
 Get detailed information about a specific sales order.
 
