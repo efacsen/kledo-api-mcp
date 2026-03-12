@@ -8,10 +8,12 @@ import sys
 import subprocess
 from pathlib import Path
 
-# Add src directory to Python path for imports
-src_dir = Path(__file__).parent / "src"
-if str(src_dir) not in sys.path:
-    sys.path.insert(0, str(src_dir))
+# Add project root to sys.path so `from src.X import` works when running
+# directly (e.g. `python kledo_mcp.py`). When installed via pip/uv the
+# package is already discoverable and this is a no-op.
+_project_root = str(Path(__file__).parent)
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
 
 def main():
     """Entry point with first-run detection and CLI support."""

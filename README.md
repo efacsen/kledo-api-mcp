@@ -24,34 +24,48 @@ An MCP server that connects AI assistants (like Claude) to the Kledo accounting 
 
 **First time setup:**
 
-1. **Install the package:**
+1. **Clone and install:**
+
+   With `uv` (recommended):
+   ```bash
+   git clone https://github.com/efacsen/kledo-api-mcp.git
+   cd kledo-api-mcp
+   uv pip install -e .
+   ```
+
+   With `pip`:
    ```bash
    git clone https://github.com/efacsen/kledo-api-mcp.git
    cd kledo-api-mcp
    pip install -e .
    ```
 
+   > Don't have `uv`? Install it: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+
 2. **Run the setup wizard:**
    ```bash
-   kledo-mcp
+   kledo-mcp --setup
    ```
    The interactive wizard will:
    - ✓ Prompt for your Kledo API key
-   - ✓ Validate your connection
-   - ✓ Create your `.env` configuration
-   - ✓ Show you the Claude Desktop config to copy
+   - ✓ Validate your connection live against the Kledo API
+   - ✓ Save config to `~/.kledo/.env` (persistent across projects)
 
-3. **Copy the config to Claude Desktop:**
+3. **Get your Claude Desktop config:**
+   ```bash
+   kledo-mcp --show-config
+   ```
+   This outputs the exact JSON to paste into your Claude Desktop config file:
    - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
    - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
    - Linux: `~/.config/Claude/claude_desktop_config.json`
 
 4. **Restart Claude Desktop** - Done! 🎉
 
-**Every time after:**
-```bash
-kledo-mcp  # Just works - no setup needed
-```
+**To get your Kledo API key:**
+1. Login to [app.kledo.com](https://app.kledo.com)
+2. Go to **Settings → Integration → API**
+3. Create a new Personal Access Token
 
 **Need help?** See [Troubleshooting](#-troubleshooting) below.
 

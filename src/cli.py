@@ -207,11 +207,16 @@ def handle_show_config() -> int:
     Returns:
         Exit code: 0 for success
     """
+    import platform
+    import shutil
+
     print(f"\n{Colors.CYAN}{Colors.BOLD}Claude Desktop Configuration{Colors.RESET}")
     print(f"{Colors.CYAN}{'─' * 40}{Colors.RESET}\n")
 
-    # Get current working directory absolute path
-    Path.cwd()
+    # Resolve absolute paths — Claude Desktop does NOT inherit shell PATH,
+    # so we must use full absolute paths for command and cwd.
+    project_root = Path(__file__).parent.parent.resolve()
+    python_executable = sys.executable  # absolute path to current Python interpreter
 
     # Load configuration
     config_manager = ConfigManager()
@@ -220,7 +225,6 @@ def handle_show_config() -> int:
     if config is None:
         print(f"{Colors.YELLOW}⚠{Colors.RESET} No configuration found (.env file missing)")
         print(f"  Run {Colors.CYAN}kledo-mcp --setup{Colors.RESET} to configure the server first.\n")
-        print("Example configuration format:\n")
         config = {
             "api_key": "YOUR_API_KEY_HERE",
             "base_url": "https://api.kledo.com/api/v1",
@@ -230,61 +234,63 @@ def handle_show_config() -> int:
     else:
         print(f"{Colors.GREEN}✓{Colors.RESET} Loaded configuration from .env file\n")
 
-    # Generate Claude Desktop config JSON
-    claude_config = {
-        "mcpServers": {
-            "kledo-crm": {
-                "command": "kledo-mcp",
-                "env": {
-                    "KLEDO_API_KEY": config.get("api_key", "YOUR_API_KEY_HERE"),
-                    "KLEDO_BASE_URL": config.get("base_url", "https://api.kledo.com/api/v1"),
-                    "CACHE_ENABLED": config.get("cache_enabled", "true"),
-                    "LOG_LEVEL": config.get("log_level", "INFO")
+    env_block = {
+        "KLEDO_API_KEY": config.get("api_key", "YOUR_API_KEY_HERE"),
+        "KLEDO_BASE_URL": config.get("base_url", "https://api.kledo.com/api/v1"),
+        "CACHE_ENABLED": config.get("cache_enabled", "true"),
+        "LOG_LEVEL": config.get("log_level", "INFO")
+    }
+
+    # Prefer uv if available (handles venv automatically)
+    uv_path = shutil.which("uv")
+    if uv_path:
+        claude_config = {
+            "mcpServers": {
+                "kledo-crm": {
+                    "command": uv_path,
+                    "args": ["--directory", str(project_root), "run", "python", "-m", "src.server"],
+                    "env": env_block
                 }
             }
         }
-    }
+        method_note = f"Uses {Colors.CYAN}uv{Colors.RESET} (detected at {uv_path}) for automatic venv management."
+    else:
+        # Fallback: use absolute path to current Python interpreter
+        claude_config = {
+            "mcpServers": {
+                "kledo-crm": {
+                    "command": python_executable,
+                    "args": ["-m", "src.server"],
+                    "cwd": str(project_root),
+                    "env": env_block
+                }
+            }
+        }
+        method_note = (
+            f"Uses Python at {Colors.CYAN}{python_executable}{Colors.RESET}.\n"
+            f"  Install uv (https://docs.astral.sh/uv/) for a more portable setup."
+        )
 
     # Print JSON configuration
     print(f"{Colors.BOLD}Configuration JSON:{Colors.RESET}")
     print(json.dumps(claude_config, indent=2))
     print()
+    print(f"{Colors.YELLOW}Note:{Colors.RESET} {method_note}")
+    print()
 
-    # Print OS-specific installation instructions
-    print(f"{Colors.BOLD}Installation Instructions:{Colors.RESET}\n")
-
-    # Detect OS
-    import platform
+    # OS-specific config file path
     os_name = platform.system()
-
-    if os_name == "Darwin":  # macOS
+    if os_name == "Darwin":
         config_path = Path.home() / "Library" / "Application Support" / "Claude" / "claude_desktop_config.json"
-        print("1. Open Claude Desktop configuration file:")
-        print(f"   {Colors.BLUE}{config_path}{Colors.RESET}")
-        print()
-        print(f"2. Add the JSON above to the {Colors.CYAN}mcpServers{Colors.RESET} section")
-        print()
-        print("3. Restart Claude Desktop")
     elif os_name == "Windows":
         config_path = Path.home() / "AppData" / "Roaming" / "Claude" / "claude_desktop_config.json"
-        print("1. Open Claude Desktop configuration file:")
-        print(f"   {Colors.BLUE}{config_path}{Colors.RESET}")
-        print()
-        print(f"2. Add the JSON above to the {Colors.CYAN}mcpServers{Colors.RESET} section")
-        print()
-        print("3. Restart Claude Desktop")
-    else:  # Linux
+    else:
         config_path = Path.home() / ".config" / "Claude" / "claude_desktop_config.json"
-        print("1. Open Claude Desktop configuration file:")
-        print(f"   {Colors.BLUE}{config_path}{Colors.RESET}")
-        print()
-        print(f"2. Add the JSON above to the {Colors.CYAN}mcpServers{Colors.RESET} section")
-        print()
-        print("3. Restart Claude Desktop")
 
-    print()
-    print(f"{Colors.YELLOW}Note:{Colors.RESET} Make sure to replace YOUR_API_KEY_HERE with your actual API key")
-    print(f"      if you haven't run {Colors.CYAN}kledo-mcp --setup{Colors.RESET} yet.\n")
+    print(f"{Colors.BOLD}Next steps:{Colors.RESET}")
+    print(f"  1. Open: {Colors.BLUE}{config_path}{Colors.RESET}")
+    print(f"  2. Add the JSON above inside the {Colors.CYAN}mcpServers{Colors.RESET} key")
+    print(f"  3. Restart Claude Desktop\n")
 
     return 0
 
