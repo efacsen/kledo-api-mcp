@@ -20,7 +20,7 @@ python -m src.server          # Run server directly
 
 ### Testing
 ```bash
-pytest tests/                              # Run all tests (80% coverage enforced)
+pytest tests/                              # Run all tests (45% coverage enforced)
 pytest tests/test_auth.py                  # Run a single test file
 pytest tests/test_auth.py::test_login      # Run a single test function
 pytest --no-cov tests/                     # Skip coverage reporting
@@ -46,7 +46,7 @@ mkdocs build                   # Build static docs site
 
 1. **MCP Transport** (`src/server.py`) — Registers tools, dispatches `call_tool()` by tool name prefix to the appropriate handler module. Uses stdio transport via `mcp.server.stdio`.
 
-2. **Tool Handlers** (`src/tools/*.py`) — Each module exports `get_tools() -> list[Tool]` and `async handle_tool(name, arguments, client) -> str`. Modules: `financial`, `invoices`, `revenue`, `sales_analytics`, `orders`, `contacts`, `deliveries`, `products`, `utilities`.
+2. **Tool Handlers** (`src/tools/*.py`) — Each module exports `get_tools() -> list[Tool]` and `async handle_tool(name, arguments, client) -> str`. Modules: `analytics`, `commission`, `contacts`, `deliveries`, `financial`, `invoices`, `orders`, `products`, `revenue`, `sales_analytics`, `utilities`.
 
 3. **Smart Routing** (`src/routing/`) — Natural language query routing using fuzzy matching (RapidFuzz at 80% threshold), synonym mapping for ID/EN business terms, idiomatic pattern matching, and relevance scoring.
 
