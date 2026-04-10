@@ -7,13 +7,23 @@ Wave 0 purpose: lock behavioral contracts before any code changes.
 Requirements: QUAL-01, QUAL-02, QUAL-03
 """
 import pytest
-from unittest.mock import AsyncMock, patch, MagicMock, Mock
+from unittest.mock import AsyncMock, Mock
 from src.server import mcp
 from src.tools import invoices, orders, deliveries, contacts, products
 from src.kledo_client import KledoAPIClient
 
-# The 24 tool names registered in server.py
-TOOL_NAMES = [
+
+def _get_tools() -> dict:
+    """Return the dict of registered tools from the FastMCP tool manager."""
+    # mcp._tool_manager._tools is the internal dict[str, Tool] in mcp>=1.0.0
+    return mcp._tool_manager._tools
+
+
+# ---------------------------------------------------------------------------
+# Tool names — all 24 tools registered in server.py
+# ---------------------------------------------------------------------------
+
+ALL_TOOL_NAMES = [
     "financial_activity",
     "financial_summary",
     "financial_balances",
@@ -42,79 +52,104 @@ TOOL_NAMES = [
 
 
 class TestToolDescriptions:
-    """QUAL-01: Every tool description must contain four structured markers."""
+    """QUAL-01: Every @mcp.tool() must have a four-part description with WHAT/RETURNS/NOT/SIBLING."""
 
-    @pytest.mark.parametrize("tool_name", TOOL_NAMES)
-    def test_description_has_what_marker(self, tool_name: str) -> None:
-        """Tool description must contain 'WHAT:' marker."""
-        tools = mcp._tool_manager._tools
-        assert tool_name in tools, f"Tool '{tool_name}' not found in mcp registry"
+    @pytest.mark.parametrize("tool_name", ALL_TOOL_NAMES)
+    def test_description_has_what_marker(self, tool_name):
+        """Each tool description must contain 'WHAT:'."""
+        tools = _get_tools()
+        assert tool_name in tools, f"Tool '{tool_name}' not registered in mcp"
         tool = tools[tool_name]
         desc = tool.description or ""
         assert "WHAT:" in desc, (
             f"Tool '{tool_name}' description missing 'WHAT:' marker. "
-            f"Current description: {desc[:200]!r}"
+            f"Got: {desc[:100]!r}"
         )
 
-    @pytest.mark.parametrize("tool_name", TOOL_NAMES)
-    def test_description_has_returns_marker(self, tool_name: str) -> None:
-        """Tool description must contain 'RETURNS:' marker."""
-        tools = mcp._tool_manager._tools
-        assert tool_name in tools, f"Tool '{tool_name}' not found in mcp registry"
+    @pytest.mark.parametrize("tool_name", ALL_TOOL_NAMES)
+    def test_description_has_returns_marker(self, tool_name):
+        """Each tool description must contain 'RETURNS:'."""
+        tools = _get_tools()
+        assert tool_name in tools, f"Tool '{tool_name}' not registered in mcp"
         tool = tools[tool_name]
         desc = tool.description or ""
         assert "RETURNS:" in desc, (
             f"Tool '{tool_name}' description missing 'RETURNS:' marker. "
-            f"Current description: {desc[:200]!r}"
+            f"Got: {desc[:100]!r}"
         )
 
-    @pytest.mark.parametrize("tool_name", TOOL_NAMES)
-    def test_description_has_not_marker(self, tool_name: str) -> None:
-        """Tool description must contain 'NOT:' marker."""
-        tools = mcp._tool_manager._tools
-        assert tool_name in tools, f"Tool '{tool_name}' not found in mcp registry"
+    @pytest.mark.parametrize("tool_name", ALL_TOOL_NAMES)
+    def test_description_has_not_marker(self, tool_name):
+        """Each tool description must contain 'NOT:'."""
+        tools = _get_tools()
+        assert tool_name in tools, f"Tool '{tool_name}' not registered in mcp"
         tool = tools[tool_name]
         desc = tool.description or ""
         assert "NOT:" in desc, (
             f"Tool '{tool_name}' description missing 'NOT:' marker. "
-            f"Current description: {desc[:200]!r}"
+            f"Got: {desc[:100]!r}"
         )
 
-    @pytest.mark.parametrize("tool_name", TOOL_NAMES)
-    def test_description_has_sibling_marker(self, tool_name: str) -> None:
-        """Tool description must contain 'SIBLING:' marker."""
-        tools = mcp._tool_manager._tools
-        assert tool_name in tools, f"Tool '{tool_name}' not found in mcp registry"
+    @pytest.mark.parametrize("tool_name", ALL_TOOL_NAMES)
+    def test_description_has_sibling_marker(self, tool_name):
+        """Each tool description must contain 'SIBLING:'."""
+        tools = _get_tools()
+        assert tool_name in tools, f"Tool '{tool_name}' not registered in mcp"
         tool = tools[tool_name]
         desc = tool.description or ""
         assert "SIBLING:" in desc, (
             f"Tool '{tool_name}' description missing 'SIBLING:' marker. "
-            f"Current description: {desc[:200]!r}"
+            f"Got: {desc[:100]!r}"
         )
 
 
 class TestToolParameters:
-    """QUAL-02: Every non-ctx parameter must have a 'description' key in its schema."""
+    """QUAL-02: Every non-ctx parameter must have a 'description' key in its inputSchema property."""
 
-    @pytest.mark.parametrize("tool_name", TOOL_NAMES)
-    def test_all_parameters_have_description(self, tool_name: str) -> None:
-        """Every non-ctx parameter must have a 'description' key in inputSchema.properties."""
-        tools = mcp._tool_manager._tools
-        assert tool_name in tools, f"Tool '{tool_name}' not found in mcp registry"
+    @pytest.mark.parametrize("tool_name", ALL_TOOL_NAMES)
+    def test_all_non_ctx_params_have_description(self, tool_name):
+        """Every parameter except 'ctx' must include a 'description' in its schema."""
+        tools = _get_tools()
+        assert tool_name in tools, f"Tool '{tool_name}' not registered in mcp"
         tool = tools[tool_name]
+
         params = tool.parameters
-        if params is None:
+        if not params:
             return  # No parameters — trivially passes
+
         props = params.get("properties", {})
         if not props:
             return  # No properties — trivially passes
-        for key, val in props.items():
-            if key == "ctx":
-                continue  # FastMCP injects Context automatically — skip
-            assert "description" in val, (
-                f"Tool '{tool_name}' param '{key}' is missing 'description' in its schema. "
-                f"Current schema: {val!r}"
+
+        for param_key, param_val in props.items():
+            if param_key == "ctx":
+                continue  # ctx is injected by FastMCP — must NOT appear in schema
+            assert "description" in param_val, (
+                f"Tool '{tool_name}' parameter '{param_key}' missing 'description' "
+                f"in inputSchema. Got keys: {list(param_val.keys())}"
             )
+
+    @pytest.mark.parametrize("tool_name", ALL_TOOL_NAMES)
+    def test_ctx_not_in_input_schema(self, tool_name):
+        """ctx must NOT appear in inputSchema.properties (FastMCP injects it automatically)."""
+        tools = _get_tools()
+        assert tool_name in tools, f"Tool '{tool_name}' not registered in mcp"
+        tool = tools[tool_name]
+
+        params = tool.parameters
+        if not params:
+            return
+
+        props = params.get("properties", {})
+        assert "ctx" not in props, (
+            f"Tool '{tool_name}' has 'ctx' in inputSchema.properties — "
+            f"ctx must be left bare (not wrapped in Annotated) so FastMCP excludes it."
+        )
+
+
+# ---------------------------------------------------------------------------
+# QUAL-03 helpers — mock clients and sample data for list function tests
+# ---------------------------------------------------------------------------
 
 
 def _make_invoice_mock_client(items: list[dict]) -> Mock:
@@ -158,6 +193,19 @@ SAMPLE_INVOICE = {
     "status_id": 1,
 }
 
+SAMPLE_PURCHASE_INVOICE = {
+    "id": 601,
+    "ref_number": "PI/TEST/001",
+    "contact": {"name": "Vendor A", "company": "PT Vendor Co"},
+    "trans_date": "2024-01-01",
+    "due_date": "2024-01-31",
+    "amount_after_tax": 2000000,
+    "subtotal": 1800000,
+    "total_tax": 200000,
+    "due": 2000000,
+    "status_id": 1,
+}
+
 SAMPLE_ORDER = {
     "id": 201,
     "ref_number": "SO/TEST/001",
@@ -165,6 +213,16 @@ SAMPLE_ORDER = {
     "trans_date": "2024-01-01",
     "amount_after_tax": 500000,
     "subtotal": 450000,
+    "status_id": 5,
+}
+
+SAMPLE_PURCHASE_ORDER = {
+    "id": 701,
+    "ref_number": "PO/TEST/001",
+    "contact": {"name": "Vendor B"},
+    "trans_date": "2024-01-01",
+    "amount_after_tax": 750000,
+    "subtotal": 675000,
     "status_id": 5,
 }
 
@@ -193,29 +251,6 @@ SAMPLE_PRODUCT = {
     "price": 100000,
     "qty": 50,
     "category_name": "Paint",
-}
-
-SAMPLE_PURCHASE_INVOICE = {
-    "id": 601,
-    "ref_number": "PI/TEST/001",
-    "contact": {"name": "Vendor A", "company": "PT Vendor Co"},
-    "trans_date": "2024-01-01",
-    "due_date": "2024-01-31",
-    "amount_after_tax": 2000000,
-    "subtotal": 1800000,
-    "total_tax": 200000,
-    "due": 2000000,
-    "status_id": 1,
-}
-
-SAMPLE_PURCHASE_ORDER = {
-    "id": 701,
-    "ref_number": "PO/TEST/001",
-    "contact": {"name": "Vendor B"},
-    "trans_date": "2024-01-01",
-    "amount_after_tax": 750000,
-    "subtotal": 675000,
-    "status_id": 5,
 }
 
 
@@ -300,7 +335,7 @@ class TestTruncationConsistency:
                 "phone": f"0812{i:07d}",
                 "type_name": "Customer",
             }
-            for i in range(1, 26)  # 25 contacts
+            for i in range(1, 26)
         ]
         mock_client = _make_contacts_mock_client(items)
         result = await contacts._list_contacts({"per_page": 25}, mock_client)
@@ -320,7 +355,7 @@ class TestTruncationConsistency:
                 "qty": 10 * i,
                 "category_name": "Paint",
             }
-            for i in range(1, 26)  # 25 products
+            for i in range(1, 26)
         ]
         mock_client = _make_products_mock_client(items)
         result = await products._list_products({"per_page": 25}, mock_client)
