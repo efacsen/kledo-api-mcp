@@ -2,6 +2,65 @@
 
 This document maps Kledo API endpoints to MCP tools and provides usage examples.
 
+---
+
+## Field Glossary — Invoice (`GET /finance/invoices`)
+
+Critical fields and their meaning in PT CSS business context:
+
+| Field | Type | Meaning | Notes |
+|-------|------|---------|-------|
+| `id` | int | Invoice record ID | Internal Kledo ID |
+| `contact_id` | int | Customer ID | References `GET /finance/contacts/{id}` |
+| `sales_id` | int | Sales rep's Kledo user ID | **Native field.** 6-digit number. Same as `sales_person.id` |
+| `owner_id` | int | Who created the invoice | Can differ from `sales_id` — e.g. admin inputs invoice on behalf of a sales rep |
+| `status_id` | int | Payment status | 1=Unpaid, 2=Partial, 3=Paid |
+| `amount_after_tax` | int | Total invoice value incl. tax | |
+| `due` | int | Remaining unpaid amount | 0 if fully paid |
+| `subtotal` | int | Net sales before tax | = "Penjualan Neto" |
+
+### `sales_id` vs `sales_person` object
+
+Both refer to the same person and same ID value:
+
+```json
+"sales_id": 352181,
+"sales_person": {
+  "id": 352181,
+  "name": "Elmo Abu Abdillah"
+}
+```
+
+`sales_person` is an expanded object returned by Kledo — it's not a separate concept, just `sales_id` with the name joined in. When filtering by sales rep, use `sales_id`.
+
+### `sales_id` vs `owner_id`
+
+```json
+"owner_id": 218933,   ← Meka (created the invoice)
+"sales_id": 352181,   ← Elmo (assigned sales rep)
+```
+
+These can be different people. For access control and attribution, always use `sales_id`, not `owner_id`.
+
+---
+
+## Kledo Users
+
+### List PT CSS Employees
+- **Endpoint**: `GET /users`
+- **Returns**: All Kledo user accounts for PT CSS
+- **Key field**: `id` — the 6-digit user ID
+- **Usage**: This `id` is the same value as `sales_id` in invoices and `sales_id` in orders
+
+**This is how CSS Agent identifies which sales rep owns which invoice:**
+```
+CSS Agent user.kledo_user_id  ==  invoice.sales_id  ==  order.sales_id
+```
+
+No MCP tool wraps this endpoint currently — used internally for user setup.
+
+---
+
 ## Authentication
 
 ### Login
@@ -18,18 +77,6 @@ This document maps Kledo API endpoints to MCP tools and provides usage examples.
 ---
 
 ## Financial Reports
-
-### Team Activity Report
-- **Tool**: `financial_activity`
-- **Endpoint**: `GET /reportings/activity-team`
-- **Parameters**:
-  - `date_from` (YYYY-MM) - Start month
-  - `date_to` (YYYY-MM) - End month
-- **Cache**: 1 hour
-- **Example**:
-  ```
-  "Show me team activity for last month"
-  ```
 
 ### Sales Summary by Contact
 - **Tool**: `financial_summary` (with `type="sales"`)
