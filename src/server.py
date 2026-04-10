@@ -29,7 +29,7 @@ from pydantic import Field
 if __package__:
     from .auth import KledoAuthenticator
     from .cache import KledoCache
-    from .kledo_client import KledoAPIClient
+    from .kledo_client import KledoAPIClient, current_tool
     from .tools import (
         analytics,
         commission,
@@ -50,7 +50,7 @@ else:  # pragma: no cover — only executed when running server.py as a direct s
         sys.path.insert(0, str(src_dir))
     from auth import KledoAuthenticator  # type: ignore[no-redef]
     from cache import KledoCache  # type: ignore[no-redef]
-    from kledo_client import KledoAPIClient  # type: ignore[no-redef]
+    from kledo_client import KledoAPIClient, current_tool  # type: ignore[no-redef]
     from tools import (  # type: ignore[no-redef]
         analytics,
         commission,
@@ -269,6 +269,7 @@ async def _tool_financial_activity(
 ) -> str:
     """Fetch team activity log from Kledo."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("financial_activity")
     args = {"date_from": date_from, "date_to": date_to}
     try:
         return await financial._activity_team_report(args, app_ctx.client)
@@ -314,6 +315,7 @@ async def _tool_financial_summary(
 ) -> str:
     """Fetch aggregated financial summary grouped by customer or sales rep."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("financial_summary")
     args = {"type": type, "group_by": group_by, "date_from": date_from, "date_to": date_to}
     try:
         if type == "purchase":
@@ -344,6 +346,7 @@ async def _tool_financial_summary(
 async def _tool_financial_balances(ctx: Context = None) -> str:
     """Fetch current bank account balances for all Kledo accounts."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("financial_balances")
     try:
         return await financial._bank_balances({}, app_ctx.client)
     except Exception as e:
@@ -407,6 +410,7 @@ async def _tool_invoice_list(
 ) -> str:
     """List sales or purchase invoices with optional filters."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("invoice_list")
     args = {
         "type": type,
         "date_from": date_from,
@@ -451,6 +455,7 @@ async def _tool_invoice_get(
 ) -> str:
     """Fetch full detail for a single invoice by numeric ID."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("invoice_get")
     try:
         return await invoices._get_invoice_detail({"invoice_id": invoice_id}, app_ctx.client)
     except Exception as e:
@@ -492,6 +497,7 @@ async def _tool_invoice_summarize(
 ) -> str:
     """Return aggregated invoice totals without individual rows."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("invoice_summarize")
     args = {"view": view, "date_from": date_from, "date_to": date_to}
     try:
         if view == "by_customer":
@@ -548,6 +554,7 @@ async def _tool_order_list(
 ) -> str:
     """List sales or purchase orders with optional filters."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("order_list")
     args = {
         "type": type,
         "date_from": date_from,
@@ -589,6 +596,7 @@ async def _tool_order_get(
 ) -> str:
     """Fetch full detail for a single order by numeric ID."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("order_get")
     try:
         return await orders._get_order({"order_id": order_id}, app_ctx.client)
     except Exception as e:
@@ -633,6 +641,7 @@ async def _tool_product_list(
 ) -> str:
     """List products with optional keyword filter and inventory quantities."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("product_list")
     args = {"search": search, "include_inventory": include_inventory, "per_page": per_page}
     try:
         return await products._list_products(args, app_ctx.client)
@@ -667,6 +676,7 @@ async def _tool_product_get(
 ) -> str:
     """Fetch full product detail by ID or SKU code."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("product_get")
     try:
         if sku:
             return await products._search_by_sku({"sku": sku}, app_ctx.client)
@@ -715,6 +725,7 @@ async def _tool_contact_list(
 ) -> str:
     """List contacts with optional name/type filter."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("contact_list")
     args = {"search": search, "type": type, "per_page": per_page}
     try:
         return await contacts._list_contacts(args, app_ctx.client)
@@ -751,6 +762,7 @@ async def _tool_contact_get(
 ) -> str:
     """Fetch full contact detail by ID, optionally with transaction history."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("contact_get")
     try:
         if include_transactions:
             return await contacts._get_contact_transactions(
@@ -803,6 +815,7 @@ async def _tool_delivery_list(
 ) -> str:
     """List delivery orders with optional date/status filter."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("delivery_list")
     args = {"date_from": date_from, "date_to": date_to, "status": status, "per_page": per_page}
     try:
         if status == "pending":
@@ -835,6 +848,7 @@ async def _tool_delivery_get(
 ) -> str:
     """Fetch full detail for a single delivery order by numeric ID."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("delivery_get")
     try:
         return await deliveries._get_delivery_detail({"delivery_id": delivery_id}, app_ctx.client)
     except Exception as e:
@@ -871,6 +885,7 @@ async def _tool_utility_cache(
 ) -> str:
     """Inspect or clear the local API response cache."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("utility_cache")
     args = {"action": action}
     try:
         if action == "clear":
@@ -899,6 +914,7 @@ async def _tool_utility_cache(
 async def _tool_utility_test_connection(ctx: Context = None) -> str:
     """Test Kledo API connectivity and authentication status."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("utility_test_connection")
     try:
         return await utilities._test_connection({}, app_ctx.client)
     except Exception as e:
@@ -950,6 +966,7 @@ async def _tool_sales_rep_report(
 ) -> str:
     """Fetch sales performance report for one or all sales reps."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("sales_rep_report")
     args = {
         "period": period,
         "sales_rep_id": sales_rep_id,
@@ -992,6 +1009,7 @@ async def _tool_sales_rep_list(
 ) -> str:
     """List all active sales representatives with paid invoice counts."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("sales_rep_list")
     args = {"date_from": date_from, "date_to": date_to}
     try:
         return await sales_analytics._sales_rep_list(app_ctx.client, args)
@@ -1034,6 +1052,7 @@ async def _tool_revenue_summary(
 ) -> str:
     """Fetch high-level revenue summary for a date range."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("revenue_summary")
     args = {"date_from": date_from, "date_to": date_to}
     try:
         await ctx.report_progress(0, 3)
@@ -1081,6 +1100,7 @@ async def _tool_revenue_receivables(
 ) -> str:
     """Fetch accounts receivable report in list, aging, or concentration view."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("revenue_receivables")
     args = {"view": view, "date_from": date_from, "date_to": date_to}
     try:
         if view == "aging":
@@ -1128,6 +1148,7 @@ async def _tool_revenue_ranking(
 ) -> str:
     """Rank revenue by customer or day for a date range."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("revenue_ranking")
     args = {"group_by": group_by, "date_from": date_from, "date_to": date_to}
     try:
         if group_by == "day":
@@ -1177,6 +1198,7 @@ async def _tool_analytics_compare(
 ) -> str:
     """Compare a metric between two named periods."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("analytics_compare")
     args = {"metric": metric, "period_a": period_a, "period_b": period_b}
     try:
         await ctx.report_progress(0, 2)
@@ -1231,6 +1253,7 @@ async def _tool_analytics_targets(
 ) -> str:
     """Report on, identify underperformers, or set sales targets."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("analytics_targets")
     args = {
         "action": action,
         "period": period,
@@ -1288,6 +1311,7 @@ async def _tool_commission_report(
 ) -> str:
     """Calculate commission from paid invoice subtotals for one or all reps."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
+    current_tool.set("commission_report")
     args = {"period": period, "sales_person_name": sales_person_name, "flat_rate": flat_rate}
     try:
         await ctx.report_progress(0, 2)

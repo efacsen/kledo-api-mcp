@@ -1,15 +1,26 @@
 """
 Kledo API Client
 """
+import asyncio
+import json
+import os
+import sqlite3
+import time
+from contextvars import ContextVar
+from pathlib import Path
+from typing import Any, Dict, Optional
+
 import httpx
 import yaml
-from typing import Any, Dict, Optional
-from pathlib import Path
 from loguru import logger
 
 from .auth import KledoAuthenticator
 from .cache import KledoCache
 from .utils.helpers import calculate_hash, clean_params
+
+# Set by each @mcp.tool() function before calling any client method.
+# Allows _request() to tag every HTTP call with the originating tool name.
+current_tool: ContextVar[str] = ContextVar("current_tool", default="unknown")
 
 
 class KledoAPIClient:
@@ -88,6 +99,36 @@ class KledoAPIClient:
             return f"{endpoint}:{param_hash}"
         return endpoint
 
+    def _log_endpoint_sync(
+        self,
+        tool_name: str,
+        method: str,
+        endpoint: str,
+        params: Optional[Dict],
+        response_ms: int,
+        success: bool,
+    ) -> None:
+        """Write one endpoint call to kledo_endpoint_log in the CSS Agent DB.
+        Runs in a thread via asyncio.to_thread — uses stdlib sqlite3."""
+        db_path = os.environ.get("DB_PATH")
+        if not db_path:
+            return
+        try:
+            params_str = json.dumps(
+                {k: v for k, v in (params or {}).items() if v is not None}
+            )
+            conn = sqlite3.connect(db_path, timeout=5)
+            conn.execute(
+                """INSERT INTO kledo_endpoint_log
+                   (tool_name, method, endpoint, params, response_ms, success)
+                   VALUES (?, ?, ?, ?, ?, ?)""",
+                (tool_name, method, endpoint, params_str, response_ms, int(success)),
+            )
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            logger.debug(f"endpoint_log write failed: {e}")
+
     async def _request(
         self,
         method: str,
@@ -134,6 +175,9 @@ class KledoAPIClient:
             params = clean_params(params)
 
         # Make request
+        tool_name = current_tool.get()
+        t_start = time.monotonic()
+        success = True
         try:
             headers = self.auth.get_auth_headers()
             headers["Content-Type"] = "application/json"
@@ -160,15 +204,26 @@ class KledoAPIClient:
                 return data
 
         except httpx.HTTPStatusError as e:
+            success = False
             logger.error(f"HTTP {e.response.status_code} error for {endpoint}")
             logger.debug(f"Response: {e.response.text}")
             raise
         except httpx.RequestError as e:
+            success = False
             logger.error(f"Network error for {endpoint}: {str(e)}")
             raise
         except Exception as e:
+            success = False
             logger.error(f"Unexpected error for {endpoint}: {str(e)}")
             raise
+        finally:
+            response_ms = int((time.monotonic() - t_start) * 1000)
+            asyncio.create_task(
+                asyncio.to_thread(
+                    self._log_endpoint_sync,
+                    tool_name, method, endpoint, params, response_ms, success,
+                )
+            )
 
     async def get(
         self,
