@@ -91,10 +91,13 @@ fi
 ok "Package installed"
 
 # ── 4. Verify kledo-mcp CLI is available ──────────────────────────────────────
-# When installed via uv, the binary lives in the uv-managed venv — use `uv run`
+# When installed via uv, the binary lives in the uv-managed venv — use `uv run`.
+# Also set PYTHONPATH to include the project root so that kledo_mcp.py (at root)
+# is importable — the editable .pth only adds src/, not the project root.
 if [[ "$USE_UV" == "true" ]]; then
+  export PYTHONPATH="$INSTALL_DIR${PYTHONPATH:+:$PYTHONPATH}"
   KLEDO_MCP_CMD=(uv run kledo-mcp)
-  ok "CLI: uv run kledo-mcp"
+  ok "CLI: uv run kledo-mcp (PYTHONPATH includes project root)"
 elif command -v kledo-mcp &>/dev/null; then
   KLEDO_MCP_CMD=(kledo-mcp)
   ok "CLI: $(command -v kledo-mcp)"
