@@ -70,7 +70,7 @@
 **Plans**: 3 plans
   - [x] 05-01-PLAN.md — Wave 0: contract test scaffold for QUAL-01, QUAL-02, QUAL-03 (RED until implementation)
   - [x] 05-02-PLAN.md — Wave 1: rewrite all 24 tool descriptions + Annotated parameter annotations in server.py
-  - [ ] 05-03-PLAN.md — Wave 2: add ID exposure + standardize truncation to 20 in 5 tool modules
+  - [x] 05-03-PLAN.md — Wave 2: add ID exposure + standardize truncation to 20 in 5 tool modules
 
 ### Phase 6: Tool Consolidation
 **Goal**: The tool surface shrinks to 14-16 dedicated tools through merging near-duplicates, dead routing code is deleted, and the dependency list reflects only what is actually used
