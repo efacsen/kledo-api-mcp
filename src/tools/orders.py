@@ -78,6 +78,9 @@ async def _list_sales_orders(args: dict[str, Any], client: KledoAPIClient) -> st
             status = status_map.get(status_id, f"Status-{status_id}")
 
             result.append(f"### {order_number}")
+            order_id = safe_get(order, "id")          # numeric ID for order_get
+            if order_id is not None:
+                result.append(f"- **ID**: {order_id}")
             result.append(f"- **Customer**: {customer}")
             result.append(f"- **Date**: {date}")
             result.append(f"- **Amount**: {format_currency(amount)}")
@@ -199,6 +202,9 @@ async def _list_purchase_orders(args: dict[str, Any], client: KledoAPIClient) ->
             status = status_map.get(status_id, f"Status-{status_id}")
 
             result.append(f"### {order_number}")
+            order_id = safe_get(order, "id")          # numeric ID for order_get
+            if order_id is not None:
+                result.append(f"- **ID**: {order_id}")
             result.append(f"- **Vendor**: {vendor}")
             result.append(f"- **Date**: {date}")
             result.append(f"- **Amount**: {format_currency(amount)}")

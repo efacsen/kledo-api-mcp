@@ -529,6 +529,9 @@ async def _list_sales_invoices(args: dict[str, Any], client: KledoAPIClient) -> 
             status = status_map.get(status_id, f"Status-{status_id}")
 
             result.append(f"### {inv_number}")
+            inv_id = safe_get(invoice, "id")          # numeric ID for invoice_get
+            if inv_id is not None:
+                result.append(f"- **ID**: {inv_id}")
             result.append(f"- **Customer**: {customer}")
             result.append(f"- **Date**: {date}")
             if due_date:
@@ -1550,6 +1553,9 @@ async def _list_purchase_invoices(args: dict[str, Any], client: KledoAPIClient) 
             status = status_map.get(status_id, f"Status-{status_id}")
 
             result.append(f"### {inv_number}")
+            inv_id = safe_get(invoice, "id")          # numeric ID for invoice_get
+            if inv_id is not None:
+                result.append(f"- **ID**: {inv_id}")
             result.append(f"- **Vendor**: {vendor}")
             result.append(f"- **Date**: {date}")
             if due_date:

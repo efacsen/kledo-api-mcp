@@ -29,7 +29,7 @@ async def _list_contacts(args: dict[str, Any], client: KledoAPIClient) -> str:
 
         result.append("\n## Contact List:\n")
 
-        for contact in contacts[:30]:
+        for contact in contacts[:20]:   # was [:30] — standardized to 20 (QUAL-03)
             name = safe_get(contact, "name", "Unknown")
             company = safe_get(contact, "company")
             email = safe_get(contact, "email", "N/A")
@@ -37,14 +37,17 @@ async def _list_contacts(args: dict[str, Any], client: KledoAPIClient) -> str:
             type_name = safe_get(contact, "type_name", "Unknown")
 
             result.append(f"### {name}")
+            contact_id = safe_get(contact, "id")      # numeric ID for contact_get
+            if contact_id is not None:
+                result.append(f"- **ID**: {contact_id}")
             if company:
                 result.append(f"- **Company**: {company}")
             result.append(f"- **Type**: {type_name}")
             result.append(f"- **Email**: {email}")
             result.append(f"- **Phone**: {phone}\n")
 
-        if len(contacts) > 30:
-            result.append(f"... and {len(contacts) - 30} more contacts")
+        if len(contacts) > 20:          # was > 30
+            result.append(f"... and {len(contacts) - 20} more contacts")   # was - 30
 
         return "\n".join(result)
 

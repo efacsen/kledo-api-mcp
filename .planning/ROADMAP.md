@@ -68,8 +68,8 @@
   2. Every input parameter has a `.describe()` string stating its type, format constraints, and default value
   3. Tool responses present IDs Claude can use in follow-up calls (e.g. invoice ID appears as a quoted field, not buried in a markdown table), and large results are truncated with an explicit count of omitted records
 **Plans**: 3 plans
-  - [ ] 05-01-PLAN.md — Wave 0: contract test scaffold for QUAL-01, QUAL-02, QUAL-03 (RED until implementation)
-  - [ ] 05-02-PLAN.md — Wave 1: rewrite all 24 tool descriptions + Annotated parameter annotations in server.py
+  - [x] 05-01-PLAN.md — Wave 0: contract test scaffold for QUAL-01, QUAL-02, QUAL-03 (RED until implementation)
+  - [x] 05-02-PLAN.md — Wave 1: rewrite all 24 tool descriptions + Annotated parameter annotations in server.py
   - [ ] 05-03-PLAN.md — Wave 2: add ID exposure + standardize truncation to 20 in 5 tool modules
 
 ### Phase 6: Tool Consolidation

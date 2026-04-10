@@ -29,7 +29,7 @@ async def _list_products(args: dict[str, Any], client: KledoAPIClient) -> str:
 
         result.append("\n## Product List:\n")
 
-        for product in products[:30]:  # Show more products
+        for product in products[:20]:   # was [:30] — standardized to 20 (QUAL-03)
             name = safe_get(product, "name", "Unknown")
             code = safe_get(product, "code", "N/A")
             price = safe_get(product, "price", 0)
@@ -37,6 +37,9 @@ async def _list_products(args: dict[str, Any], client: KledoAPIClient) -> str:
             category = safe_get(product, "category_name", "Uncategorized")
 
             result.append(f"### {name}")
+            product_id = safe_get(product, "id")      # numeric ID for product_get
+            if product_id is not None:
+                result.append(f"- **ID**: {product_id}")
             result.append(f"- **SKU**: {code}")
             result.append(f"- **Price**: {format_currency(price)}")
             result.append(f"- **Category**: {category}")
@@ -46,8 +49,8 @@ async def _list_products(args: dict[str, Any], client: KledoAPIClient) -> str:
 
             result.append("")
 
-        if len(products) > 30:
-            result.append(f"... and {len(products) - 30} more products")
+        if len(products) > 20:          # was > 30
+            result.append(f"... and {len(products) - 20} more products")   # was - 30
 
         return "\n".join(result)
 

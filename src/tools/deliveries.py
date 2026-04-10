@@ -57,6 +57,9 @@ async def _list_deliveries(args: dict[str, Any], client: KledoAPIClient) -> str:
             shipping_company = safe_get(delivery, "shipping_company.name", "N/A")
 
             result.append(f"### {delivery_number}")
+            delivery_id = safe_get(delivery, "id")    # numeric ID for delivery_get
+            if delivery_id is not None:
+                result.append(f"- **ID**: {delivery_id}")
             result.append(f"- **Customer**: {customer}")
             result.append(f"- **Date**: {date}")
             result.append(f"- **Status**: {status}")
