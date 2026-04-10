@@ -67,7 +67,10 @@
   1. Every tool description follows the four-part pattern: what it does, what it returns, what it does NOT do, when to use a sibling tool instead
   2. Every input parameter has a `.describe()` string stating its type, format constraints, and default value
   3. Tool responses present IDs Claude can use in follow-up calls (e.g. invoice ID appears as a quoted field, not buried in a markdown table), and large results are truncated with an explicit count of omitted records
-**Plans**: TBD
+**Plans**: 3 plans
+  - [ ] 05-01-PLAN.md — Wave 0: contract test scaffold for QUAL-01, QUAL-02, QUAL-03 (RED until implementation)
+  - [ ] 05-02-PLAN.md — Wave 1: rewrite all 24 tool descriptions + Annotated parameter annotations in server.py
+  - [ ] 05-03-PLAN.md — Wave 2: add ID exposure + standardize truncation to 20 in 5 tool modules
 
 ### Phase 6: Tool Consolidation
 **Goal**: The tool surface shrinks to 14-16 dedicated tools through merging near-duplicates, dead routing code is deleted, and the dependency list reflects only what is actually used
@@ -89,5 +92,5 @@
 | 2. Security Hardening | v1.0 | — | Complete | 2026-04-02 |
 | 3. SDK Foundation | v1.1 | 0/2 | Planned | - |
 | 4. Tool Interface Migration | v1.1 | 3/3 | Complete   | 2026-04-10 |
-| 5. Tool Quality | v1.1 | 0/TBD | Not started | - |
+| 5. Tool Quality | v1.1 | 0/3 | Planned | - |
 | 6. Tool Consolidation | v1.1 | 0/TBD | Not started | - |
