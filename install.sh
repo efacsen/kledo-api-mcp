@@ -75,9 +75,11 @@ ok "Python: $("$PYTHON" --version)"
 echo ""
 info "Installing Kledo MCP Server..."
 
+USE_UV=false
 if command -v uv &>/dev/null; then
   ok "Using uv (fast)"
   uv pip install -e . --quiet
+  USE_UV=true
 elif command -v pip3 &>/dev/null; then
   ok "Using pip3"
   pip3 install -e . --quiet
@@ -89,20 +91,20 @@ fi
 ok "Package installed"
 
 # ── 4. Verify kledo-mcp CLI is available ──────────────────────────────────────
-if ! command -v kledo-mcp &>/dev/null; then
-  # Try to find it in common locations
-  KMC="$("$PYTHON" -c "import sysconfig; print(sysconfig.get_path('scripts'))")/kledo-mcp"
-  if [[ -f "$KMC" ]]; then
-    alias kledo-mcp="$KMC"
-    KLEDO_MCP="$KMC"
-  else
-    die "kledo-mcp CLI not found after install. Try: pip install -e . then re-run."
-  fi
+# When installed via uv, the binary lives in the uv-managed venv — use `uv run`
+if [[ "$USE_UV" == "true" ]]; then
+  KLEDO_MCP_CMD=(uv run kledo-mcp)
+  ok "CLI: uv run kledo-mcp"
+elif command -v kledo-mcp &>/dev/null; then
+  KLEDO_MCP_CMD=(kledo-mcp)
+  ok "CLI: $(command -v kledo-mcp)"
 else
-  KLEDO_MCP="$(command -v kledo-mcp)"
+  # Last resort: find via pip scripts dir
+  KMC="$("$PYTHON" -c "import sysconfig; print(sysconfig.get_path('scripts'))")/kledo-mcp"
+  [[ -f "$KMC" ]] || die "kledo-mcp CLI not found after install. Run: pip install -e . manually."
+  KLEDO_MCP_CMD=("$KMC")
+  ok "CLI: $KMC"
 fi
-
-ok "CLI: $KLEDO_MCP"
 
 # ── 5. Setup wizard ───────────────────────────────────────────────────────────
 echo ""
@@ -111,7 +113,7 @@ echo -e "${CYAN}─────────────────────�
 info "Get your API key: Kledo → Settings → Integration → API → Personal Access Token"
 echo ""
 
-"$KLEDO_MCP" --setup
+"${KLEDO_MCP_CMD[@]}" --setup
 
 # ── 6. Patch Claude Desktop config ───────────────────────────────────────────
 if [[ "$PATCH_CLAUDE" == "true" ]]; then
