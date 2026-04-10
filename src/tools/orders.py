@@ -1,88 +1,14 @@
 """
 Order tools for Kledo MCP Server
 """
-from typing import Any, Dict
-from mcp.types import Tool
+
+from typing import Any
 
 from ..kledo_client import KledoAPIClient
-from ..utils.helpers import parse_date_range, format_currency, safe_get
+from ..utils.helpers import format_currency, parse_date_range, safe_get
 
 
-def get_tools() -> list[Tool]:
-    """Get list of order tools."""
-    return [
-        Tool(
-            name="order_list",
-            description="List orders with optional filtering. Supports both sales and purchase orders.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "type": {
-                        "type": "string",
-                        "enum": ["sales", "purchase"],
-                        "description": "Order type: 'sales' for customer orders, 'purchase' for vendor orders"
-                    },
-                    "search": {
-                        "type": "string",
-                        "description": "Search term"
-                    },
-                    "contact_id": {
-                        "type": "integer",
-                        "description": "Filter by customer ID (for sales) or vendor ID (for purchase)"
-                    },
-                    "status_id": {
-                        "type": "integer",
-                        "description": "Filter by status (for sales orders)"
-                    },
-                    "date_from": {
-                        "type": "string",
-                        "description": "Start date"
-                    },
-                    "date_to": {
-                        "type": "string",
-                        "description": "End date"
-                    }
-                },
-                "required": ["type"]
-            }
-        ),
-        Tool(
-            name="order_get",
-            description="Get detailed information about a specific order.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "order_id": {
-                        "type": "integer",
-                        "description": "Order ID"
-                    }
-                },
-                "required": ["order_id"]
-            }
-        )
-    ]
-
-
-async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClient) -> str:
-    """Handle order tool calls."""
-    if name == "order_list":
-        return await _list_orders(arguments, client)
-    elif name == "order_get":
-        return await _get_order(arguments, client)
-    # Backward compatibility: support old tool names
-    elif name == "order_list_sales":
-        arguments["type"] = "sales"
-        return await _list_orders(arguments, client)
-    elif name == "order_list_purchase":
-        arguments["type"] = "purchase"
-        return await _list_orders(arguments, client)
-    elif name == "order_get_detail":
-        return await _get_order(arguments, client)
-    else:
-        return f"Unknown order tool: {name}"
-
-
-async def _list_orders(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _list_orders(args: dict[str, Any], client: KledoAPIClient) -> str:
     """List orders (sales or purchase based on type parameter)."""
     order_type = args.get("type")
 
@@ -99,7 +25,7 @@ async def _list_orders(args: Dict[str, Any], client: KledoAPIClient) -> str:
         return await _list_purchase_orders(args, client)
 
 
-async def _list_sales_orders(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _list_sales_orders(args: dict[str, Any], client: KledoAPIClient) -> str:
     """List sales orders."""
     date_from = args.get("date_from")
     date_to = args.get("date_to")
@@ -120,9 +46,9 @@ async def _list_sales_orders(args: Dict[str, Any], client: KledoAPIClient) -> st
                 "status_id": args.get("status_id"),
                 "date_from": date_from,
                 "date_to": date_to,
-                "per_page": 50
+                "per_page": 50,
             },
-            cache_category="orders"
+            cache_category="orders",
         )
 
         result = ["# Sales Orders\n"]
@@ -166,7 +92,7 @@ async def _list_sales_orders(args: Dict[str, Any], client: KledoAPIClient) -> st
         return f"Error fetching sales orders: {str(e)}"
 
 
-async def _get_order(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _get_order(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Get order detail."""
     order_id = args.get("order_id")
 
@@ -175,10 +101,7 @@ async def _get_order(args: Dict[str, Any], client: KledoAPIClient) -> str:
 
     try:
         data = await client.get(
-            "orders",
-            "detail",
-            path_params={"id": order_id},
-            cache_category="orders"
+            "orders", "detail", path_params={"id": order_id}, cache_category="orders"
         )
 
         order = safe_get(data, "data.data")
@@ -214,7 +137,9 @@ async def _get_order(args: Dict[str, Any], client: KledoAPIClient) -> str:
                 amount = safe_get(item, "amount", 0)
 
                 result.append(f"- **{desc}**")
-                result.append(f"  - Qty: {qty} × {format_currency(price)} = {format_currency(amount)}")
+                result.append(
+                    f"  - Qty: {qty} × {format_currency(price)} = {format_currency(amount)}"
+                )
 
         return "\n".join(result)
 
@@ -222,7 +147,7 @@ async def _get_order(args: Dict[str, Any], client: KledoAPIClient) -> str:
         return f"Error fetching order details: {str(e)}"
 
 
-async def _list_purchase_orders(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _list_purchase_orders(args: dict[str, Any], client: KledoAPIClient) -> str:
     """List purchase orders."""
     date_from = args.get("date_from")
     date_to = args.get("date_to")
@@ -242,9 +167,9 @@ async def _list_purchase_orders(args: Dict[str, Any], client: KledoAPIClient) ->
                 "contact_id": args.get("contact_id"),
                 "date_from": date_from,
                 "date_to": date_to,
-                "per_page": 50
+                "per_page": 50,
             },
-            cache_category="orders"
+            cache_category="orders",
         )
 
         result = ["# Purchase Orders\n"]

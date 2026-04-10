@@ -2,25 +2,24 @@
 Analytics tools for period-over-period comparison.
 Enables comparison of revenue and outstanding across time periods.
 """
-from typing import Any, Dict
-from mcp.types import Tool
-from collections import defaultdict
+
 import asyncio
 import calendar
+from collections import defaultdict
 from datetime import datetime
+from typing import Any
 
 from ..kledo_client import KledoAPIClient
 from ..utils.helpers import (
-    parse_indonesian_date_phrase,
     format_currency,
-    safe_get,
-    get_jakarta_today,
     format_markdown_table,
-    parse_date_range
+    get_jakarta_today,
+    parse_date_range,
+    parse_indonesian_date_phrase,
+    safe_get,
 )
-from .financial import _fetch_all_invoices
 from ..utils.targets import SalesTargetManager
-
+from .financial import _fetch_all_invoices
 
 # Unicode progress bar characters
 FILLED_BLOCK = "\u2588"
@@ -28,132 +27,19 @@ EMPTY_BLOCK = "\u2591"
 
 # Indonesian month names for display
 INDONESIAN_MONTHS = [
-    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
 ]
-
-
-def get_tools() -> list[Tool]:
-    """Get list of analytics comparison tools."""
-    return [
-        Tool(
-            name="analytics_compare",
-            description=(
-                "Compare revenue or outstanding invoices between two periods. "
-                "\n\n"
-                "**metric='revenue'**: Compare paid invoices (status_id=3) between periods. "
-                "Indonesian: 'revenue bulan ini vs bulan lalu', 'penjualan kuartal ini vs kuartal lalu'"
-                "\n\n"
-                "**metric='outstanding'**: Compare unpaid invoices (status_id!=3) between periods. "
-                "Indonesian: 'outstanding bulan ini vs bulan lalu', 'piutang kuartal ini vs kuartal lalu'"
-                "\n\n"
-                "If compare_to is omitted, shows only the current period (no comparison)."
-            ),
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "metric": {
-                        "type": "string",
-                        "enum": ["revenue", "outstanding"],
-                        "description": "'revenue' for paid invoices, 'outstanding' for unpaid invoices"
-                    },
-                    "period": {
-                        "type": "string",
-                        "description": "Current period: 'bulan ini', 'kuartal ini', 'tahun ini', '2026-01', or YYYY-MM-DD"
-                    },
-                    "compare_to": {
-                        "type": "string",
-                        "description": "Comparison period: 'bulan lalu', 'kuartal lalu'. If omitted, shows current period only."
-                    },
-                    "per_sales": {
-                        "type": "boolean",
-                        "description": "If true, break down by sales rep"
-                    }
-                },
-                "required": ["metric", "period"]
-            }
-        ),
-        Tool(
-            name="analytics_targets",
-            description=(
-                "Manage and report on sales targets. "
-                "\n\n"
-                "**action='report'**: Compare actual revenue vs targets for all reps. "
-                "Shows achievement % and progress bar. "
-                "Indonesian: 'target vs actual per sales', 'achievement bulan ini', 'pencapaian target'"
-                "\n\n"
-                "**action='underperformers'**: Show reps below target threshold (default 80%). "
-                "Indonesian: 'sales yang dibawah target', 'siapa belum capai target'"
-                "\n\n"
-                "**action='set'**: Set or update sales target for a specific rep and month. "
-                "Requires sales_person_name and amount. "
-                "Indonesian: 'set target Ahmad bulan ini 50 juta', 'pasang target Budi'"
-            ),
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "action": {
-                        "type": "string",
-                        "enum": ["report", "underperformers", "set"],
-                        "description": "'report' for achievement overview, 'underperformers' for below-target reps, 'set' to create/update a target"
-                    },
-                    "period": {
-                        "type": "string",
-                        "description": "Period phrase: 'bulan ini', '2026-02', or YYYY-MM"
-                    },
-                    "sales_person_name": {
-                        "type": "string",
-                        "description": "(Required for action='set') Sales rep name, e.g., 'Ahmad', 'Budi'"
-                    },
-                    "amount": {
-                        "type": "number",
-                        "description": "(Required for action='set') Target amount in IDR"
-                    },
-                    "threshold": {
-                        "type": "number",
-                        "description": "(action='underperformers' only) Achievement threshold, e.g., 0.8 for 80%. Default: 0.8"
-                    }
-                },
-                "required": ["action", "period"]
-            }
-        )
-    ]
-
-
-async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClient) -> str:
-    """Handle analytics tool calls."""
-    # New consolidated tools
-    if name == "analytics_compare":
-        metric = arguments.get("metric")
-        if metric == "revenue":
-            return await _compare_revenue(arguments, client)
-        elif metric == "outstanding":
-            return await _compare_outstanding(arguments, client)
-        else:
-            return f"Error: Invalid metric '{metric}'. Must be 'revenue' or 'outstanding'."
-    elif name == "analytics_targets":
-        action = arguments.get("action")
-        if action == "report":
-            return await _target_achievement(arguments, client)
-        elif action == "underperformers":
-            return await _underperformers(arguments, client)
-        elif action == "set":
-            return await _set_target(arguments, client)
-        else:
-            return f"Error: Invalid action '{action}'. Must be 'report', 'underperformers', or 'set'."
-    # Backward compatibility
-    elif name == "analytics_compare_revenue":
-        return await _compare_revenue(arguments, client)
-    elif name == "analytics_compare_outstanding":
-        return await _compare_outstanding(arguments, client)
-    elif name == "analytics_target_achievement":
-        return await _target_achievement(arguments, client)
-    elif name == "analytics_underperformers":
-        return await _underperformers(arguments, client)
-    elif name == "analytics_set_target":
-        return await _set_target(arguments, client)
-    else:
-        return f"Unknown analytics tool: {name}"
 
 
 def _resolve_period(phrase: str) -> tuple[str, str, str]:
@@ -179,7 +65,10 @@ def _resolve_period(phrase: str) -> tuple[str, str, str]:
             # Single month
             month_name = INDONESIAN_MONTHS[date_from.month - 1]
             display_name = f"{month_name} {date_from.year}"
-        elif date_from.day == 1 and date_to.day == calendar.monthrange(date_to.year, date_to.month)[1]:
+        elif (
+            date_from.day == 1
+            and date_to.day == calendar.monthrange(date_to.year, date_to.month)[1]
+        ):
             # Detect quarter
             quarter = (date_from.month - 1) // 3 + 1
             if date_from.month == (quarter - 1) * 3 + 1 and date_to.month == quarter * 3:
@@ -192,7 +81,12 @@ def _resolve_period(phrase: str) -> tuple[str, str, str]:
                     display_name = f"{from_month}-{to_month} {date_from.year}"
                 else:
                     display_name = f"{from_month} {date_from.year} - {to_month} {date_to.year}"
-        elif date_from.month == 1 and date_to.month == 12 and date_from.day == 1 and date_to.day == 31:
+        elif (
+            date_from.month == 1
+            and date_to.month == 12
+            and date_from.day == 1
+            and date_to.day == 31
+        ):
             # Full year
             display_name = f"Tahun {date_from.year}"
         else:
@@ -265,12 +159,7 @@ def _aggregate_period_data(invoices: list, per_sales: bool = False) -> dict:
             }
         }
     """
-    result = {
-        "revenue": 0.0,
-        "outstanding": 0.0,
-        "count": 0,
-        "paid_count": 0
-    }
+    result = {"revenue": 0.0, "outstanding": 0.0, "count": 0, "paid_count": 0}
 
     if per_sales:
         result["by_sales"] = defaultdict(lambda: {"revenue": 0.0, "outstanding": 0.0, "count": 0})
@@ -306,7 +195,7 @@ def _aggregate_period_data(invoices: list, per_sales: bool = False) -> dict:
     return result
 
 
-async def _compare_revenue(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _compare_revenue(args: dict[str, Any], client: KledoAPIClient) -> str:
     """
     Compare revenue between two periods.
 
@@ -332,8 +221,7 @@ async def _compare_revenue(args: Dict[str, Any], client: KledoAPIClient) -> str:
 
         # Fetch both periods in parallel
         inv_current, inv_comparison = await asyncio.gather(
-            _fetch_all_invoices(client, from1, to1),
-            _fetch_all_invoices(client, from2, to2)
+            _fetch_all_invoices(client, from1, to1), _fetch_all_invoices(client, from2, to2)
         )
 
         # Aggregate both periods
@@ -355,7 +243,9 @@ async def _compare_revenue(args: Dict[str, Any], client: KledoAPIClient) -> str:
             rev_change_str = "N/A"
 
         result.append("**Revenue (Paid):**")
-        result.append(f"{name1}: {format_currency(rev1, short=True)} | {name2}: {format_currency(rev2, short=True)} ({rev_change_str})")
+        result.append(
+            f"{name1}: {format_currency(rev1, short=True)} | {name2}: {format_currency(rev2, short=True)} ({rev_change_str})"
+        )
         result.append("")
 
         # Invoice count
@@ -370,7 +260,9 @@ async def _compare_revenue(args: Dict[str, Any], client: KledoAPIClient) -> str:
             result.append("\n### Per Sales Rep:\n")
 
             # Combine sales reps from both periods
-            all_sales = set(data_current["by_sales"].keys()) | set(data_comparison["by_sales"].keys())
+            all_sales = set(data_current["by_sales"].keys()) | set(
+                data_comparison["by_sales"].keys()
+            )
 
             rows = []
             for sp_name in sorted(all_sales):
@@ -386,17 +278,16 @@ async def _compare_revenue(args: Dict[str, Any], client: KledoAPIClient) -> str:
                 else:
                     change_str = "N/A"
 
-                rows.append([
-                    sp_name,
-                    format_currency(rev1_sp, short=True),
-                    format_currency(rev2_sp, short=True),
-                    change_str
-                ])
+                rows.append(
+                    [
+                        sp_name,
+                        format_currency(rev1_sp, short=True),
+                        format_currency(rev2_sp, short=True),
+                        change_str,
+                    ]
+                )
 
-            result.append(format_markdown_table(
-                ["Sales Rep", name1, name2, "Change"],
-                rows
-            ))
+            result.append(format_markdown_table(["Sales Rep", name1, name2, "Change"], rows))
 
         return "\n".join(result)
 
@@ -420,21 +311,20 @@ async def _compare_revenue(args: Dict[str, Any], client: KledoAPIClient) -> str:
 
             rows = []
             for sp_name, sp_data in sorted(data_current["by_sales"].items()):
-                rows.append([
-                    sp_name,
-                    format_currency(sp_data["revenue"], short=True),
-                    str(sp_data["count"])
-                ])
+                rows.append(
+                    [
+                        sp_name,
+                        format_currency(sp_data["revenue"], short=True),
+                        str(sp_data["count"]),
+                    ]
+                )
 
-            result.append(format_markdown_table(
-                ["Sales Rep", "Revenue", "Invoices"],
-                rows
-            ))
+            result.append(format_markdown_table(["Sales Rep", "Revenue", "Invoices"], rows))
 
         return "\n".join(result)
 
 
-async def _compare_outstanding(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _compare_outstanding(args: dict[str, Any], client: KledoAPIClient) -> str:
     """
     Compare outstanding between two periods.
 
@@ -460,8 +350,7 @@ async def _compare_outstanding(args: Dict[str, Any], client: KledoAPIClient) -> 
 
         # Fetch both periods in parallel
         inv_current, inv_comparison = await asyncio.gather(
-            _fetch_all_invoices(client, from1, to1),
-            _fetch_all_invoices(client, from2, to2)
+            _fetch_all_invoices(client, from1, to1), _fetch_all_invoices(client, from2, to2)
         )
 
         # Aggregate both periods
@@ -483,7 +372,9 @@ async def _compare_outstanding(args: Dict[str, Any], client: KledoAPIClient) -> 
             out_change_str = "N/A"
 
         result.append("**Outstanding (Unpaid):**")
-        result.append(f"{name1}: {format_currency(out1, short=True)} | {name2}: {format_currency(out2, short=True)} ({out_change_str})")
+        result.append(
+            f"{name1}: {format_currency(out1, short=True)} | {name2}: {format_currency(out2, short=True)} ({out_change_str})"
+        )
         result.append("")
 
         # Invoice count (unpaid)
@@ -498,7 +389,9 @@ async def _compare_outstanding(args: Dict[str, Any], client: KledoAPIClient) -> 
             result.append("\n### Per Sales Rep:\n")
 
             # Combine sales reps from both periods
-            all_sales = set(data_current["by_sales"].keys()) | set(data_comparison["by_sales"].keys())
+            all_sales = set(data_current["by_sales"].keys()) | set(
+                data_comparison["by_sales"].keys()
+            )
 
             rows = []
             for sp_name in sorted(all_sales):
@@ -514,17 +407,16 @@ async def _compare_outstanding(args: Dict[str, Any], client: KledoAPIClient) -> 
                 else:
                     change_str = "N/A"
 
-                rows.append([
-                    sp_name,
-                    format_currency(out1_sp, short=True),
-                    format_currency(out2_sp, short=True),
-                    change_str
-                ])
+                rows.append(
+                    [
+                        sp_name,
+                        format_currency(out1_sp, short=True),
+                        format_currency(out2_sp, short=True),
+                        change_str,
+                    ]
+                )
 
-            result.append(format_markdown_table(
-                ["Sales Rep", name1, name2, "Change"],
-                rows
-            ))
+            result.append(format_markdown_table(["Sales Rep", name1, name2, "Change"], rows))
 
         return "\n".join(result)
 
@@ -548,16 +440,15 @@ async def _compare_outstanding(args: Dict[str, Any], client: KledoAPIClient) -> 
 
             rows = []
             for sp_name, sp_data in sorted(data_current["by_sales"].items()):
-                rows.append([
-                    sp_name,
-                    format_currency(sp_data["outstanding"], short=True),
-                    str(sp_data["count"])
-                ])
+                rows.append(
+                    [
+                        sp_name,
+                        format_currency(sp_data["outstanding"], short=True),
+                        str(sp_data["count"]),
+                    ]
+                )
 
-            result.append(format_markdown_table(
-                ["Sales Rep", "Outstanding", "Invoices"],
-                rows
-            ))
+            result.append(format_markdown_table(["Sales Rep", "Outstanding", "Invoices"], rows))
 
         return "\n".join(result)
 
@@ -590,7 +481,7 @@ def format_progress_bar(current: float, target: float, bar_length: int = 10) -> 
     return f"{bar} {pct:.0f}%"
 
 
-async def _target_achievement(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _target_achievement(args: dict[str, Any], client: KledoAPIClient) -> str:
     """
     Show target vs actual achievement for all sales reps in a period.
 
@@ -662,16 +553,24 @@ async def _target_achievement(args: Dict[str, Any], client: KledoAPIClient) -> s
     if reps_with_targets:
         for rep_name, actual, target, achievement_pct, gap in reps_with_targets:
             progress_bar = format_progress_bar(actual, target)
-            gap_str = f"+{format_currency(gap, short=True)}" if gap >= 0 else format_currency(gap, short=True)
+            gap_str = (
+                f"+{format_currency(gap, short=True)}"
+                if gap >= 0
+                else format_currency(gap, short=True)
+            )
 
-            result.append(f"**{rep_name}:** {progress_bar} ({format_currency(actual, short=True)} / {format_currency(target, short=True)})")
+            result.append(
+                f"**{rep_name}:** {progress_bar} ({format_currency(actual, short=True)} / {format_currency(target, short=True)})"
+            )
             result.append(f"Gap: {gap_str}\n")
 
     # Display reps without targets
     if reps_without_targets:
         result.append("### Reps without Target:\n")
         for rep_name, actual in sorted(reps_without_targets):
-            result.append(f"**{rep_name}:** Revenue {format_currency(actual, short=True)} -- Target belum diset\n")
+            result.append(
+                f"**{rep_name}:** Revenue {format_currency(actual, short=True)} -- Target belum diset\n"
+            )
 
     if not all_reps:
         result.append("Tidak ada data revenue atau target untuk periode ini.")
@@ -679,7 +578,7 @@ async def _target_achievement(args: Dict[str, Any], client: KledoAPIClient) -> s
     return "\n".join(result)
 
 
-async def _underperformers(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _underperformers(args: dict[str, Any], client: KledoAPIClient) -> str:
     """
     Show sales reps who are below target threshold.
 
@@ -755,7 +654,7 @@ async def _underperformers(args: Dict[str, Any], client: KledoAPIClient) -> str:
     return "\n".join(result)
 
 
-async def _set_target(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _set_target(args: dict[str, Any], client: KledoAPIClient) -> str:
     """
     Set or update sales target for a sales rep.
 

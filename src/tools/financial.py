@@ -2,12 +2,12 @@
 Financial report tools for Kledo MCP Server
 Fixed to use working endpoints (aggregate from /finance/invoices)
 """
-from typing import Any, Dict
-from mcp.types import Tool
+
 from collections import defaultdict
+from typing import Any
 
 from ..kledo_client import KledoAPIClient
-from ..utils.helpers import parse_date_range, format_currency, safe_get
+from ..utils.helpers import format_currency, parse_date_range, safe_get
 
 
 def get_tools() -> list[Tool]:
@@ -88,37 +88,32 @@ async def _fetch_all_invoices(client: KledoAPIClient, date_from: str, date_to: s
     all_invoices = []
     page = 1
     max_pages = 20  # Safety limit
-    
+
     while page <= max_pages:
         data = await client.get(
             "invoices",
             "list",
-            params={
-                "date_from": date_from,
-                "date_to": date_to,
-                "per_page": 100,
-                "page": page
-            },
-            cache_category="invoices"
+            params={"date_from": date_from, "date_to": date_to, "per_page": 100, "page": page},
+            cache_category="invoices",
         )
-        
+
         invoices = safe_get(data, "data.data", [])
         if not invoices:
             break
-            
+
         all_invoices.extend(invoices)
-        
+
         current_page = safe_get(data, "data.current_page", 1)
         last_page = safe_get(data, "data.last_page", 1)
-        
+
         if current_page >= last_page:
             break
         page += 1
-    
+
     return all_invoices
 
 
-async def _activity_team_report(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _activity_team_report(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Get team activity report."""
     date_from = args.get("date_from")
     date_to = args.get("date_to")
@@ -166,7 +161,7 @@ async def _activity_team_report(args: Dict[str, Any], client: KledoAPIClient) ->
         return f"Error fetching team activity report: {str(e)}"
 
 
-async def _sales_summary(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _sales_summary(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Get sales summary by customer - aggregated from invoices."""
     date_from = args.get("date_from")
     date_to = args.get("date_to")
@@ -192,12 +187,12 @@ async def _sales_summary(args: Dict[str, Any], client: KledoAPIClient) -> str:
 
         # Aggregate by customer
         customer_sales = defaultdict(lambda: {"total": 0, "paid": 0, "count": 0})
-        
+
         for inv in invoices:
             customer_name = safe_get(inv, "contact.name", "Unknown")
             amount = safe_get(inv, "amount_after_tax", 0)
             status_id = safe_get(inv, "status_id", 1)
-            
+
             customer_sales[customer_name]["total"] += amount
             customer_sales[customer_name]["count"] += 1
             if status_id == 3:  # Paid
@@ -206,7 +201,7 @@ async def _sales_summary(args: Dict[str, Any], client: KledoAPIClient) -> str:
         # Calculate totals
         total_sales = sum(c["total"] for c in customer_sales.values())
         total_paid = sum(c["paid"] for c in customer_sales.values())
-        
+
         result.append(f"**Total Revenue**: {format_currency(total_sales)}")
         result.append(f"**Total Paid**: {format_currency(total_paid)}")
         result.append(f"**Outstanding**: {format_currency(total_sales - total_paid)}")
@@ -219,7 +214,9 @@ async def _sales_summary(args: Dict[str, Any], client: KledoAPIClient) -> str:
 
         for idx, (customer, data) in enumerate(sorted_customers[:10], 1):
             status = "✅" if data["paid"] == data["total"] else "🔴"
-            result.append(f"{idx}. **{customer}**: {format_currency(data['total'])} ({data['count']} inv) {status}")
+            result.append(
+                f"{idx}. **{customer}**: {format_currency(data['total'])} ({data['count']} inv) {status}"
+            )
 
         return "\n".join(result)
 
@@ -227,7 +224,7 @@ async def _sales_summary(args: Dict[str, Any], client: KledoAPIClient) -> str:
         return f"Error fetching sales summary: {str(e)}"
 
 
-async def _sales_by_person(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _sales_by_person(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Get sales summary by sales person - aggregated from invoices."""
     date_from = args.get("date_from")
     date_to = args.get("date_to")
@@ -251,13 +248,8 @@ async def _sales_by_person(args: Dict[str, Any], client: KledoAPIClient) -> str:
             return "\n".join(result)
 
         # Aggregate by sales person
-        sales_person_data = defaultdict(lambda: {
-            "total": 0, 
-            "paid": 0, 
-            "count": 0,
-            "invoices": []
-        })
-        
+        sales_person_data = defaultdict(lambda: {"total": 0, "paid": 0, "count": 0, "invoices": []})
+
         for inv in invoices:
             # Get sales person name - use None check properly
             sales_person = inv.get("sales_person")
@@ -265,27 +257,29 @@ async def _sales_by_person(args: Dict[str, Any], client: KledoAPIClient) -> str:
                 sp_name = sales_person.get("name", "(Tidak Ada Sales)")
             else:
                 sp_name = "(Tidak Ada Sales)"
-            
+
             amount = safe_get(inv, "amount_after_tax", 0)
             status_id = safe_get(inv, "status_id", 1)
-            
+
             sales_person_data[sp_name]["total"] += amount
             sales_person_data[sp_name]["count"] += 1
             if status_id == 3:
                 sales_person_data[sp_name]["paid"] += amount
-            
+
             # Store invoice details (limit to prevent too much data)
             if len(sales_person_data[sp_name]["invoices"]) < 10:
-                sales_person_data[sp_name]["invoices"].append({
-                    "ref": safe_get(inv, "ref_number", ""),
-                    "customer": safe_get(inv, "contact.name", ""),
-                    "amount": amount,
-                    "status": "Lunas" if status_id == 3 else "Unpaid"
-                })
+                sales_person_data[sp_name]["invoices"].append(
+                    {
+                        "ref": safe_get(inv, "ref_number", ""),
+                        "customer": safe_get(inv, "contact.name", ""),
+                        "amount": amount,
+                        "status": "Lunas" if status_id == 3 else "Unpaid",
+                    }
+                )
 
         # Calculate totals
         total_sales = sum(s["total"] for s in sales_person_data.values())
-        
+
         result.append(f"**Total Revenue**: {format_currency(total_sales)}")
         result.append(f"**Total Invoices**: {len(invoices)}\n")
 
@@ -298,7 +292,9 @@ async def _sales_by_person(args: Dict[str, Any], client: KledoAPIClient) -> str:
 
         for sp_name, data in sorted_sales:
             outstanding = data["total"] - data["paid"]
-            result.append(f"| {sp_name} | {data['count']} | {format_currency(data['total'])} | {format_currency(data['paid'])} | {format_currency(outstanding)} |")
+            result.append(
+                f"| {sp_name} | {data['count']} | {format_currency(data['total'])} | {format_currency(data['paid'])} | {format_currency(outstanding)} |"
+            )
 
         # Detail per person
         result.append("\n## Invoice Details:\n")
@@ -308,7 +304,9 @@ async def _sales_by_person(args: Dict[str, Any], client: KledoAPIClient) -> str:
             result.append(f"\n### {sp_name}")
             for inv in data["invoices"]:
                 status_emoji = "✅" if inv["status"] == "Lunas" else "🔴"
-                result.append(f"- {inv['ref']} | {inv['customer']} | {format_currency(inv['amount'])} {status_emoji}")
+                result.append(
+                    f"- {inv['ref']} | {inv['customer']} | {format_currency(inv['amount'])} {status_emoji}"
+                )
             if data["count"] > len(data["invoices"]):
                 result.append(f"- ... dan {data['count'] - len(data['invoices'])} invoice lainnya")
 
@@ -318,7 +316,7 @@ async def _sales_by_person(args: Dict[str, Any], client: KledoAPIClient) -> str:
         return f"Error fetching sales by person: {str(e)}"
 
 
-async def _purchase_summary(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _purchase_summary(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Get purchase summary by vendor - aggregated from purchase invoices."""
     date_from = args.get("date_from")
     date_to = args.get("date_to")
@@ -334,29 +332,24 @@ async def _purchase_summary(args: Dict[str, Any], client: KledoAPIClient) -> str
         all_purchases = []
         page = 1
         max_pages = 20
-        
+
         while page <= max_pages:
             data = await client.get(
                 "purchase_invoices",
                 "list",
-                params={
-                    "date_from": date_from,
-                    "date_to": date_to,
-                    "per_page": 100,
-                    "page": page
-                },
-                cache_category="purchases"
+                params={"date_from": date_from, "date_to": date_to, "per_page": 100, "page": page},
+                cache_category="purchases",
             )
-            
+
             purchases = safe_get(data, "data.data", [])
             if not purchases:
                 break
-                
+
             all_purchases.extend(purchases)
-            
+
             current_page = safe_get(data, "data.current_page", 1)
             last_page = safe_get(data, "data.last_page", 1)
-            
+
             if current_page >= last_page:
                 break
             page += 1
@@ -372,12 +365,12 @@ async def _purchase_summary(args: Dict[str, Any], client: KledoAPIClient) -> str
 
         # Aggregate by vendor
         vendor_purchases = defaultdict(lambda: {"total": 0, "paid": 0, "count": 0})
-        
+
         for pi in all_purchases:
             vendor_name = safe_get(pi, "contact.name", "Unknown")
             amount = safe_get(pi, "amount_after_tax", 0) or safe_get(pi, "gross_amount", 0)
             status_id = safe_get(pi, "status_id", 1)
-            
+
             vendor_purchases[vendor_name]["total"] += amount
             vendor_purchases[vendor_name]["count"] += 1
             if status_id == 3:
@@ -385,7 +378,7 @@ async def _purchase_summary(args: Dict[str, Any], client: KledoAPIClient) -> str
 
         total_purchases = sum(v["total"] for v in vendor_purchases.values())
         total_paid = sum(v["paid"] for v in vendor_purchases.values())
-        
+
         result.append(f"**Total Purchases**: {format_currency(total_purchases)}")
         result.append(f"**Total Paid**: {format_currency(total_paid)}")
         result.append(f"**Outstanding**: {format_currency(total_purchases - total_paid)}")
@@ -397,7 +390,9 @@ async def _purchase_summary(args: Dict[str, Any], client: KledoAPIClient) -> str
 
         for idx, (vendor, data) in enumerate(sorted_vendors[:10], 1):
             status = "✅" if data["paid"] == data["total"] else "🔴"
-            result.append(f"{idx}. **{vendor}**: {format_currency(data['total'])} ({data['count']} inv) {status}")
+            result.append(
+                f"{idx}. **{vendor}**: {format_currency(data['total'])} ({data['count']} inv) {status}"
+            )
 
         return "\n".join(result)
 
@@ -405,15 +400,10 @@ async def _purchase_summary(args: Dict[str, Any], client: KledoAPIClient) -> str
         return f"Error fetching purchase summary: {str(e)}"
 
 
-async def _bank_balances(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _bank_balances(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Get bank account balances."""
     try:
-        data = await client.get(
-            "bank",
-            "balances",
-            cache_category="realtime",
-            force_refresh=True
-        )
+        data = await client.get("bank", "balances", cache_category="realtime", force_refresh=True)
 
         result = ["# Bank Account Balances\n"]
 

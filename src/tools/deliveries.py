@@ -1,89 +1,14 @@
 """
 Delivery tracking tools for Kledo MCP Server
 """
-from typing import Any, Dict
-from mcp.types import Tool
+
+from typing import Any
 
 from ..kledo_client import KledoAPIClient
 from ..utils.helpers import parse_date_range, safe_get
 
 
-def get_tools() -> list[Tool]:
-    """Get list of delivery tools."""
-    return [
-        Tool(
-            name="delivery_list",
-            description="List deliveries/shipments with optional filtering by date or status.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "search": {
-                        "type": "string",
-                        "description": "Search term"
-                    },
-                    "date_from": {
-                        "type": "string",
-                        "description": "Start date"
-                    },
-                    "date_to": {
-                        "type": "string",
-                        "description": "End date"
-                    },
-                    "status_id": {
-                        "type": "integer",
-                        "description": "Filter by delivery status"
-                    }
-                },
-                "required": []
-            }
-        ),
-        Tool(
-            name="delivery_get",
-            description=(
-                "Get delivery details or list of pending deliveries. "
-                "Use view='detail' with delivery_id for a specific delivery's tracking status, "
-                "view='pending' for all undelivered orders that need to be shipped. "
-                "Indonesian: 'detail pengiriman', 'pengiriman yang belum dikirim'"
-            ),
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "view": {
-                        "type": "string",
-                        "enum": ["detail", "pending"],
-                        "description": "'detail' = specific delivery info (requires delivery_id), 'pending' = list of unshipped orders"
-                    },
-                    "delivery_id": {
-                        "type": "integer",
-                        "description": "Delivery ID (required for view='detail')"
-                    }
-                },
-                "required": ["view"]
-            }
-        )
-    ]
-
-
-async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClient) -> str:
-    """Handle delivery tool calls."""
-    if name == "delivery_list":
-        return await _list_deliveries(arguments, client)
-    elif name == "delivery_get":
-        view = arguments.get("view", "detail")
-        if view == "pending":
-            return await _get_pending_deliveries(arguments, client)
-        else:
-            return await _get_delivery_detail(arguments, client)
-    # Backward compatibility
-    elif name == "delivery_get_detail":
-        return await _get_delivery_detail(arguments, client)
-    elif name == "delivery_get_pending":
-        return await _get_pending_deliveries(arguments, client)
-    else:
-        return f"Unknown delivery tool: {name}"
-
-
-async def _list_deliveries(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _list_deliveries(args: dict[str, Any], client: KledoAPIClient) -> str:
     """List deliveries."""
     date_from = args.get("date_from")
     date_to = args.get("date_to")
@@ -103,9 +28,9 @@ async def _list_deliveries(args: Dict[str, Any], client: KledoAPIClient) -> str:
                 "date_from": date_from,
                 "date_to": date_to,
                 "status_id": args.get("status_id"),
-                "per_page": 50
+                "per_page": 50,
             },
-            cache_category="deliveries"
+            cache_category="deliveries",
         )
 
         result = ["# Deliveries\n"]
@@ -146,7 +71,7 @@ async def _list_deliveries(args: Dict[str, Any], client: KledoAPIClient) -> str:
         return f"Error fetching deliveries: {str(e)}"
 
 
-async def _get_delivery_detail(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _get_delivery_detail(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Get delivery detail."""
     delivery_id = args.get("delivery_id")
 
@@ -155,10 +80,7 @@ async def _get_delivery_detail(args: Dict[str, Any], client: KledoAPIClient) -> 
 
     try:
         data = await client.get(
-            "deliveries",
-            "detail",
-            path_params={"id": delivery_id},
-            cache_category="deliveries"
+            "deliveries", "detail", path_params={"id": delivery_id}, cache_category="deliveries"
         )
 
         delivery = safe_get(data, "data.data")
@@ -216,19 +138,16 @@ async def _get_delivery_detail(args: Dict[str, Any], client: KledoAPIClient) -> 
         return f"Error fetching delivery details: {str(e)}"
 
 
-async def _get_pending_deliveries(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _get_pending_deliveries(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Get pending deliveries."""
     try:
         # Get deliveries with pending status (assuming status_id 1 or 2 is pending)
         data = await client.get(
             "deliveries",
             "list",
-            params={
-                "status_id": 1,  # Adjust based on Kledo's status codes
-                "per_page": 100
-            },
+            params={"status_id": 1, "per_page": 100},  # Adjust based on Kledo's status codes
             cache_category="deliveries",
-            force_refresh=True  # Get fresh data for pending items
+            force_refresh=True,  # Get fresh data for pending items
         )
 
         result = ["# Pending Deliveries\n"]

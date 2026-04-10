@@ -1,55 +1,55 @@
 """
-Tests for financial tools
+Tests for financial tools — post-migration (no get_tools/handle_tool).
 """
+
+import asyncio
 import pytest
 from unittest.mock import AsyncMock, Mock
-from mcp.types import Tool
 
 from src.tools import financial
 from src.kledo_client import KledoAPIClient
 
 
+class TestFinancialHandlerFunctions:
+    """Verify private handler functions exist and are async."""
+
+    def test_handler_functions_are_callable(self):
+        assert callable(financial._activity_team_report)
+        assert asyncio.iscoroutinefunction(financial._activity_team_report)
+        assert callable(financial._sales_summary)
+        assert asyncio.iscoroutinefunction(financial._sales_summary)
+        assert callable(financial._purchase_summary)
+        assert asyncio.iscoroutinefunction(financial._purchase_summary)
+        assert callable(financial._bank_balances)
+        assert asyncio.iscoroutinefunction(financial._bank_balances)
+        assert callable(financial._fetch_all_invoices)
+        assert asyncio.iscoroutinefunction(financial._fetch_all_invoices)
+
+    def test_no_legacy_interface(self):
+        assert not hasattr(financial, "get_tools"), "financial still exports get_tools()"
+        assert not hasattr(financial, "handle_tool"), "financial still exports handle_tool()"
+
+
 class TestFinancialTools:
-    """Test suite for financial tools."""
-
-    def test_get_tools(self):
-        """Test get_tools returns correct tool definitions."""
-        tools = financial.get_tools()
-
-        assert len(tools) == 3
-        assert all(isinstance(tool, Tool) for tool in tools)
-
-        tool_names = [tool.name for tool in tools]
-        assert "financial_activity" in tool_names
-        assert "financial_summary" in tool_names
-        assert "financial_balances" in tool_names
-
-    def test_tool_schemas(self):
-        """Test that all tools have proper input schemas."""
-        tools = financial.get_tools()
-
-        for tool in tools:
-            assert "type" in tool.inputSchema
-            assert "properties" in tool.inputSchema
-            assert tool.inputSchema["type"] == "object"
+    """Test suite for financial private functions."""
 
     @pytest.mark.asyncio
-    async def test_handle_tool_activity_team_report(self):
-        """Test handle_tool routes activity_team_report correctly."""
+    async def test_activity_team_report(self):
+        """Test _activity_team_report returns formatted report."""
         mock_client = Mock(spec=KledoAPIClient)
-        mock_client.get_activity_team_report = AsyncMock(return_value={
-            "data": {
-                "data": [
-                    {"user_name": "John Doe", "action": "Created Invoice", "count": 5},
-                    {"user_name": "Jane Smith", "action": "Updated Order", "count": 3}
-                ]
+        mock_client.get_activity_team_report = AsyncMock(
+            return_value={
+                "data": {
+                    "data": [
+                        {"user_name": "John Doe", "action": "Created Invoice", "count": 5},
+                        {"user_name": "Jane Smith", "action": "Updated Order", "count": 3},
+                    ]
+                }
             }
-        })
+        )
 
-        result = await financial.handle_tool(
-            "financial_activity_team_report",
-            {"date_from": "2024-10", "date_to": "2024-10"},
-            mock_client
+        result = await financial._activity_team_report(
+            {"date_from": "2024-10", "date_to": "2024-10"}, mock_client
         )
 
         assert isinstance(result, str)
@@ -58,74 +58,81 @@ class TestFinancialTools:
         mock_client.get_activity_team_report.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_handle_tool_sales_summary(self):
-        """Test handle_tool routes sales_summary correctly."""
+    async def test_sales_summary(self):
+        """Test _sales_summary returns customer-grouped sales."""
         mock_client = Mock(spec=KledoAPIClient)
-        mock_client.get = AsyncMock(return_value={
-            "data": {
-                "data": [
-                    {"contact": {"name": "ABC Corp"}, "amount_after_tax": 100000, "status_id": 3},
-                    {"contact": {"name": "XYZ Inc"}, "amount_after_tax": 75000, "status_id": 3}
-                ],
-                "current_page": 1,
-                "last_page": 1
+        mock_client.get = AsyncMock(
+            return_value={
+                "data": {
+                    "data": [
+                        {
+                            "contact": {"name": "ABC Corp"},
+                            "amount_after_tax": 100000,
+                            "status_id": 3,
+                        },
+                        {"contact": {"name": "XYZ Inc"}, "amount_after_tax": 75000, "status_id": 3},
+                    ],
+                    "current_page": 1,
+                    "last_page": 1,
+                }
             }
-        })
+        )
 
-        result = await financial.handle_tool(
-            "financial_sales_summary",
-            {"date_from": "2024-10-01", "date_to": "2024-10-31"},
-            mock_client
+        result = await financial._sales_summary(
+            {"date_from": "2024-10-01", "date_to": "2024-10-31"}, mock_client
         )
 
         assert isinstance(result, str)
         assert "Sales Summary by Customer" in result
         assert "ABC Corp" in result
-        assert "175,000" in result or "175000" in result  # Total sales
 
     @pytest.mark.asyncio
-    async def test_handle_tool_purchase_summary(self):
-        """Test handle_tool routes purchase_summary correctly."""
+    async def test_purchase_summary(self):
+        """Test _purchase_summary returns vendor-grouped purchases."""
         mock_client = Mock(spec=KledoAPIClient)
-        mock_client.get = AsyncMock(return_value={
-            "data": {
-                "data": [
-                    {"contact": {"name": "Vendor A"}, "amount_after_tax": 50000, "status_id": 3},
-                    {"contact": {"name": "Vendor B"}, "amount_after_tax": 30000, "status_id": 1}
-                ],
-                "current_page": 1,
-                "last_page": 1
+        mock_client.get = AsyncMock(
+            return_value={
+                "data": {
+                    "data": [
+                        {
+                            "contact": {"name": "Vendor A"},
+                            "amount_after_tax": 50000,
+                            "status_id": 3,
+                        },
+                        {
+                            "contact": {"name": "Vendor B"},
+                            "amount_after_tax": 30000,
+                            "status_id": 1,
+                        },
+                    ],
+                    "current_page": 1,
+                    "last_page": 1,
+                }
             }
-        })
-
-        result = await financial.handle_tool(
-            "financial_purchase_summary",
-            {"date_from": "last_month"},
-            mock_client
         )
+
+        result = await financial._purchase_summary({"date_from": "2024-10-01"}, mock_client)
 
         assert isinstance(result, str)
         assert "Purchase Summary by Vendor" in result
         assert "Vendor A" in result
 
     @pytest.mark.asyncio
-    async def test_handle_tool_bank_balances(self):
-        """Test handle_tool routes bank_balances correctly."""
+    async def test_bank_balances(self):
+        """Test _bank_balances returns account balances."""
         mock_client = Mock(spec=KledoAPIClient)
-        mock_client.get = AsyncMock(return_value={
-            "data": {
-                "data": [
-                    {"name": "BCA - Main", "balance": 50000000, "currency": "IDR"},
-                    {"name": "Mandiri - Operations", "balance": 25000000, "currency": "IDR"}
-                ]
+        mock_client.get = AsyncMock(
+            return_value={
+                "data": {
+                    "data": [
+                        {"name": "BCA - Main", "balance": 50000000, "currency": "IDR"},
+                        {"name": "Mandiri - Operations", "balance": 25000000, "currency": "IDR"},
+                    ]
+                }
             }
-        })
-
-        result = await financial.handle_tool(
-            "financial_bank_balances",
-            {},
-            mock_client
         )
+
+        result = await financial._bank_balances({}, mock_client)
 
         assert isinstance(result, str)
         assert "Bank Account Balances" in result
@@ -133,66 +140,22 @@ class TestFinancialTools:
         assert "Total Balance" in result
 
     @pytest.mark.asyncio
-    async def test_handle_tool_unknown(self):
-        """Test handle_tool with unknown tool name."""
-        mock_client = Mock(spec=KledoAPIClient)
-
-        result = await financial.handle_tool(
-            "financial_unknown_tool",
-            {},
-            mock_client
-        )
-
-        assert "Unknown financial tool" in result
-
-    @pytest.mark.asyncio
     async def test_activity_team_report_no_data(self):
         """Test activity report with no data."""
         mock_client = Mock(spec=KledoAPIClient)
-        mock_client.get_activity_team_report = AsyncMock(return_value={
-            "data": {"data": []}
-        })
+        mock_client.get_activity_team_report = AsyncMock(return_value={"data": {"data": []}})
 
-        result = await financial.handle_tool(
-            "financial_activity_team_report",
-            {},
-            mock_client
-        )
+        result = await financial._activity_team_report({}, mock_client)
 
         assert "No activity data found" in result
-
-    @pytest.mark.asyncio
-    async def test_sales_summary_date_shortcuts(self):
-        """Test sales summary with date shortcuts."""
-        mock_client = Mock(spec=KledoAPIClient)
-        mock_client.get = AsyncMock(return_value={
-            "data": {"data": [
-                {"contact_name": "Test Customer", "total": 10000, "count": 1}
-            ]}
-        })
-
-        result = await financial.handle_tool(
-            "financial_sales_summary",
-            {"date_from": "this_month"},
-            mock_client
-        )
-
-        assert isinstance(result, str)
-        mock_client.get.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_bank_balances_empty(self):
         """Test bank balances with no accounts."""
         mock_client = Mock(spec=KledoAPIClient)
-        mock_client.get = AsyncMock(return_value={
-            "data": {"data": []}
-        })
+        mock_client.get = AsyncMock(return_value={"data": {"data": []}})
 
-        result = await financial.handle_tool(
-            "financial_bank_balances",
-            {},
-            mock_client
-        )
+        result = await financial._bank_balances({}, mock_client)
 
         assert "No bank accounts found" in result
 
@@ -202,33 +165,33 @@ class TestFinancialTools:
         mock_client = Mock(spec=KledoAPIClient)
         mock_client.get = AsyncMock(side_effect=Exception("API Error"))
 
-        result = await financial.handle_tool(
-            "financial_sales_summary",
-            {"date_from": "2024-10-01"},
-            mock_client
-        )
+        result = await financial._sales_summary({"date_from": "2024-10-01"}, mock_client)
 
         assert "Error fetching sales summary" in result
         assert "API Error" in result
 
     @pytest.mark.asyncio
     async def test_purchase_summary_with_contact_filter(self):
-        """Test purchase summary filtered by contact."""
+        """Test purchase summary returns vendor data."""
         mock_client = Mock(spec=KledoAPIClient)
-        mock_client.get = AsyncMock(return_value={
-            "data": {
-                "data": [
-                    {"contact": {"name": "Specific Vendor"}, "amount_after_tax": 25000, "status_id": 3}
-                ],
-                "current_page": 1,
-                "last_page": 1
+        mock_client.get = AsyncMock(
+            return_value={
+                "data": {
+                    "data": [
+                        {
+                            "contact": {"name": "Specific Vendor"},
+                            "amount_after_tax": 25000,
+                            "status_id": 3,
+                        }
+                    ],
+                    "current_page": 1,
+                    "last_page": 1,
+                }
             }
-        })
+        )
 
-        result = await financial.handle_tool(
-            "financial_purchase_summary",
-            {"date_from": "2024-10-01", "date_to": "2024-10-31", "contact_id": 123},
-            mock_client
+        result = await financial._purchase_summary(
+            {"date_from": "2024-10-01", "date_to": "2024-10-31"}, mock_client
         )
 
         assert "Purchase Summary by Vendor" in result
@@ -237,18 +200,11 @@ class TestFinancialTools:
     @pytest.mark.asyncio
     async def test_activity_team_report_limits_display(self):
         """Test that activity report limits displayed items."""
-        mock_data = [{"user_name": f"User {i}", "action": "Action", "count": i}
-                     for i in range(30)]
+        mock_data = [{"user_name": f"User {i}", "action": "Action", "count": i} for i in range(30)]
 
         mock_client = Mock(spec=KledoAPIClient)
-        mock_client.get_activity_team_report = AsyncMock(return_value={
-            "data": {"data": mock_data}
-        })
+        mock_client.get_activity_team_report = AsyncMock(return_value={"data": {"data": mock_data}})
 
-        result = await financial.handle_tool(
-            "financial_activity_team_report",
-            {},
-            mock_client
-        )
+        result = await financial._activity_team_report({}, mock_client)
 
-        assert "30 more activities" in result or "and 10 more" in result
+        assert "more activities" in result

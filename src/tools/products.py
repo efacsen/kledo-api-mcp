@@ -1,89 +1,20 @@
 """
 Product tools for Kledo MCP Server
 """
-from typing import Any, Dict
-from mcp.types import Tool
+
+from typing import Any
 
 from ..kledo_client import KledoAPIClient
 from ..utils.helpers import format_currency, safe_get
 
 
-def get_tools() -> list[Tool]:
-    """Get list of product tools."""
-    return [
-        Tool(
-            name="product_list",
-            description="List products with optional search and filtering. Shows product prices and inventory.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "search": {
-                        "type": "string",
-                        "description": "Search by product name, code/SKU, or description"
-                    },
-                    "include_inventory": {
-                        "type": "boolean",
-                        "description": "Include warehouse inventory quantities (default: false)"
-                    },
-                    "per_page": {
-                        "type": "integer",
-                        "description": "Results per page (default: 50)"
-                    }
-                },
-                "required": []
-            }
-        ),
-        Tool(
-            name="product_get",
-            description=(
-                "Get detailed product info by ID or by SKU/code. "
-                "Provide product_id to look up by database ID, or sku to look up by product code. "
-                "Returns pricing and inventory details. "
-                "Indonesian: 'detail produk', 'harga produk', 'cari produk by kode'"
-            ),
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "product_id": {
-                        "type": "integer",
-                        "description": "Product ID (use this OR sku)"
-                    },
-                    "sku": {
-                        "type": "string",
-                        "description": "Product SKU/code (use this OR product_id)"
-                    }
-                },
-                "required": []
-            }
-        )
-    ]
-
-
-async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClient) -> str:
-    """Handle product tool calls."""
-    if name == "product_list":
-        return await _list_products(arguments, client)
-    elif name == "product_get":
-        if arguments.get("sku"):
-            return await _search_by_sku(arguments, client)
-        else:
-            return await _get_product_detail(arguments, client)
-    # Backward compatibility
-    elif name == "product_get_detail":
-        return await _get_product_detail(arguments, client)
-    elif name == "product_search_by_sku":
-        return await _search_by_sku(arguments, client)
-    else:
-        return f"Unknown product tool: {name}"
-
-
-async def _list_products(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _list_products(args: dict[str, Any], client: KledoAPIClient) -> str:
     """List products."""
     try:
         data = await client.list_products(
             search=args.get("search"),
             include_warehouse_qty=args.get("include_inventory", False),
-            per_page=args.get("per_page", 50)
+            per_page=args.get("per_page", 50),
         )
 
         result = ["# Products\n"]
@@ -124,7 +55,7 @@ async def _list_products(args: Dict[str, Any], client: KledoAPIClient) -> str:
         return f"Error fetching products: {str(e)}"
 
 
-async def _get_product_detail(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _get_product_detail(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Get product detail."""
     product_id = args.get("product_id")
 
@@ -133,10 +64,7 @@ async def _get_product_detail(args: Dict[str, Any], client: KledoAPIClient) -> s
 
     try:
         data = await client.get(
-            "products",
-            "detail",
-            path_params={"id": product_id},
-            cache_category="products"
+            "products", "detail", path_params={"id": product_id}, cache_category="products"
         )
 
         product = safe_get(data, "data.data")
@@ -179,7 +107,7 @@ async def _get_product_detail(args: Dict[str, Any], client: KledoAPIClient) -> s
         return f"Error fetching product details: {str(e)}"
 
 
-async def _search_by_sku(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _search_by_sku(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Search product by SKU."""
     sku = args.get("sku")
 
@@ -187,12 +115,7 @@ async def _search_by_sku(args: Dict[str, Any], client: KledoAPIClient) -> str:
         return "Error: sku is required"
 
     try:
-        data = await client.get(
-            "products",
-            "list",
-            params={"code": sku},
-            cache_category="products"
-        )
+        data = await client.get("products", "list", params={"code": sku}, cache_category="products")
 
         products = safe_get(data, "data.data", [])
 

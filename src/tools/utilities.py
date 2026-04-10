@@ -1,66 +1,13 @@
 """
 Utility tools for Kledo MCP Server
 """
-from typing import Any, Dict
-from mcp.types import Tool
+
+from typing import Any
 
 from ..kledo_client import KledoAPIClient
 
 
-def get_tools() -> list[Tool]:
-    """Get list of utility tools."""
-    return [
-        Tool(
-            name="utility_cache",
-            description=(
-                "Manage the API response cache. "
-                "Use action='stats' to see hit rate, size, and performance metrics. "
-                "Use action='clear' to invalidate all cached data and force fresh API calls."
-            ),
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "action": {
-                        "type": "string",
-                        "enum": ["stats", "clear"],
-                        "description": "'stats' = view cache performance, 'clear' = invalidate all cached entries"
-                    }
-                },
-                "required": ["action"]
-            }
-        ),
-        Tool(
-            name="utility_test_connection",
-            description="Test connection to Kledo API and verify authentication status.",
-            inputSchema={
-                "type": "object",
-                "properties": {},
-                "required": []
-            }
-        )
-    ]
-
-
-async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClient) -> str:
-    """Handle utility tool calls."""
-    if name == "utility_cache":
-        action = arguments.get("action", "stats")
-        if action == "clear":
-            return await _clear_cache(arguments, client)
-        else:
-            return await _get_cache_stats(arguments, client)
-    elif name == "utility_test_connection":
-        return await _test_connection(arguments, client)
-    # Backward compatibility
-    elif name == "utility_clear_cache":
-        return await _clear_cache(arguments, client)
-    elif name == "utility_get_cache_stats":
-        return await _get_cache_stats(arguments, client)
-    else:
-        return f"Unknown utility tool: {name}"
-
-
-async def _clear_cache(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _clear_cache(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Clear cache."""
     try:
         if client.cache:
@@ -72,7 +19,7 @@ async def _clear_cache(args: Dict[str, Any], client: KledoAPIClient) -> str:
         return f"Error clearing cache: {str(e)}"
 
 
-async def _get_cache_stats(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _get_cache_stats(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Get cache statistics."""
     try:
         if not client.cache:
@@ -93,7 +40,7 @@ async def _get_cache_stats(args: Dict[str, Any], client: KledoAPIClient) -> str:
         result.append(f"**Expirations**: {stats['expirations']}")
 
         # Performance assessment
-        hit_rate_value = float(stats['hit_rate'].rstrip('%'))
+        hit_rate_value = float(stats["hit_rate"].rstrip("%"))
 
         performance = ""
         if hit_rate_value >= 80:
@@ -113,14 +60,16 @@ async def _get_cache_stats(args: Dict[str, Any], client: KledoAPIClient) -> str:
         return f"Error fetching cache stats: {str(e)}"
 
 
-async def _test_connection(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _test_connection(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Test API connection."""
     try:
         result = ["# Connection Test\n"]
 
         # Check authentication status
         is_auth = client.auth.is_authenticated
-        result.append(f"**Authentication Status**: {'✓ Authenticated' if is_auth else '✗ Not Authenticated'}")
+        result.append(
+            f"**Authentication Status**: {'✓ Authenticated' if is_auth else '✗ Not Authenticated'}"
+        )
 
         if is_auth:
             result.append("**Access Token**: Present")

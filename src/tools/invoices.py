@@ -1,33 +1,38 @@
 """
 Invoice tools for Kledo MCP Server
 """
+
 import re
 from collections import defaultdict
 from datetime import timedelta
-from typing import Any, Dict
-from mcp.types import Tool
+from typing import Any
+
 from rapidfuzz import fuzz
 
 from ..kledo_client import KledoAPIClient
 from ..utils.helpers import (
-    parse_date_range, format_currency, safe_get,
-    parse_indonesian_date_phrase, get_jakarta_today,
-    calculate_overdue_days, categorize_overdue_invoices
+    calculate_overdue_days,
+    categorize_overdue_invoices,
+    format_currency,
+    get_jakarta_today,
+    parse_date_range,
+    parse_indonesian_date_phrase,
+    safe_get,
 )
 
 
 def format_customer_display(invoice: dict) -> str:
     """
     Format customer/vendor display name prioritizing company name.
-    
+
     For B2B context, company name is more important than contact person name.
-    
+
     Args:
         invoice: Invoice dictionary with contact data
-    
+
     Returns:
         Formatted customer string
-        
+
     Examples:
         - Company only: "PT Nippon Paint Indonesia"
         - Company + Contact: "PT Nippon Paint Indonesia (Darma)"
@@ -35,34 +40,36 @@ def format_customer_display(invoice: dict) -> str:
     """
     contact_name = (safe_get(invoice, "contact.name", "") or "").strip()
     company_name = (safe_get(invoice, "contact.company", "") or "").strip()
-    
+
     # Priority 1: Company name with contact in parentheses (if different)
     if company_name:
         if contact_name and contact_name.lower() != company_name.lower():
             return f"{company_name} ({contact_name})"
         return company_name
-    
+
     # Priority 2: Contact name only (fallback)
     if contact_name:
         return contact_name
-    
+
     # Priority 3: Unknown
     return "Unknown"
 
 
-def fuzzy_company_match(search_term: str, company_name: str, contact_name: str, threshold: int = 55) -> tuple[bool, float]:
+def fuzzy_company_match(
+    search_term: str, company_name: str, contact_name: str, threshold: int = 55
+) -> tuple[bool, float]:
     """
     Fuzzy match search term against company name and contact name.
-    
+
     Args:
         search_term: Search input (e.g., "CoatingCo", "Nipon")
         company_name: Company/organization name
         contact_name: Contact person name
         threshold: Minimum match score (0-100), default 70
-    
+
     Returns:
         Tuple of (is_match, best_score)
-        
+
     Examples:
         - "CoatingCo" matches "PT Nippon Paint Indonesia" (fuzzy)
         - "Nipon" matches "PT Nippon Paint Indonesia" (fuzzy)
@@ -71,13 +78,13 @@ def fuzzy_company_match(search_term: str, company_name: str, contact_name: str, 
     search_lower = search_term.lower().strip()
     company_lower = (company_name or "").lower().strip()
     contact_lower = (contact_name or "").lower().strip()
-    
+
     # Skip very short terms
     if len(search_lower) < 3:
         return False, 0.0
-    
+
     best_score = 0.0
-    
+
     # Check exact substring match first (highest priority)
     if search_lower in company_lower:
         best_score = 100.0
@@ -92,46 +99,46 @@ def fuzzy_company_match(search_term: str, company_name: str, contact_name: str, 
             token_score = fuzz.token_sort_ratio(search_lower, company_lower)
             company_score = max(partial_score, token_score)
             best_score = max(best_score, company_score)
-        
+
         if contact_lower:
             partial_score = fuzz.partial_ratio(search_lower, contact_lower)
             token_score = fuzz.token_sort_ratio(search_lower, contact_lower)
             contact_score = max(partial_score, token_score) * 0.9  # Slightly lower priority
             best_score = max(best_score, contact_score)
-    
+
     return best_score >= threshold, best_score
 
 
 def filter_invoices_by_company_fuzzy(invoices: list[dict], search_term: str) -> list[dict]:
     """
     Filter invoices using fuzzy matching on company names and contact names.
-    
+
     Args:
         invoices: List of invoice dictionaries
         search_term: Search term to match fuzzily
-    
+
     Returns:
         Filtered list of invoices sorted by match quality
-        
+
     Examples:
         - "CoatingCo" → matches "PT Nippon Paint Indonesia"
         - "Nipon" → matches "PT Nippon Paint Indonesia"
         - "Kurnia" → matches "PT. KURNIA PROPERTINDO SEJAHTERA"
     """
     matches = []
-    
+
     for invoice in invoices:
         company_name = safe_get(invoice, "contact.company", "")
         contact_name = safe_get(invoice, "contact.name", "")
-        
+
         is_match, score = fuzzy_company_match(search_term, company_name, contact_name)
-        
+
         if is_match:
             matches.append((invoice, score))
-    
+
     # Sort by score (best matches first)
     matches.sort(key=lambda x: x[1], reverse=True)
-    
+
     return [inv for inv, score in matches]
 
 
@@ -145,11 +152,13 @@ def extract_invoice_digits(ref_number: str) -> list[str]:
     - "123" -> ["123"]
     """
     # Find all sequences of digits
-    matches = re.findall(r'\d+', ref_number)
+    matches = re.findall(r"\d+", ref_number)
     return matches
 
 
-def fuzzy_invoice_match(search_term: str, invoice_ref_number: str, threshold: int = 80) -> tuple[bool, float]:
+def fuzzy_invoice_match(
+    search_term: str, invoice_ref_number: str, threshold: int = 80
+) -> tuple[bool, float]:
     """
     Check if search term fuzzily matches any numeric part of invoice reference number.
 
@@ -166,7 +175,7 @@ def fuzzy_invoice_match(search_term: str, invoice_ref_number: str, threshold: in
         return False, 0.0
 
     # Skip if search term is all non-digits (probably customer name search)
-    if not re.search(r'\d', search_term):
+    if not re.search(r"\d", search_term):
         return False, 0.0
 
     # Extract numeric parts from invoice number
@@ -230,200 +239,17 @@ def should_use_fuzzy_search(search_term: str) -> bool:
         return False
 
     # Must contain at least one digit
-    if not re.search(r'\d', search_term):
+    if not re.search(r"\d", search_term):
         return False
 
     # Avoid triggering on complex search terms (with spaces, commas, etc.)
-    if re.search(r'[,\s]', search_term):
+    if re.search(r"[,\s]", search_term):
         return False
 
     return True
 
 
-def get_tools() -> list[Tool]:
-    """Get list of invoice tools."""
-    return [
-        Tool(
-            name="invoice_list",
-            description="""List invoices with optional filtering. Supports both sales and purchase invoices.
-
-**For sales invoices (type="sales"):**
-Shows invoice details including Net Sales (Penjualan Neto), Gross Sales (Penjualan Bruto), payment status, and customer info.
-Displays company name prominently for B2B customers (e.g., 'PT Nippon Paint Indonesia (Darma)').
-Supports due date filtering and overdue analysis with aging buckets.
-Status codes: 1=Belum Dibayar (Unpaid), 2=Dibayar Sebagian (Partial), 3=Lunas (Paid - use for revenue)
-
-**For purchase invoices (type="purchase"):**
-Displays vendor company name prominently for B2B vendors.
-Supports filtering by due date range, overdue threshold, vendor name with fuzzy matching, minimum outstanding amount per vendor.
-Aging buckets for overdue invoices (1-30, 31-60, 60+ days).
-Status codes: 1=Belum Dibayar (Unpaid), 3=Lunas (Paid)""",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "type": {
-                        "type": "string",
-                        "enum": ["sales", "purchase"],
-                        "description": "Invoice type: 'sales' for customer invoices, 'purchase' for vendor bills"
-                    },
-                    "search": {
-                        "type": "string",
-                        "description": "Search invoice number, customer/vendor name, or company name. Supports fuzzy search for both invoice numbers (e.g., '1153' → 'INV/26/JAN/01153') and company names (e.g., 'CoatingCo' → 'PT Nippon Paint Indonesia')"
-                    },
-                    "vendor_name": {
-                        "type": "string",
-                        "description": "(Purchase only) Filter by vendor name using fuzzy matching (e.g., 'Nippon', 'CoatingCo'). Resolves to vendor contact_id automatically."
-                    },
-                    "contact_id": {
-                        "type": "integer",
-                        "description": "Filter by customer ID (sales) or vendor ID (purchase)"
-                    },
-                    "min_outstanding": {
-                        "type": "number",
-                        "description": "(Purchase only) Minimum total outstanding amount per vendor (IDR). E.g., 10000000 for '10 juta'. Applied after vendor aggregation."
-                    },
-                    "status_id": {
-                        "type": "integer",
-                        "description": "Filter by status: 1=Unpaid, 2=Partial (sales only), 3=Paid"
-                    },
-                    "date_from": {
-                        "type": "string",
-                        "description": "Start date for invoice date filter (YYYY-MM-DD or 'last_month', 'this_month', etc.)"
-                    },
-                    "date_to": {
-                        "type": "string",
-                        "description": "End date for invoice date filter (YYYY-MM-DD)"
-                    },
-                    "due_date_from": {
-                        "type": "string",
-                        "description": "Start date for due_date filter (YYYY-MM-DD or Indonesian phrase like 'minggu ini', 'bulan lalu')"
-                    },
-                    "due_date_to": {
-                        "type": "string",
-                        "description": "End date for due_date filter (YYYY-MM-DD or Indonesian phrase)"
-                    },
-                    "overdue_days": {
-                        "type": "integer",
-                        "description": "Filter invoices overdue by at least this many days. E.g., 30 for 'telat >30 hari'. Use 0 for any overdue."
-                    },
-                    "overdue_only": {
-                        "type": "boolean",
-                        "description": "If true, show only overdue invoices (due_date < today Jakarta time)"
-                    },
-                    "per_page": {
-                        "type": "integer",
-                        "description": "Results per page (default: 50, max: 100)"
-                    },
-                    "invoice_selection": {
-                        "type": "string",
-                        "description": "(Sales only) When fuzzy search returns multiple matches: single number ('1'), multiple ('1,2,3'), range ('1-5'), 'all', or 'summary'"
-                    }
-                },
-                "required": ["type"]
-            }
-        ),
-        Tool(
-            name="invoice_get",
-            description="Get detailed information about a specific invoice including line items.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "invoice_id": {
-                        "type": "integer",
-                        "description": "Invoice ID"
-                    }
-                },
-                "required": ["invoice_id"]
-            }
-        ),
-        Tool(
-            name="invoice_summarize",
-            description="""Get invoice summary with different views: totals, by customer, or by vendor.
-
-**view="totals"**: Summary totals for sales invoices (total outstanding, paid, overdue, etc.)
-**view="by_customer"**: Outstanding amounts grouped by customer. Shows which customers owe money with totals and individual invoices. Default sort: highest outstanding first. Top 10. Uses type_id=3 (Customer).
-**view="by_vendor"**: Outstanding amounts grouped by vendor (supplier). Shows which vendors we owe money to. Default sort: highest outstanding first. Top 10. Uses type_id=1 (Vendor).""",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "view": {
-                        "type": "string",
-                        "enum": ["totals", "by_customer", "by_vendor"],
-                        "description": "Summary view: 'totals' for overall totals, 'by_customer' for customer grouping, 'by_vendor' for vendor grouping"
-                    },
-                    "min_outstanding": {
-                        "type": "number",
-                        "description": "(by_customer/by_vendor only) Minimum total outstanding (IDR). Applied after grouping."
-                    },
-                    "overdue_days": {
-                        "type": "integer",
-                        "description": "(by_customer/by_vendor only) Only include invoices overdue by at least this many days. Applied before grouping."
-                    },
-                    "sort_by": {
-                        "type": "string",
-                        "enum": ["amount", "count", "overdue"],
-                        "description": "(by_customer/by_vendor only) Sort by: 'amount' (outstanding, default), 'count' (invoice count), 'overdue' (max overdue days)"
-                    },
-                    "date_from": {
-                        "type": "string",
-                        "description": "Start date filter (YYYY-MM-DD or 'last_month', 'this_month')"
-                    },
-                    "date_to": {
-                        "type": "string",
-                        "description": "End date filter (YYYY-MM-DD)"
-                    }
-                },
-                "required": ["view"]
-            }
-        )
-    ]
-
-
-async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClient) -> str:
-    """Handle invoice tool calls."""
-    # New consolidated tools
-    if name == "invoice_list":
-        invoice_type = arguments.get("type")
-        if not invoice_type:
-            return "Error: type parameter is required. Must be 'sales' or 'purchase'."
-        if invoice_type == "sales":
-            return await _list_sales_invoices(arguments, client)
-        elif invoice_type == "purchase":
-            return await _list_purchase_invoices(arguments, client)
-        else:
-            return f"Error: Invalid type '{invoice_type}'. Must be 'sales' or 'purchase'."
-    elif name == "invoice_get":
-        return await _get_invoice_detail(arguments, client)
-    elif name == "invoice_summarize":
-        view = arguments.get("view")
-        if not view:
-            return "Error: view parameter is required. Must be 'totals', 'by_customer', or 'by_vendor'."
-        if view == "totals":
-            return await _get_invoice_totals(arguments, client)
-        elif view == "by_customer":
-            return await _outstanding_by_customer(arguments, client)
-        elif view == "by_vendor":
-            return await _outstanding_by_vendor(arguments, client)
-        else:
-            return f"Error: Invalid view '{view}'. Must be 'totals', 'by_customer', or 'by_vendor'."
-    # Backward compatibility: support old tool names
-    elif name == "invoice_list_sales":
-        return await _list_sales_invoices(arguments, client)
-    elif name == "invoice_list_purchase":
-        return await _list_purchase_invoices(arguments, client)
-    elif name == "invoice_get_detail":
-        return await _get_invoice_detail(arguments, client)
-    elif name == "invoice_get_totals":
-        return await _get_invoice_totals(arguments, client)
-    elif name == "outstanding_by_customer":
-        return await _outstanding_by_customer(arguments, client)
-    elif name == "outstanding_by_vendor":
-        return await _outstanding_by_vendor(arguments, client)
-    else:
-        return f"Unknown invoice tool: {name}"
-
-
-async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _list_sales_invoices(args: dict[str, Any], client: KledoAPIClient) -> str:
     """List sales invoices."""
     # Parse date range (for invoice date)
     date_from = args.get("date_from")
@@ -487,7 +313,7 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
                 due_date_from=due_date_from,
                 due_date_to=due_date_to,
                 per_page=200,  # Fetch more invoices for fuzzy matching
-                force_refresh=args.get("force_refresh", False)
+                force_refresh=args.get("force_refresh", False),
             )
 
             all_invoices = safe_get(data, "data.data", [])
@@ -497,39 +323,49 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
 
             # Apply client-side overdue filtering (exclude fully paid invoices)
             if is_overdue_mode and invoices:
-                invoices = [inv for inv in invoices if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3]
+                invoices = [
+                    inv
+                    for inv in invoices
+                    if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3
+                ]
 
             if not invoices:
                 return f"No invoices found matching fuzzy search for '{search_term}'."
 
             # Handle invoice selection if specified
             if invoice_selection is not None:
-                action_type, indices = parse_invoice_selection(str(invoice_selection), len(invoices))
-                
+                action_type, indices = parse_invoice_selection(
+                    str(invoice_selection), len(invoices)
+                )
+
                 if action_type == "invalid":
                     return f"❌ Invalid selection '{invoice_selection}'. Pilih nomor 1-{len(invoices)}, atau 'all', atau 'summary'."
-                
+
                 elif action_type == "summary":
                     # Return aggregate summary only
                     total_net = sum(float(safe_get(inv, "subtotal", 0)) for inv in invoices)
                     total_tax = sum(float(safe_get(inv, "total_tax", 0)) for inv in invoices)
-                    total_gross = sum(float(safe_get(inv, "amount_after_tax", 0)) for inv in invoices)
+                    total_gross = sum(
+                        float(safe_get(inv, "amount_after_tax", 0)) for inv in invoices
+                    )
                     total_due = sum(float(safe_get(inv, "due", 0)) for inv in invoices)
                     total_paid = total_gross - total_due
-                    
+
                     result = [f"# Summary: {len(invoices)} Invoices for '{search_term}'\n"]
                     result.append(f"**Penjualan Neto (Net Sales)**: {format_currency(total_net)}")
                     result.append(f"**PPN Collected**: {format_currency(total_tax)}")
-                    result.append(f"**Penjualan Bruto (Gross Sales)**: {format_currency(total_gross)}")
+                    result.append(
+                        f"**Penjualan Bruto (Gross Sales)**: {format_currency(total_gross)}"
+                    )
                     result.append(f"**Paid**: {format_currency(total_paid)}")
                     result.append(f"**Outstanding**: {format_currency(total_due)}")
                     return "\n".join(result)
-                
+
                 elif action_type in ["single", "multiple", "all"]:
                     # Filter to selected invoices
                     invoices = [invoices[i] for i in indices]
                     # Continue to normal display below
-                
+
             # If multiple matches and no selection, present disambiguation
             elif len(invoices) > 1:
                 return _handle_fuzzy_search_disambiguation(invoices, search_term)
@@ -546,13 +382,17 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
                 due_date_from=due_date_from,
                 due_date_to=due_date_to,
                 per_page=args.get("per_page", 50),
-                force_refresh=args.get("force_refresh", False)
+                force_refresh=args.get("force_refresh", False),
             )
             invoices = safe_get(data, "data.data", [])
 
             # Apply client-side overdue filtering (exclude fully paid invoices)
             if is_overdue_mode and invoices:
-                invoices = [inv for inv in invoices if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3]
+                invoices = [
+                    inv
+                    for inv in invoices
+                    if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3
+                ]
 
             # If no results and search_term looks like a company name, try client-side fuzzy search
             if not invoices and search_term and len(search_term) >= 3:
@@ -566,7 +406,7 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
                     due_date_from=due_date_from,
                     due_date_to=due_date_to,
                     per_page=100,
-                    force_refresh=args.get("force_refresh", False)
+                    force_refresh=args.get("force_refresh", False),
                 )
                 all_invoices = safe_get(broader_data, "data.data", [])
 
@@ -575,8 +415,12 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
 
                 # Apply client-side overdue filtering
                 if is_overdue_mode and invoices:
-                    invoices = [inv for inv in invoices if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3]
-                
+                    invoices = [
+                        inv
+                        for inv in invoices
+                        if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3
+                    ]
+
                 if not invoices:
                     result = ["# Sales Invoices\n"]
                     result.append("No invoices found matching the criteria.")
@@ -585,34 +429,40 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
                 result = ["# Sales Invoices\n"]
                 result.append("No invoices found matching the criteria.")
                 return "\n".join(result)
-            
+
             # Handle invoice selection if specified (for normal search too)
             if invoice_selection is not None and len(invoices) > 0:
-                action_type, indices = parse_invoice_selection(str(invoice_selection), len(invoices))
-                
+                action_type, indices = parse_invoice_selection(
+                    str(invoice_selection), len(invoices)
+                )
+
                 if action_type == "invalid":
                     return f"❌ Invalid selection '{invoice_selection}'. Pilih nomor 1-{len(invoices)}, atau 'all', atau 'summary'."
-                
+
                 elif action_type == "summary":
                     # Return aggregate summary only
                     total_net = sum(float(safe_get(inv, "subtotal", 0)) for inv in invoices)
                     total_tax = sum(float(safe_get(inv, "total_tax", 0)) for inv in invoices)
-                    total_gross = sum(float(safe_get(inv, "amount_after_tax", 0)) for inv in invoices)
+                    total_gross = sum(
+                        float(safe_get(inv, "amount_after_tax", 0)) for inv in invoices
+                    )
                     total_due = sum(float(safe_get(inv, "due", 0)) for inv in invoices)
                     total_paid = total_gross - total_due
-                    
+
                     result = [f"# Summary: {len(invoices)} Invoices for '{search_term}'\n"]
                     result.append(f"**Penjualan Neto (Net Sales)**: {format_currency(total_net)}")
                     result.append(f"**PPN Collected**: {format_currency(total_tax)}")
-                    result.append(f"**Penjualan Bruto (Gross Sales)**: {format_currency(total_gross)}")
+                    result.append(
+                        f"**Penjualan Bruto (Gross Sales)**: {format_currency(total_gross)}"
+                    )
                     result.append(f"**Paid**: {format_currency(total_paid)}")
                     result.append(f"**Outstanding**: {format_currency(total_due)}")
                     return "\n".join(result)
-                
+
                 elif action_type in ["single", "multiple", "all"]:
                     # Filter to selected invoices
                     invoices = [invoices[i] for i in indices]
-            
+
             # If multiple matches and no selection, present disambiguation
             elif len(invoices) > 1 and search_term:
                 return _handle_fuzzy_search_disambiguation(invoices, search_term)
@@ -645,8 +495,12 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
                 bucket_items = buckets[bucket_name]
                 if bucket_items:
                     bucket_count = len(bucket_items)
-                    bucket_outstanding = sum(float(safe_get(inv, "due", 0)) for inv, _ in bucket_items)
-                    result.append(f"**{bucket_name} hari**: {bucket_count} invoices, {format_currency(bucket_outstanding)} outstanding")
+                    bucket_outstanding = sum(
+                        float(safe_get(inv, "due", 0)) for inv, _ in bucket_items
+                    )
+                    result.append(
+                        f"**{bucket_name} hari**: {bucket_count} invoices, {format_currency(bucket_outstanding)} outstanding"
+                    )
 
             result.append("")  # Empty line
 
@@ -656,7 +510,7 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
         status_map = {
             1: "Belum Dibayar (Unpaid)",
             2: "Dibayar Sebagian (Partially Paid)",
-            3: "Lunas (Paid)"
+            3: "Lunas (Paid)",
         }
 
         for invoice in invoices[:20]:  # Limit display
@@ -702,16 +556,16 @@ async def _list_sales_invoices(args: Dict[str, Any], client: KledoAPIClient) -> 
 def parse_invoice_selection(selection_str: str, max_count: int) -> tuple[str, list[int]]:
     """
     Parse invoice selection string into action type and indices.
-    
+
     Args:
         selection_str: Selection string (e.g., "1", "1,2,3", "1-5", "all", "summary")
         max_count: Maximum number of invoices available
-    
+
     Returns:
         Tuple of (action_type, selected_indices)
         - action_type: "single", "multiple", "all", "summary"
         - selected_indices: List of 0-based indices
-    
+
     Examples:
         "1" → ("single", [0])
         "1,2,3" → ("multiple", [0, 1, 2])
@@ -720,39 +574,39 @@ def parse_invoice_selection(selection_str: str, max_count: int) -> tuple[str, li
         "summary" → ("summary", [])
     """
     selection_lower = selection_str.lower().strip()
-    
+
     # Handle special keywords
     if selection_lower in ["all", "semua", "tampilkan semua", "show all"]:
         return "all", list(range(max_count))
-    
+
     if selection_lower in ["summary", "total", "aggregate", "ringkasan"]:
         return "summary", []
-    
+
     # Parse numeric selections
     indices = []
-    
+
     # Handle ranges (e.g., "1-5")
-    if '-' in selection_str and not selection_str.startswith('-'):
+    if "-" in selection_str and not selection_str.startswith("-"):
         try:
-            parts = selection_str.split('-')
+            parts = selection_str.split("-")
             if len(parts) == 2:
                 start = int(parts[0].strip()) - 1  # Convert to 0-based
                 end = int(parts[1].strip())  # End is inclusive, so don't subtract 1 yet
                 indices = list(range(start, min(end, max_count)))
         except (ValueError, IndexError):
             pass
-    
+
     # Handle comma-separated (e.g., "1,2,3" or "1, 2, 3")
-    if not indices and ',' in selection_str:
+    if not indices and "," in selection_str:
         try:
-            parts = selection_str.split(',')
+            parts = selection_str.split(",")
             for part in parts:
                 num = int(part.strip()) - 1  # Convert to 0-based
                 if 0 <= num < max_count:
                     indices.append(num)
         except (ValueError, IndexError):
             pass
-    
+
     # Handle single number
     if not indices:
         try:
@@ -761,7 +615,7 @@ def parse_invoice_selection(selection_str: str, max_count: int) -> tuple[str, li
                 indices = [num]
         except (ValueError, IndexError):
             pass
-    
+
     # Determine action type
     if not indices:
         return "invalid", []
@@ -783,20 +637,16 @@ def _handle_fuzzy_search_disambiguation(invoices: list[dict], search_term: str) 
         Formatted string showing numbered options and selection instructions
     """
     result = []
-    
+
     result.append(f"Nemu {len(invoices)} invoice yang match dengan **'{search_term}'**\n")
     result.append("Pilih mana yang lo mau:\n")
 
     # Status mapping
-    status_map = {
-        1: "Belum Dibayar",
-        2: "Dibayar Sebagian",
-        3: "Lunas"
-    }
+    status_map = {1: "Belum Dibayar", 2: "Dibayar Sebagian", 3: "Lunas"}
 
     # Show up to 10 matches for clarity
     display_count = min(len(invoices), 10)
-    
+
     for i, invoice in enumerate(invoices[:display_count], 1):
         inv_number = safe_get(invoice, "ref_number", "N/A")
         customer = format_customer_display(invoice)
@@ -805,7 +655,7 @@ def _handle_fuzzy_search_disambiguation(invoices: list[dict], search_term: str) 
         due = float(safe_get(invoice, "due", 0))
         status_id = safe_get(invoice, "status_id", 0)
         status = status_map.get(status_id, f"Status-{status_id}")
-        
+
         # Use emoji for status
         status_emoji = "✅" if status_id == 3 else "🔴" if due > 0 else "⚠️"
 
@@ -821,15 +671,15 @@ def _handle_fuzzy_search_disambiguation(invoices: list[dict], search_term: str) 
     # Instructions - more conversational
     result.append("\n---")
     result.append("\n**Cara pilih:**")
-    result.append("- **Satu invoice:** Bilang nomor nya (e.g., \"nomor 1\" atau \"yang pertama\")")
-    result.append("- **Beberapa invoice:** Bilang nomor nya (e.g., \"nomor 1 dan 3\" atau \"1, 2, 5\")")
-    result.append("- **Semua invoice:** Bilang \"semua\" atau \"tampilkan semua\"")
-    result.append("- **Agregat/summary:** Bilang \"total\" atau \"summary\"\n")
+    result.append('- **Satu invoice:** Bilang nomor nya (e.g., "nomor 1" atau "yang pertama")')
+    result.append('- **Beberapa invoice:** Bilang nomor nya (e.g., "nomor 1 dan 3" atau "1, 2, 5")')
+    result.append('- **Semua invoice:** Bilang "semua" atau "tampilkan semua"')
+    result.append('- **Agregat/summary:** Bilang "total" atau "summary"\n')
 
     # Calculate aggregate for quick reference
     total_amount = sum(float(safe_get(inv, "amount_after_tax", 0)) for inv in invoices)
     total_outstanding = sum(float(safe_get(inv, "due", 0)) for inv in invoices)
-    
+
     result.append("**Quick Summary:**")
     result.append(f"- Total {len(invoices)} invoices: {format_currency(total_amount)}")
     result.append(f"- Outstanding: {format_currency(total_outstanding)}")
@@ -873,7 +723,7 @@ def _get_best_match_highlight(search_term: str, invoice_number: str) -> str:
     return invoice_number
 
 
-async def _get_invoice_detail(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _get_invoice_detail(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Get invoice detail."""
     invoice_id = args.get("invoice_id")
 
@@ -890,7 +740,11 @@ async def _get_invoice_detail(args: Dict[str, Any], client: KledoAPIClient) -> s
         result = ["# Invoice Details\n"]
 
         # Status mapping (consistent with list view)
-        status_map = {1: "Belum Dibayar (Unpaid)", 2: "Dibayar Sebagian (Partial)", 3: "Lunas (Paid)"}
+        status_map = {
+            1: "Belum Dibayar (Unpaid)",
+            2: "Dibayar Sebagian (Partial)",
+            3: "Lunas (Paid)",
+        }
 
         # Header info
         result.append(f"**Invoice Number**: {safe_get(invoice, 'ref_number', 'N/A')}")
@@ -924,7 +778,9 @@ async def _get_invoice_detail(args: Dict[str, Any], client: KledoAPIClient) -> s
                 amount = safe_get(item, "amount", 0)
 
                 result.append(f"- **{desc}**")
-                result.append(f"  - Qty: {qty} × {format_currency(price)} = {format_currency(amount)}")
+                result.append(
+                    f"  - Qty: {qty} × {format_currency(price)} = {format_currency(amount)}"
+                )
 
         # Memo
         memo = safe_get(invoice, "memo")
@@ -937,7 +793,7 @@ async def _get_invoice_detail(args: Dict[str, Any], client: KledoAPIClient) -> s
         return f"Error fetching invoice details: {str(e)}"
 
 
-async def _get_invoice_totals(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _get_invoice_totals(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Get invoice totals summary with smart fallback."""
     date_from = args.get("date_from")
     date_to = args.get("date_to")
@@ -953,11 +809,8 @@ async def _get_invoice_totals(args: Dict[str, Any], client: KledoAPIClient) -> s
         data = await client.get(
             "invoices",
             "totals",
-            params={
-                "date_from": date_from,
-                "date_to": date_to
-            },
-            cache_category="invoices"
+            params={"date_from": date_from, "date_to": date_to},
+            cache_category="invoices",
         )
 
         result = ["# Invoice Totals Summary\n"]
@@ -971,52 +824,58 @@ async def _get_invoice_totals(args: Dict[str, Any], client: KledoAPIClient) -> s
         total_amount = float(safe_get(totals, "amount_after_tax", 0))
         total_due = float(safe_get(totals, "due", 0))
         total_paid = float(safe_get(totals, "paid", 0))
-        
+
         # Fallback: If totals are zero but date filtering was requested,
         # fetch the actual invoice list and calculate manually
         if total_amount == 0 and (date_from or date_to):
-            result.append("_Note: Calculating totals from invoice list (API totals endpoint returned zero)_\n")
-            
+            result.append(
+                "_Note: Calculating totals from invoice list (API totals endpoint returned zero)_\n"
+            )
+
             # Fetch invoices with date filter
             invoices_data = await client.list_invoices(
                 date_from=date_from,
                 date_to=date_to,
                 per_page=100,  # Get more results
-                force_refresh=False
+                force_refresh=False,
             )
-            
+
             invoices = safe_get(invoices_data, "data.data", [])
-            
+
             if invoices:
                 # Calculate totals manually from invoice list
                 total_amount = sum(float(safe_get(inv, "amount_after_tax", 0)) for inv in invoices)
                 total_due = sum(float(safe_get(inv, "due", 0)) for inv in invoices)
                 total_paid = total_amount - total_due
                 total_count = len(invoices)
-                
+
                 # Count by status for better insight
                 status_counts = {}
                 for inv in invoices:
                     status_id = safe_get(inv, "status_id", 0)
                     status_counts[status_id] = status_counts.get(status_id, 0) + 1
-                
+
                 result.append(f"**Total Invoices**: {total_count}")
                 result.append(f"**Total Amount**: {format_currency(total_amount)}")
                 result.append(f"**Paid**: {format_currency(total_paid)}")
                 result.append(f"**Outstanding**: {format_currency(total_due)}\n")
-                
+
                 # Add status breakdown
                 result.append("## Status Breakdown:")
-                status_names = {1: "Belum Dibayar (Unpaid)", 2: "Dibayar Sebagian (Partial)", 3: "Lunas (Paid)"}
+                status_names = {
+                    1: "Belum Dibayar (Unpaid)",
+                    2: "Dibayar Sebagian (Partial)",
+                    3: "Lunas (Paid)",
+                }
                 for status_id, count in sorted(status_counts.items()):
                     status_name = status_names.get(status_id, f"Status-{status_id}")
                     result.append(f"- **{status_name}**: {count} invoices")
-                
+
                 return "\n".join(result)
             else:
                 result.append("No invoices found for the specified period.")
                 return "\n".join(result)
-        
+
         # Use API totals if available
         result.append(f"**Total Amount**: {format_currency(total_amount)}")
         result.append(f"**Paid**: {format_currency(total_paid)}")
@@ -1028,9 +887,11 @@ async def _get_invoice_totals(args: Dict[str, Any], client: KledoAPIClient) -> s
         return f"Error fetching invoice totals: {str(e)}"
 
 
-async def _fetch_all_purchase_invoices(client: KledoAPIClient, date_from: str = None, date_to: str = None, status_ids: list = None) -> list:
+async def _fetch_all_purchase_invoices(
+    client: KledoAPIClient, date_from: str = None, date_to: str = None, status_ids: list = None
+) -> list:
     """Fetch all purchase invoices for a date range (handles pagination).
-    
+
     Args:
         status_ids: List of status IDs to filter (e.g. [1] for unpaid only).
                     If None, fetches all statuses.
@@ -1044,20 +905,12 @@ async def _fetch_all_purchase_invoices(client: KledoAPIClient, date_from: str = 
     for status_id in filter_statuses:
         page = 1
         while page <= max_pages:
-            params = {
-                "date_from": date_from,
-                "date_to": date_to,
-                "per_page": 100,
-                "page": page
-            }
+            params = {"date_from": date_from, "date_to": date_to, "per_page": 100, "page": page}
             if status_id is not None:
                 params["status_id"] = status_id
 
             data = await client.get(
-                "purchase_invoices",
-                "list",
-                params=params,
-                cache_category="invoices"
+                "purchase_invoices", "list", params=params, cache_category="invoices"
             )
 
             invoices = safe_get(data, "data.data", [])
@@ -1076,7 +929,7 @@ async def _fetch_all_purchase_invoices(client: KledoAPIClient, date_from: str = 
     return all_invoices
 
 
-async def _outstanding_by_customer(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _outstanding_by_customer(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Get outstanding amounts grouped by customer."""
     date_from = args.get("date_from")
     date_to = args.get("date_to")
@@ -1087,6 +940,7 @@ async def _outstanding_by_customer(args: Dict[str, Any], client: KledoAPIClient)
     # Parse date range
     if date_from and not date_to:
         from ..utils.helpers import parse_date_range
+
         parsed_from, parsed_to = parse_date_range(date_from)
         if parsed_from:
             date_from = parsed_from
@@ -1112,9 +966,9 @@ async def _outstanding_by_customer(args: Dict[str, Any], client: KledoAPIClient)
                         "date_from": date_from,
                         "date_to": date_to,
                         "per_page": 100,
-                        "page": page
+                        "page": page,
                     },
-                    cache_category="invoices"
+                    cache_category="invoices",
                 )
 
                 invoices = safe_get(data, "data.data", [])
@@ -1154,12 +1008,9 @@ async def _outstanding_by_customer(args: Dict[str, Any], client: KledoAPIClient)
             return f"No invoices found overdue by at least {overdue_days} days."
 
         # Group by customer
-        customer_groups = defaultdict(lambda: {
-            "total_outstanding": 0,
-            "count": 0,
-            "invoices": [],
-            "max_overdue_days": 0
-        })
+        customer_groups = defaultdict(
+            lambda: {"total_outstanding": 0, "count": 0, "invoices": [], "max_overdue_days": 0}
+        )
 
         for inv in all_invoices:
             customer_name = format_customer_display(inv)
@@ -1174,17 +1025,14 @@ async def _outstanding_by_customer(args: Dict[str, Any], client: KledoAPIClient)
             customer_groups[customer_name]["total_outstanding"] += due_amount
             customer_groups[customer_name]["count"] += 1
             customer_groups[customer_name]["max_overdue_days"] = max(
-                customer_groups[customer_name]["max_overdue_days"],
-                age_days
+                customer_groups[customer_name]["max_overdue_days"], age_days
             )
 
             # Store invoice details (limit to 5 per customer for memory efficiency)
             if len(customer_groups[customer_name]["invoices"]) < 5:
-                customer_groups[customer_name]["invoices"].append({
-                    "ref_number": ref_number,
-                    "due": due_amount,
-                    "age_days": age_days
-                })
+                customer_groups[customer_name]["invoices"].append(
+                    {"ref_number": ref_number, "due": due_amount, "age_days": age_days}
+                )
 
         # Apply min_outstanding filter (HAVING clause)
         if min_outstanding is not None:
@@ -1200,11 +1048,17 @@ async def _outstanding_by_customer(args: Dict[str, Any], client: KledoAPIClient)
 
         # Sort results
         if sort_by == "count":
-            sorted_customers = sorted(customer_groups.items(), key=lambda x: x[1]["count"], reverse=True)
+            sorted_customers = sorted(
+                customer_groups.items(), key=lambda x: x[1]["count"], reverse=True
+            )
         elif sort_by == "overdue":
-            sorted_customers = sorted(customer_groups.items(), key=lambda x: x[1]["max_overdue_days"], reverse=True)
+            sorted_customers = sorted(
+                customer_groups.items(), key=lambda x: x[1]["max_overdue_days"], reverse=True
+            )
         else:  # Default: amount
-            sorted_customers = sorted(customer_groups.items(), key=lambda x: x[1]["total_outstanding"], reverse=True)
+            sorted_customers = sorted(
+                customer_groups.items(), key=lambda x: x[1]["total_outstanding"], reverse=True
+            )
 
         # Cap at top 10
         display_count = min(len(sorted_customers), 10)
@@ -1222,11 +1076,17 @@ async def _outstanding_by_customer(args: Dict[str, Any], client: KledoAPIClient)
         result.append("## Results:\n")
 
         for idx, (customer_name, data) in enumerate(top_customers, 1):
-            result.append(f"{idx}. **{customer_name}**: {format_currency(data['total_outstanding'])} ({data['count']} invoices)")
+            result.append(
+                f"{idx}. **{customer_name}**: {format_currency(data['total_outstanding'])} ({data['count']} invoices)"
+            )
 
             for inv in data["invoices"]:
-                age_text = f"{inv['age_days']} hari overdue" if inv['age_days'] > 0 else "Not yet due"
-                result.append(f"   - {inv['ref_number']} | {format_currency(inv['due'])} | {age_text}")
+                age_text = (
+                    f"{inv['age_days']} hari overdue" if inv["age_days"] > 0 else "Not yet due"
+                )
+                result.append(
+                    f"   - {inv['ref_number']} | {format_currency(inv['due'])} | {age_text}"
+                )
 
             remaining = data["count"] - len(data["invoices"])
             if remaining > 0:
@@ -1235,7 +1095,9 @@ async def _outstanding_by_customer(args: Dict[str, Any], client: KledoAPIClient)
                 result.append("")
 
         if overflow_customers:
-            result.append(f"... dan {len(overflow_customers)} customer lainnya dengan total {format_currency(overflow_total)}")
+            result.append(
+                f"... dan {len(overflow_customers)} customer lainnya dengan total {format_currency(overflow_total)}"
+            )
 
         return "\n".join(result)
 
@@ -1243,7 +1105,7 @@ async def _outstanding_by_customer(args: Dict[str, Any], client: KledoAPIClient)
         return f"Error fetching outstanding by customer: {str(e)}"
 
 
-async def _outstanding_by_vendor(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _outstanding_by_vendor(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Get outstanding amounts grouped by vendor."""
     date_from = args.get("date_from")
     date_to = args.get("date_to")
@@ -1254,6 +1116,7 @@ async def _outstanding_by_vendor(args: Dict[str, Any], client: KledoAPIClient) -
     # Parse date range
     if date_from and not date_to:
         from ..utils.helpers import parse_date_range
+
         parsed_from, parsed_to = parse_date_range(date_from)
         if parsed_from:
             date_from = parsed_from
@@ -1261,7 +1124,9 @@ async def _outstanding_by_vendor(args: Dict[str, Any], client: KledoAPIClient) -
 
     try:
         # Fetch unpaid + partially paid purchase invoices (server-side filter)
-        all_invoices = await _fetch_all_purchase_invoices(client, date_from, date_to, status_ids=[1, 2])
+        all_invoices = await _fetch_all_purchase_invoices(
+            client, date_from, date_to, status_ids=[1, 2]
+        )
 
         # Safety: filter out any zero-due invoices that slipped through
         all_invoices = [inv for inv in all_invoices if float(safe_get(inv, "due", 0)) > 0]
@@ -1287,12 +1152,9 @@ async def _outstanding_by_vendor(args: Dict[str, Any], client: KledoAPIClient) -
             return f"No purchase invoices found overdue by at least {overdue_days} days."
 
         # Group by vendor
-        vendor_groups = defaultdict(lambda: {
-            "total_outstanding": 0,
-            "count": 0,
-            "invoices": [],
-            "max_overdue_days": 0
-        })
+        vendor_groups = defaultdict(
+            lambda: {"total_outstanding": 0, "count": 0, "invoices": [], "max_overdue_days": 0}
+        )
 
         for inv in all_invoices:
             vendor_name = format_customer_display(inv)  # Works for vendors too
@@ -1307,17 +1169,14 @@ async def _outstanding_by_vendor(args: Dict[str, Any], client: KledoAPIClient) -
             vendor_groups[vendor_name]["total_outstanding"] += due_amount
             vendor_groups[vendor_name]["count"] += 1
             vendor_groups[vendor_name]["max_overdue_days"] = max(
-                vendor_groups[vendor_name]["max_overdue_days"],
-                age_days
+                vendor_groups[vendor_name]["max_overdue_days"], age_days
             )
 
             # Store invoice details (limit to 5 per vendor for memory efficiency)
             if len(vendor_groups[vendor_name]["invoices"]) < 5:
-                vendor_groups[vendor_name]["invoices"].append({
-                    "ref_number": ref_number,
-                    "due": due_amount,
-                    "age_days": age_days
-                })
+                vendor_groups[vendor_name]["invoices"].append(
+                    {"ref_number": ref_number, "due": due_amount, "age_days": age_days}
+                )
 
         # Apply min_outstanding filter (HAVING clause)
         if min_outstanding is not None:
@@ -1333,11 +1192,17 @@ async def _outstanding_by_vendor(args: Dict[str, Any], client: KledoAPIClient) -
 
         # Sort results
         if sort_by == "count":
-            sorted_vendors = sorted(vendor_groups.items(), key=lambda x: x[1]["count"], reverse=True)
+            sorted_vendors = sorted(
+                vendor_groups.items(), key=lambda x: x[1]["count"], reverse=True
+            )
         elif sort_by == "overdue":
-            sorted_vendors = sorted(vendor_groups.items(), key=lambda x: x[1]["max_overdue_days"], reverse=True)
+            sorted_vendors = sorted(
+                vendor_groups.items(), key=lambda x: x[1]["max_overdue_days"], reverse=True
+            )
         else:  # Default: amount
-            sorted_vendors = sorted(vendor_groups.items(), key=lambda x: x[1]["total_outstanding"], reverse=True)
+            sorted_vendors = sorted(
+                vendor_groups.items(), key=lambda x: x[1]["total_outstanding"], reverse=True
+            )
 
         # Cap at top 10
         display_count = min(len(sorted_vendors), 10)
@@ -1355,11 +1220,17 @@ async def _outstanding_by_vendor(args: Dict[str, Any], client: KledoAPIClient) -
         result.append("## Results:\n")
 
         for idx, (vendor_name, data) in enumerate(top_vendors, 1):
-            result.append(f"{idx}. **{vendor_name}**: {format_currency(data['total_outstanding'])} ({data['count']} invoices)")
+            result.append(
+                f"{idx}. **{vendor_name}**: {format_currency(data['total_outstanding'])} ({data['count']} invoices)"
+            )
 
             for inv in data["invoices"]:
-                age_text = f"{inv['age_days']} hari overdue" if inv['age_days'] > 0 else "Not yet due"
-                result.append(f"   - {inv['ref_number']} | {format_currency(inv['due'])} | {age_text}")
+                age_text = (
+                    f"{inv['age_days']} hari overdue" if inv["age_days"] > 0 else "Not yet due"
+                )
+                result.append(
+                    f"   - {inv['ref_number']} | {format_currency(inv['due'])} | {age_text}"
+                )
 
             remaining = data["count"] - len(data["invoices"])
             if remaining > 0:
@@ -1368,7 +1239,9 @@ async def _outstanding_by_vendor(args: Dict[str, Any], client: KledoAPIClient) -
                 result.append("")
 
         if overflow_vendors:
-            result.append(f"... dan {len(overflow_vendors)} vendor lainnya dengan total {format_currency(overflow_total)}")
+            result.append(
+                f"... dan {len(overflow_vendors)} vendor lainnya dengan total {format_currency(overflow_total)}"
+            )
 
         return "\n".join(result)
 
@@ -1420,7 +1293,9 @@ async def resolve_vendor_name(client: KledoAPIClient, vendor_name: str) -> int |
                 matches.sort(key=lambda x: x[1], reverse=True)
 
                 # If single high-confidence match (>= 90), return that contact_id
-                if len(matches) == 1 or (matches[0][1] >= 90 and matches[0][1] - matches[1][1] >= 10):
+                if len(matches) == 1 or (
+                    matches[0][1] >= 90 and matches[0][1] - matches[1][1] >= 10
+                ):
                     return matches[0][0]["id"]
 
                 # Multiple good matches - return for disambiguation
@@ -1439,7 +1314,9 @@ async def resolve_vendor_name(client: KledoAPIClient, vendor_name: str) -> int |
         for contact in all_vendors:
             company_name = contact.get("company_name", "") or contact.get("company", "")
             contact_name = contact.get("name", "")
-            is_match, score = fuzzy_company_match(vendor_name, company_name, contact_name, threshold=55)
+            is_match, score = fuzzy_company_match(
+                vendor_name, company_name, contact_name, threshold=55
+            )
             if is_match:
                 matches.append((contact, score))
 
@@ -1462,7 +1339,7 @@ async def resolve_vendor_name(client: KledoAPIClient, vendor_name: str) -> int |
         return None
 
 
-async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _list_purchase_invoices(args: dict[str, Any], client: KledoAPIClient) -> str:
     """List purchase invoices."""
     date_from = args.get("date_from")
     date_to = args.get("date_to")
@@ -1490,9 +1367,13 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
             for i, contact in enumerate(resolution, 1):
                 name = contact.get("name", "Unknown")
                 company = contact.get("company_name", "") or contact.get("company", "")
-                display = f"{company} ({name})" if company and name != company else (company or name)
+                display = (
+                    f"{company} ({name})" if company and name != company else (company or name)
+                )
                 result.append(f"**{i}.** {display} (ID: {contact['id']})")
-            result.append("\nPlease specify which vendor by using contact_id parameter or a more specific vendor_name.")
+            result.append(
+                "\nPlease specify which vendor by using contact_id parameter or a more specific vendor_name."
+            )
             return "\n".join(result)
 
         # Single match - use resolved contact_id
@@ -1542,9 +1423,9 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
                 "date_to": date_to,
                 "due_date_from": due_date_from,
                 "due_date_to": due_date_to,
-                "per_page": args.get("per_page", 50)
+                "per_page": args.get("per_page", 50),
             },
-            cache_category="invoices"
+            cache_category="invoices",
         )
 
         result = ["# Purchase Invoices\n"]
@@ -1553,7 +1434,11 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
 
         # Apply client-side overdue filtering (exclude fully paid invoices)
         if is_overdue_query and invoices:
-            invoices = [inv for inv in invoices if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3]
+            invoices = [
+                inv
+                for inv in invoices
+                if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3
+            ]
 
         # Apply minimum outstanding filter
         min_outstanding = args.get("min_outstanding")
@@ -1564,7 +1449,11 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
             total_outstanding = sum(float(safe_get(inv, "due", 0)) for inv in invoices)
 
             if total_outstanding < min_outstanding:
-                vendor_display = vendor_name or f"contact_id={resolved_contact_id}" if resolved_contact_id else "all vendors"
+                vendor_display = (
+                    vendor_name or f"contact_id={resolved_contact_id}"
+                    if resolved_contact_id
+                    else "all vendors"
+                )
                 return (
                     f"Vendor '{vendor_display}' has total outstanding "
                     f"{format_currency(total_outstanding)}, which is below the minimum "
@@ -1585,9 +1474,9 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
                     "date_to": date_to,
                     "due_date_from": due_date_from,
                     "due_date_to": due_date_to,
-                    "per_page": 100
+                    "per_page": 100,
                 },
-                cache_category="invoices"
+                cache_category="invoices",
             )
             all_invoices = safe_get(broader_data, "data.data", [])
 
@@ -1596,11 +1485,17 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
 
             # Apply client-side overdue filtering
             if is_overdue_query and invoices:
-                invoices = [inv for inv in invoices if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3]
+                invoices = [
+                    inv
+                    for inv in invoices
+                    if float(safe_get(inv, "due", 0)) > 0 and safe_get(inv, "status_id") != 3
+                ]
 
             if invoices:
                 # Found matches via client-side fuzzy search
-                result.append(f"_Note: Results found via fuzzy vendor name matching for '{search_term}'_\n")
+                result.append(
+                    f"_Note: Results found via fuzzy vendor name matching for '{search_term}'_\n"
+                )
             else:
                 result.append("No purchase invoices found.")
                 return "\n".join(result)
@@ -1629,18 +1524,19 @@ async def _list_purchase_invoices(args: Dict[str, Any], client: KledoAPIClient) 
                 bucket_items = buckets[bucket_name]
                 if bucket_items:
                     bucket_count = len(bucket_items)
-                    bucket_outstanding = sum(float(safe_get(inv, "due", 0)) for inv, _ in bucket_items)
-                    result.append(f"**{bucket_name} hari**: {bucket_count} invoices, {format_currency(bucket_outstanding)} outstanding")
+                    bucket_outstanding = sum(
+                        float(safe_get(inv, "due", 0)) for inv, _ in bucket_items
+                    )
+                    result.append(
+                        f"**{bucket_name} hari**: {bucket_count} invoices, {format_currency(bucket_outstanding)} outstanding"
+                    )
 
             result.append("")  # Empty line
 
         result.append("\n## Purchase Invoices:\n")
 
         # Status mapping (VERIFIED from dashboard - purchase invoices only have status 1 and 3)
-        status_map = {
-            1: "Belum Dibayar (Unpaid)",
-            3: "Lunas (Paid)"
-        }
+        status_map = {1: "Belum Dibayar (Unpaid)", 3: "Lunas (Paid)"}
 
         for invoice in invoices[:20]:
             inv_number = safe_get(invoice, "ref_number", "N/A")

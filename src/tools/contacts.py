@@ -1,90 +1,20 @@
 """
 Contact/CRM tools for Kledo MCP Server
 """
-from typing import Any, Dict
-from mcp.types import Tool
+
+from typing import Any
 
 from ..kledo_client import KledoAPIClient
 from ..utils.helpers import format_currency, safe_get
 
 
-def get_tools() -> list[Tool]:
-    """Get list of contact tools."""
-    return [
-        Tool(
-            name="contact_list",
-            description="List customers and vendors with optional search and filtering.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "search": {
-                        "type": "string",
-                        "description": "Search by name, email, phone, or company"
-                    },
-                    "type_id": {
-                        "type": "integer",
-                        "description": "Filter by type (1=Vendor, 2=Employee, 3=Customer)"
-                    },
-                    "per_page": {
-                        "type": "integer",
-                        "description": "Results per page (default: 50)"
-                    }
-                },
-                "required": []
-            }
-        ),
-        Tool(
-            name="contact_get",
-            description=(
-                "Get contact details or transaction history for a specific contact/customer/vendor. "
-                "Use view='detail' for contact info, view='transactions' for invoice/payment history. "
-                "Indonesian: 'detail customer', 'riwayat transaksi customer'"
-            ),
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "contact_id": {
-                        "type": "integer",
-                        "description": "Contact ID"
-                    },
-                    "view": {
-                        "type": "string",
-                        "enum": ["detail", "transactions"],
-                        "description": "'detail' = contact profile, 'transactions' = invoice and payment history"
-                    }
-                },
-                "required": ["contact_id", "view"]
-            }
-        )
-    ]
-
-
-async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClient) -> str:
-    """Handle contact tool calls."""
-    if name == "contact_list":
-        return await _list_contacts(arguments, client)
-    elif name == "contact_get":
-        view = arguments.get("view", "detail")
-        if view == "transactions":
-            return await _get_contact_transactions(arguments, client)
-        else:
-            return await _get_contact_detail(arguments, client)
-    # Backward compatibility
-    elif name == "contact_get_detail":
-        return await _get_contact_detail(arguments, client)
-    elif name == "contact_get_transactions":
-        return await _get_contact_transactions(arguments, client)
-    else:
-        return f"Unknown contact tool: {name}"
-
-
-async def _list_contacts(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _list_contacts(args: dict[str, Any], client: KledoAPIClient) -> str:
     """List contacts."""
     try:
         data = await client.list_contacts(
             search=args.get("search"),
             type_id=args.get("type_id"),
-            per_page=args.get("per_page", 50)
+            per_page=args.get("per_page", 50),
         )
 
         result = ["# Contacts\n"]
@@ -122,7 +52,7 @@ async def _list_contacts(args: Dict[str, Any], client: KledoAPIClient) -> str:
         return f"Error fetching contacts: {str(e)}"
 
 
-async def _get_contact_detail(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _get_contact_detail(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Get contact detail."""
     contact_id = args.get("contact_id")
 
@@ -131,10 +61,7 @@ async def _get_contact_detail(args: Dict[str, Any], client: KledoAPIClient) -> s
 
     try:
         data = await client.get(
-            "contacts",
-            "detail",
-            path_params={"id": contact_id},
-            cache_category="contacts"
+            "contacts", "detail", path_params={"id": contact_id}, cache_category="contacts"
         )
 
         contact = safe_get(data, "data.data")
@@ -174,7 +101,7 @@ async def _get_contact_detail(args: Dict[str, Any], client: KledoAPIClient) -> s
         return f"Error fetching contact details: {str(e)}"
 
 
-async def _get_contact_transactions(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _get_contact_transactions(args: dict[str, Any], client: KledoAPIClient) -> str:
     """Get contact transaction history."""
     contact_id = args.get("contact_id")
 
@@ -183,10 +110,7 @@ async def _get_contact_transactions(args: Dict[str, Any], client: KledoAPIClient
 
     try:
         data = await client.get(
-            "contacts",
-            "transactions",
-            path_params={"id": contact_id},
-            cache_category="contacts"
+            "contacts", "transactions", path_params={"id": contact_id}, cache_category="contacts"
         )
 
         result = ["# Contact Transaction History\n"]

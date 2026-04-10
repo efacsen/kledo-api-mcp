@@ -2,30 +2,27 @@
 Commission calculation tools for sales reps.
 Enables tiered commission calculation based on paid invoices (cash basis).
 """
-from typing import Any, Dict
-from mcp.types import Tool
+
 from collections import defaultdict
+from typing import Any
 
 from ..kledo_client import KledoAPIClient
-from ..utils.helpers import (
-    format_currency,
-    safe_get,
-    format_markdown_table
-)
-from .financial import _fetch_all_invoices
+from ..utils.helpers import format_currency, format_markdown_table, safe_get
 from .analytics import _resolve_period
-
+from .financial import _fetch_all_invoices
 
 # Default tiered commission structure (hardcoded per CONTEXT.md)
 # Progressive tiers like tax brackets - each rate applies ONLY to revenue in that bracket
 DEFAULT_COMMISSION_TIERS = [
-    {"threshold": 0, "rate": 0.01},            # 1% on first 100M
-    {"threshold": 100_000_000, "rate": 0.02},   # 2% on 100M-300M
-    {"threshold": 300_000_000, "rate": 0.03},   # 3% on 300M+
+    {"threshold": 0, "rate": 0.01},  # 1% on first 100M
+    {"threshold": 100_000_000, "rate": 0.02},  # 2% on 100M-300M
+    {"threshold": 300_000_000, "rate": 0.03},  # 3% on 300M+
 ]
 
 
-def calculate_tiered_commission(paid_revenue: float, tiers: list = None, flat_rate: float = None) -> dict:
+def calculate_tiered_commission(
+    paid_revenue: float, tiers: list = None, flat_rate: float = None
+) -> dict:
     """
     Calculate tiered commission on paid revenue.
 
@@ -46,14 +43,16 @@ def calculate_tiered_commission(paid_revenue: float, tiers: list = None, flat_ra
         commission = paid_revenue * flat_rate
         return {
             "total_commission": commission,
-            "breakdown": [{
-                "tier": 1,
-                "range": "Flat rate",
-                "amount": paid_revenue,
-                "rate": flat_rate,
-                "commission": commission
-            }],
-            "effective_rate": flat_rate
+            "breakdown": [
+                {
+                    "tier": 1,
+                    "range": "Flat rate",
+                    "amount": paid_revenue,
+                    "rate": flat_rate,
+                    "commission": commission,
+                }
+            ],
+            "effective_rate": flat_rate,
         }
 
     # Default tiered calculation
@@ -69,7 +68,7 @@ def calculate_tiered_commission(paid_revenue: float, tiers: list = None, flat_ra
             break
 
         # Calculate amount in this tier
-        next_threshold = tiers[idx + 1]["threshold"] if idx + 1 < len(tiers) else float('inf')
+        next_threshold = tiers[idx + 1]["threshold"] if idx + 1 < len(tiers) else float("inf")
         tier_amount = min(remaining, next_threshold - tier["threshold"])
 
         if tier_amount <= 0:
@@ -87,13 +86,15 @@ def calculate_tiered_commission(paid_revenue: float, tiers: list = None, flat_ra
             # Last tier
             range_str = f"{tier['threshold'] // 1_000_000}jt+"
 
-        breakdown.append({
-            "tier": idx + 1,
-            "range": range_str,
-            "amount": tier_amount,
-            "rate": tier["rate"],
-            "commission": tier_commission
-        })
+        breakdown.append(
+            {
+                "tier": idx + 1,
+                "range": range_str,
+                "amount": tier_amount,
+                "rate": tier["rate"],
+                "commission": tier_commission,
+            }
+        )
 
         remaining -= tier_amount
 
@@ -102,67 +103,13 @@ def calculate_tiered_commission(paid_revenue: float, tiers: list = None, flat_ra
     return {
         "total_commission": total_commission,
         "breakdown": breakdown,
-        "effective_rate": effective_rate
+        "effective_rate": effective_rate,
     }
 
 
-def get_tools() -> list[Tool]:
-    """Get list of commission calculation tools."""
-    return [
-        Tool(
-            name="commission_report",
-            description=(
-                "Calculate commission for sales reps based on paid invoices only (cash basis). "
-                "Commission is calculated on subtotal (before tax). "
-                "Supports tiered rates (1% on first 100M, 2% on 100M-300M, 3% on 300M+) or flat rate override. "
-                "\n\n"
-                "**For one person**: Provide sales_person_name to get detailed breakdown for that rep. "
-                "Indonesian: 'komisi Ahmad bulan ini', 'komisi sales Budi dengan rate 3%'"
-                "\n\n"
-                "**For all reps**: Omit sales_person_name to get commission breakdown for ALL sales reps. "
-                "Indonesian: 'komisi per sales bulan ini', 'laporan komisi seluruh sales'"
-            ),
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "period": {
-                        "type": "string",
-                        "description": "Period phrase: 'bulan ini', 'bulan lalu', '2026-01', or YYYY-MM-DD"
-                    },
-                    "sales_person_name": {
-                        "type": "string",
-                        "description": "(Optional) Sales rep name to calculate for one person. If omitted, shows all reps. E.g., 'Ahmad', 'Budi', 'Sari'"
-                    },
-                    "flat_rate": {
-                        "type": "number",
-                        "description": "Override tiered commission with flat rate (e.g., 0.03 for 3%). Applies to entire revenue instead of tiered brackets."
-                    }
-                },
-                "required": ["period"]
-            }
-        )
-    ]
-
-
-async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClient) -> str:
-    """Handle commission tool calls."""
-    if name == "commission_report":
-        # Route based on sales_person_name parameter
-        sales_person_name = arguments.get("sales_person_name", "").strip()
-        if sales_person_name:
-            # Calculate for one person
-            return await _commission_calculate(arguments, client)
-        else:
-            # Report for all reps
-            return await _commission_report(arguments, client)
-    # Backward compatibility
-    elif name == "commission_calculate":
-        return await _commission_calculate(arguments, client)
-    else:
-        return f"Unknown commission tool: {name}"
-
-
-async def _fetch_paid_invoices_for_period(client: KledoAPIClient, period_phrase: str) -> tuple[list, str, str, str]:
+async def _fetch_paid_invoices_for_period(
+    client: KledoAPIClient, period_phrase: str
+) -> tuple[list, str, str, str]:
     """
     Fetch paid invoices for a period with payment date awareness.
 
@@ -200,7 +147,7 @@ async def _fetch_paid_invoices_for_period(client: KledoAPIClient, period_phrase:
     return paid_invoices, date_from, date_to, display_name
 
 
-async def _commission_calculate(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _commission_calculate(args: dict[str, Any], client: KledoAPIClient) -> str:
     """
     Calculate commission for a specific sales person.
 
@@ -221,7 +168,9 @@ async def _commission_calculate(args: Dict[str, Any], client: KledoAPIClient) ->
         return "Error: sales_person_name parameter is required"
 
     # Fetch paid invoices for period
-    paid_invoices, date_from, date_to, display_name = await _fetch_paid_invoices_for_period(client, period)
+    paid_invoices, date_from, date_to, display_name = await _fetch_paid_invoices_for_period(
+        client, period
+    )
 
     # Filter to invoices where sales_person.name matches (case-insensitive partial match)
     sales_invoices = []
@@ -248,8 +197,12 @@ async def _commission_calculate(args: Dict[str, Any], client: KledoAPIClient) ->
     result = []
     result.append(f"## Komisi Sales: {sales_person_name} - {display_name}\n")
 
-    result.append(f"**Revenue (Paid):** {format_currency(commission_base, short=True)} (subtotal, sebelum pajak)")
-    result.append(f"**Total Komisi:** {format_currency(commission_data['total_commission'], short=True)} ({commission_data['effective_rate']:.2%})")
+    result.append(
+        f"**Revenue (Paid):** {format_currency(commission_base, short=True)} (subtotal, sebelum pajak)"
+    )
+    result.append(
+        f"**Total Komisi:** {format_currency(commission_data['total_commission'], short=True)} ({commission_data['effective_rate']:.2%})"
+    )
     result.append(f"**Invoice Count:** {len(sales_invoices)}\n")
 
     # Tier breakdown
@@ -258,26 +211,27 @@ async def _commission_calculate(args: Dict[str, Any], client: KledoAPIClient) ->
 
     rows = []
     for tier in commission_data["breakdown"]:
-        rows.append([
-            str(tier["tier"]),
-            tier["range"],
-            format_currency(tier["amount"], short=True),
-            f"{tier['rate']:.1%}",
-            format_currency(tier["commission"], short=True)
-        ])
+        rows.append(
+            [
+                str(tier["tier"]),
+                tier["range"],
+                format_currency(tier["amount"], short=True),
+                f"{tier['rate']:.1%}",
+                format_currency(tier["commission"], short=True),
+            ]
+        )
 
-    result.append(format_markdown_table(
-        ["Tier", "Range", "Revenue", "Rate", "Komisi"],
-        rows
-    ))
+    result.append(format_markdown_table(["Tier", "Range", "Revenue", "Rate", "Komisi"], rows))
     result.append("```")
 
-    result.append("\n_*Komisi dihitung dari revenue setelah customer bayar (cash basis), sebelum pajak_")
+    result.append(
+        "\n_*Komisi dihitung dari revenue setelah customer bayar (cash basis), sebelum pajak_"
+    )
 
     return "\n".join(result)
 
 
-async def _commission_report(args: Dict[str, Any], client: KledoAPIClient) -> str:
+async def _commission_report(args: dict[str, Any], client: KledoAPIClient) -> str:
     """
     Get commission breakdown for ALL sales reps in a period.
 
@@ -295,7 +249,9 @@ async def _commission_report(args: Dict[str, Any], client: KledoAPIClient) -> st
         return "Error: period parameter is required"
 
     # Fetch paid invoices for period
-    paid_invoices, date_from, date_to, display_name = await _fetch_paid_invoices_for_period(client, period)
+    paid_invoices, date_from, date_to, display_name = await _fetch_paid_invoices_for_period(
+        client, period
+    )
 
     if not paid_invoices:
         return f"Tidak ada invoice yang sudah dibayar di {display_name}"
@@ -318,14 +274,16 @@ async def _commission_report(args: Dict[str, Any], client: KledoAPIClient) -> st
     commission_results = []
     for sp_name, data in sales_data.items():
         comm_data = calculate_tiered_commission(data["revenue"], flat_rate=flat_rate)
-        commission_results.append({
-            "name": sp_name,
-            "revenue": data["revenue"],
-            "commission": comm_data["total_commission"],
-            "effective_rate": comm_data["effective_rate"],
-            "invoice_count": len(data["invoices"]),
-            "breakdown": comm_data["breakdown"]
-        })
+        commission_results.append(
+            {
+                "name": sp_name,
+                "revenue": data["revenue"],
+                "commission": comm_data["total_commission"],
+                "effective_rate": comm_data["effective_rate"],
+                "invoice_count": len(data["invoices"]),
+                "breakdown": comm_data["breakdown"],
+            }
+        )
 
     # Sort by revenue descending
     commission_results.sort(key=lambda x: x["revenue"], reverse=True)
@@ -339,40 +297,42 @@ async def _commission_report(args: Dict[str, Any], client: KledoAPIClient) -> st
 
     summary_rows = []
     for item in commission_results:
-        summary_rows.append([
-            item["name"],
-            format_currency(item["revenue"], short=True),
-            format_currency(item["commission"], short=True),
-            f"{item['effective_rate']:.2%}"
-        ])
+        summary_rows.append(
+            [
+                item["name"],
+                format_currency(item["revenue"], short=True),
+                format_currency(item["commission"], short=True),
+                f"{item['effective_rate']:.2%}",
+            ]
+        )
 
-    result.append(format_markdown_table(
-        ["Sales", "Revenue", "Komisi", "Rate"],
-        summary_rows
-    ))
+    result.append(format_markdown_table(["Sales", "Revenue", "Komisi", "Rate"], summary_rows))
     result.append("```")
 
     # Per-rep tier breakdown (top 10 cap)
     result.append("\n### Detail Breakdown per Sales:\n")
 
     for idx, item in enumerate(commission_results[:10], 1):
-        result.append(f"\n**{idx}. {item['name']}** - {format_currency(item['revenue'], short=True)}")
+        result.append(
+            f"\n**{idx}. {item['name']}** - {format_currency(item['revenue'], short=True)}"
+        )
         result.append("```")
 
         tier_rows = []
         for tier in item["breakdown"]:
-            tier_rows.append([
-                str(tier["tier"]),
-                tier["range"],
-                format_currency(tier["amount"], short=True),
-                f"{tier['rate']:.1%}",
-                format_currency(tier["commission"], short=True)
-            ])
+            tier_rows.append(
+                [
+                    str(tier["tier"]),
+                    tier["range"],
+                    format_currency(tier["amount"], short=True),
+                    f"{tier['rate']:.1%}",
+                    format_currency(tier["commission"], short=True),
+                ]
+            )
 
-        result.append(format_markdown_table(
-            ["Tier", "Range", "Revenue", "Rate", "Komisi"],
-            tier_rows
-        ))
+        result.append(
+            format_markdown_table(["Tier", "Range", "Revenue", "Rate", "Komisi"], tier_rows)
+        )
         result.append("```")
 
     if len(commission_results) > 10:
@@ -388,6 +348,8 @@ async def _commission_report(args: Dict[str, Any], client: KledoAPIClient) -> st
     result.append(f"**Total Komisi:** {format_currency(total_commission, short=True)}")
     result.append(f"**Average Rate:** {avg_rate:.2%}")
 
-    result.append("\n_*Komisi dihitung dari revenue setelah customer bayar (cash basis), sebelum pajak_")
+    result.append(
+        "\n_*Komisi dihitung dari revenue setelah customer bayar (cash basis), sebelum pajak_"
+    )
 
     return "\n".join(result)
