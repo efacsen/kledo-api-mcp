@@ -154,8 +154,9 @@ class TestProgressReporting:
     def _get_handler(self, tool_name: str):
         """Find the registered tool handler by name from mcp._tool_manager."""
         tool_manager = mcp._tool_manager
-        if hasattr(tool_manager, "tools"):
-            tool = tool_manager.tools.get(tool_name)
+        # Use the stable public API get_tool() — the internal _tools dict is private.
+        if hasattr(tool_manager, "get_tool"):
+            tool = tool_manager.get_tool(tool_name)
             if tool and hasattr(tool, "fn"):
                 return tool.fn
         return None

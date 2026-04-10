@@ -1,15 +1,14 @@
 """
 Kledo MCP Server — FastMCP 1.x implementation.
 
-Phase 3 (v1.1 SDK Foundation): replaces the pre-1.0 `mcp.server.Server` pattern
-with `FastMCP`, adds a `lifespan` hook for KledoAPIClient init/teardown, injects
-domain facts via the `instructions` field, and returns machine-readable errors
-via `ToolError`.
+Phase 4 (tool-interface-migration): all 11 tool modules are now plain async
+libraries. The old get_tools/handle_tool bridge (_TOOL_MODULES, _make_wrapper,
+_register_tools) is replaced with 24 explicit @mcp.tool() decorated functions,
+one per registered tool name. Each function reproduces the former dispatch logic
+inline and passes (args, client) to the appropriate private implementation.
 
-The 11 tool modules in `src/tools/` are NOT modified in Phase 3. Their existing
-`get_tools()` / `handle_tool()` interface is bridged into FastMCP via a
-registration loop that wraps each Tool in a closure calling `handle_tool`.
-Phase 4 will replace this bridge with `@mcp.tool()` decorators per module.
+Tool names are preserved exactly from the Phase 3 bridge to avoid breaking
+existing Claude Desktop configs and conversation history.
 """
 
 import os
@@ -18,13 +17,12 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 from dotenv import load_dotenv
 from loguru import logger
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import Context, FastMCP
 from mcp.server.fastmcp.exceptions import ToolError
-from mcp.types import Tool
+from mcp.types import ToolAnnotations
 
 if __package__:
     from .auth import KledoAuthenticator
@@ -179,10 +177,6 @@ async def lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
     try:
         yield AppContext(client=client)
     finally:
-        # KledoAPIClient currently creates httpx.AsyncClient per-request
-        # (src/kledo_client.py line 141), so there is no long-lived HTTP session
-        # to close. The defensive check below is for forward compatibility if
-        # the client is ever refactored to hold a persistent AsyncClient.
         if hasattr(client, "_http_client") and getattr(client, "_http_client", None):
             try:
                 await client._http_client.aclose()
@@ -197,6 +191,10 @@ mcp = FastMCP(
     instructions=INSTRUCTIONS,
     lifespan=lifespan,
 )
+
+# Applied to every @mcp.tool() registration — signals to the MCP client that
+# all tools are safe, read-only, and may reference resources not in the context.
+_READ_ONLY = ToolAnnotations(readOnlyHint=True, openWorldHint=True)
 
 
 def _recovery_hint(tool_name: str, error: Exception) -> str:
@@ -236,77 +234,585 @@ def _scrub_secrets(message: str) -> str:
     return message
 
 
-# Maps tool-module reference → handler callable. All modules expose the same
-# (get_tools, handle_tool) pair. revenue_ tools include a few legacy names
-# without the "revenue_" prefix — all go to revenue.handle_tool.
-_TOOL_MODULES = [
-    financial,
-    invoices,
-    orders,
-    products,
-    contacts,
-    deliveries,
-    utilities,
-    sales_analytics,
-    revenue,
-    analytics,
-    commission,
-]
+# ---------------------------------------------------------------------------
+# Financial tools (3)
+# ---------------------------------------------------------------------------
 
 
-def _make_wrapper(module: Any, tool: Tool) -> Any:
-    """
-    Build an async closure that FastMCP can register as a tool.
-
-    The closure captures the tool name and owning module. At call time it
-    fetches the KledoAPIClient from the lifespan context and routes through
-    the module's existing `handle_tool` dispatch. On exception it raises
-    ToolError with a scrubbed recovery hint.
-    """
-    tool_name = tool.name
-
-    async def _wrapper(**arguments: Any) -> str:
-        ctx = mcp.get_context()
-        app_ctx: AppContext = ctx.request_context.lifespan_context  # type: ignore[assignment]
-        client = app_ctx.client
-        logger.info(f"Calling tool: {tool_name} with arguments: {arguments}")
-        try:
-            result = await module.handle_tool(tool_name, arguments, client)
-            logger.info(f"Tool {tool_name} completed successfully")
-            return result
-        except Exception as e:
-            scrubbed = _scrub_secrets(str(e))
-            hint = _recovery_hint(tool_name, e)
-            logger.exception(f"Tool {tool_name} failed: {scrubbed}")
-            raise ToolError(f"Tool '{tool_name}' failed: {scrubbed}. {hint}") from e
-
-    _wrapper.__name__ = tool_name
-    _wrapper.__doc__ = tool.description or f"Kledo tool: {tool_name}"
-    return _wrapper
+@mcp.tool(name="financial_activity", annotations=_READ_ONLY)
+async def _tool_financial_activity(
+    date_from: str | None = None,
+    date_to: str | None = None,
+    ctx: Context = None,
+) -> str:
+    """Get team activity report. Shows actions performed by each user."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {"date_from": date_from, "date_to": date_to}
+    try:
+        return await financial._activity_team_report(args, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'financial_activity' failed: {scrubbed}. {_recovery_hint('financial_activity', e)}"
+        ) from e
 
 
-def _register_tools() -> int:
-    """Register every legacy tool with FastMCP. Returns the number registered."""
-    count = 0
-    for module in _TOOL_MODULES:
-        for tool in module.get_tools():
-            wrapper = _make_wrapper(module, tool)
-            mcp.add_tool(
-                wrapper,
-                name=tool.name,
-                description=tool.description,
+@mcp.tool(name="financial_summary", annotations=_READ_ONLY)
+async def _tool_financial_summary(
+    type: str = "sales",
+    group_by: str = "customer",
+    date_from: str | None = None,
+    date_to: str | None = None,
+    ctx: Context = None,
+) -> str:
+    """Get financial summary. type='sales' or 'purchase'. group_by='customer' or 'sales_rep'."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {"type": type, "group_by": group_by, "date_from": date_from, "date_to": date_to}
+    try:
+        if type == "purchase":
+            return await financial._purchase_summary(args, app_ctx.client)
+        elif group_by == "sales_rep":
+            return await financial._sales_by_person(args, app_ctx.client)
+        else:
+            return await financial._sales_summary(args, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'financial_summary' failed: {scrubbed}. {_recovery_hint('financial_summary', e)}"
+        ) from e
+
+
+@mcp.tool(name="financial_balances", annotations=_READ_ONLY)
+async def _tool_financial_balances(ctx: Context = None) -> str:
+    """Get current bank account balances for all accounts."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    try:
+        return await financial._bank_balances({}, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'financial_balances' failed: {scrubbed}. {_recovery_hint('financial_balances', e)}"
+        ) from e
+
+
+# ---------------------------------------------------------------------------
+# Invoice tools (3)
+# ---------------------------------------------------------------------------
+
+
+@mcp.tool(name="invoice_list", annotations=_READ_ONLY)
+async def _tool_invoice_list(
+    type: str = "sales",
+    date_from: str | None = None,
+    date_to: str | None = None,
+    contact_id: int | None = None,
+    status_id: int | None = None,
+    search: str | None = None,
+    per_page: int = 50,
+    ctx: Context = None,
+) -> str:
+    """List invoices. type='sales' (default) or 'purchase'."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {
+        "type": type,
+        "date_from": date_from,
+        "date_to": date_to,
+        "contact_id": contact_id,
+        "status_id": status_id,
+        "search": search,
+        "per_page": per_page,
+    }
+    try:
+        if type == "purchase":
+            return await invoices._list_purchase_invoices(args, app_ctx.client)
+        else:
+            return await invoices._list_sales_invoices(args, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'invoice_list' failed: {scrubbed}. {_recovery_hint('invoice_list', e)}"
+        ) from e
+
+
+@mcp.tool(name="invoice_get", annotations=_READ_ONLY)
+async def _tool_invoice_get(invoice_id: int, ctx: Context = None) -> str:
+    """Get full details for a single invoice by ID."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    try:
+        return await invoices._get_invoice_detail({"invoice_id": invoice_id}, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'invoice_get' failed: {scrubbed}. {_recovery_hint('invoice_get', e)}"
+        ) from e
+
+
+@mcp.tool(name="invoice_summarize", annotations=_READ_ONLY)
+async def _tool_invoice_summarize(
+    view: str = "totals",
+    date_from: str | None = None,
+    date_to: str | None = None,
+    ctx: Context = None,
+) -> str:
+    """Summarize invoices. view='totals', 'by_customer', or 'by_vendor'."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {"view": view, "date_from": date_from, "date_to": date_to}
+    try:
+        if view == "by_customer":
+            return await invoices._outstanding_by_customer(args, app_ctx.client)
+        elif view == "by_vendor":
+            return await invoices._outstanding_by_vendor(args, app_ctx.client)
+        else:
+            return await invoices._get_invoice_totals(args, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'invoice_summarize' failed: {scrubbed}. {_recovery_hint('invoice_summarize', e)}"
+        ) from e
+
+
+# ---------------------------------------------------------------------------
+# Order tools (2)
+# ---------------------------------------------------------------------------
+
+
+@mcp.tool(name="order_list", annotations=_READ_ONLY)
+async def _tool_order_list(
+    type: str = "sales",
+    date_from: str | None = None,
+    date_to: str | None = None,
+    status_id: int | None = None,
+    per_page: int = 50,
+    ctx: Context = None,
+) -> str:
+    """List orders. type='sales' (default) or 'purchase'."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {
+        "type": type,
+        "date_from": date_from,
+        "date_to": date_to,
+        "status_id": status_id,
+        "per_page": per_page,
+    }
+    try:
+        if type == "purchase":
+            return await orders._list_purchase_orders(args, app_ctx.client)
+        elif type == "sales":
+            return await orders._list_sales_orders(args, app_ctx.client)
+        else:
+            return await orders._list_orders(args, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'order_list' failed: {scrubbed}. {_recovery_hint('order_list', e)}"
+        ) from e
+
+
+@mcp.tool(name="order_get", annotations=_READ_ONLY)
+async def _tool_order_get(order_id: int, ctx: Context = None) -> str:
+    """Get full details for a single order by ID."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    try:
+        return await orders._get_order({"order_id": order_id}, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'order_get' failed: {scrubbed}. {_recovery_hint('order_get', e)}"
+        ) from e
+
+
+# ---------------------------------------------------------------------------
+# Product tools (2)
+# ---------------------------------------------------------------------------
+
+
+@mcp.tool(name="product_list", annotations=_READ_ONLY)
+async def _tool_product_list(
+    search: str | None = None,
+    include_inventory: bool = False,
+    per_page: int = 50,
+    ctx: Context = None,
+) -> str:
+    """List products. Optionally filter by search term or include inventory quantities."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {"search": search, "include_inventory": include_inventory, "per_page": per_page}
+    try:
+        return await products._list_products(args, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'product_list' failed: {scrubbed}. {_recovery_hint('product_list', e)}"
+        ) from e
+
+
+@mcp.tool(name="product_get", annotations=_READ_ONLY)
+async def _tool_product_get(
+    product_id: int | None = None,
+    sku: str | None = None,
+    ctx: Context = None,
+) -> str:
+    """Get product details by ID or SKU code."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    try:
+        if sku:
+            return await products._search_by_sku({"sku": sku}, app_ctx.client)
+        return await products._get_product_detail({"product_id": product_id}, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'product_get' failed: {scrubbed}. {_recovery_hint('product_get', e)}"
+        ) from e
+
+
+# ---------------------------------------------------------------------------
+# Contact tools (2)
+# ---------------------------------------------------------------------------
+
+
+@mcp.tool(name="contact_list", annotations=_READ_ONLY)
+async def _tool_contact_list(
+    search: str | None = None,
+    type: str | None = None,
+    per_page: int = 50,
+    ctx: Context = None,
+) -> str:
+    """List contacts (customers and vendors). Optionally filter by name or type."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {"search": search, "type": type, "per_page": per_page}
+    try:
+        return await contacts._list_contacts(args, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'contact_list' failed: {scrubbed}. {_recovery_hint('contact_list', e)}"
+        ) from e
+
+
+@mcp.tool(name="contact_get", annotations=_READ_ONLY)
+async def _tool_contact_get(
+    contact_id: int | None = None,
+    include_transactions: bool = False,
+    ctx: Context = None,
+) -> str:
+    """Get contact details and optionally their transaction history."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    try:
+        if include_transactions:
+            return await contacts._get_contact_transactions(
+                {"contact_id": contact_id}, app_ctx.client
             )
-            count += 1
-    logger.info(f"Registered {count} tools with FastMCP")
-    return count
+        return await contacts._get_contact_detail({"contact_id": contact_id}, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'contact_get' failed: {scrubbed}. {_recovery_hint('contact_get', e)}"
+        ) from e
 
 
-_TOOL_COUNT = _register_tools()
+# ---------------------------------------------------------------------------
+# Delivery tools (2)
+# ---------------------------------------------------------------------------
+
+
+@mcp.tool(name="delivery_list", annotations=_READ_ONLY)
+async def _tool_delivery_list(
+    date_from: str | None = None,
+    date_to: str | None = None,
+    status: str | None = None,
+    per_page: int = 50,
+    ctx: Context = None,
+) -> str:
+    """List delivery orders. Optionally filter by date range or status."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {"date_from": date_from, "date_to": date_to, "status": status, "per_page": per_page}
+    try:
+        if status == "pending":
+            return await deliveries._get_pending_deliveries(args, app_ctx.client)
+        return await deliveries._list_deliveries(args, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'delivery_list' failed: {scrubbed}. {_recovery_hint('delivery_list', e)}"
+        ) from e
+
+
+@mcp.tool(name="delivery_get", annotations=_READ_ONLY)
+async def _tool_delivery_get(delivery_id: int, ctx: Context = None) -> str:
+    """Get full details for a single delivery order by ID."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    try:
+        return await deliveries._get_delivery_detail({"delivery_id": delivery_id}, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'delivery_get' failed: {scrubbed}. {_recovery_hint('delivery_get', e)}"
+        ) from e
+
+
+# ---------------------------------------------------------------------------
+# Utility tools (2)
+# ---------------------------------------------------------------------------
+
+
+@mcp.tool(name="utility_cache", annotations=_READ_ONLY)
+async def _tool_utility_cache(
+    action: str = "stats",
+    ctx: Context = None,
+) -> str:
+    """Manage API cache. action='stats' (default) or 'clear'."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {"action": action}
+    try:
+        if action == "clear":
+            return await utilities._clear_cache(args, app_ctx.client)
+        return await utilities._get_cache_stats(args, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'utility_cache' failed: {scrubbed}. {_recovery_hint('utility_cache', e)}"
+        ) from e
+
+
+@mcp.tool(name="utility_test_connection", annotations=_READ_ONLY)
+async def _tool_utility_test_connection(ctx: Context = None) -> str:
+    """Test the connection to the Kledo API and report authentication status."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    try:
+        return await utilities._test_connection({}, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'utility_test_connection' failed: {scrubbed}. "
+            f"{_recovery_hint('utility_test_connection', e)}"
+        ) from e
+
+
+# ---------------------------------------------------------------------------
+# Sales analytics tools (2)
+# Note: sales_analytics module uses reversed parameter order (client, args)
+# ---------------------------------------------------------------------------
+
+
+@mcp.tool(name="sales_rep_report", annotations=_READ_ONLY)
+async def _tool_sales_rep_report(
+    period: str | None = None,
+    sales_rep_id: int | None = None,
+    date_from: str | None = None,
+    date_to: str | None = None,
+    ctx: Context = None,
+) -> str:
+    """Get detailed sales performance report for a sales representative."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {
+        "period": period,
+        "sales_rep_id": sales_rep_id,
+        "date_from": date_from,
+        "date_to": date_to,
+    }
+    try:
+        return await sales_analytics._sales_rep_revenue_report(app_ctx.client, args)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'sales_rep_report' failed: {scrubbed}. {_recovery_hint('sales_rep_report', e)}"
+        ) from e
+
+
+@mcp.tool(name="sales_rep_list", annotations=_READ_ONLY)
+async def _tool_sales_rep_list(
+    date_from: str | None = None,
+    date_to: str | None = None,
+    ctx: Context = None,
+) -> str:
+    """List all active sales representatives with their paid invoice counts."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {"date_from": date_from, "date_to": date_to}
+    try:
+        return await sales_analytics._sales_rep_list(app_ctx.client, args)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'sales_rep_list' failed: {scrubbed}. {_recovery_hint('sales_rep_list', e)}"
+        ) from e
+
+
+# ---------------------------------------------------------------------------
+# Revenue tools (3)
+# ---------------------------------------------------------------------------
+
+
+@mcp.tool(name="revenue_summary", annotations=_READ_ONLY)
+async def _tool_revenue_summary(
+    date_from: str | None = None,
+    date_to: str | None = None,
+    ctx: Context = None,
+) -> str:
+    """Get revenue summary for a date range (total, paid, outstanding, by customer)."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {"date_from": date_from, "date_to": date_to}
+    try:
+        await ctx.report_progress(0, 3)
+        result = await revenue._revenue_summary(args, app_ctx.client)
+        await ctx.report_progress(3, 3)
+        return result
+    except ToolError:
+        raise
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'revenue_summary' failed: {scrubbed}. {_recovery_hint('revenue_summary', e)}"
+        ) from e
+
+
+@mcp.tool(name="revenue_receivables", annotations=_READ_ONLY)
+async def _tool_revenue_receivables(
+    view: str = "list",
+    date_from: str | None = None,
+    date_to: str | None = None,
+    ctx: Context = None,
+) -> str:
+    """Get receivables report. view='list' (default), 'aging', or 'concentration'."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {"view": view, "date_from": date_from, "date_to": date_to}
+    try:
+        if view == "aging":
+            return await revenue._outstanding_aging_report(args, app_ctx.client)
+        elif view == "concentration":
+            return await revenue._customer_concentration_report(args, app_ctx.client)
+        else:
+            return await revenue._outstanding_receivables(args, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'revenue_receivables' failed: {scrubbed}. "
+            f"{_recovery_hint('revenue_receivables', e)}"
+        ) from e
+
+
+@mcp.tool(name="revenue_ranking", annotations=_READ_ONLY)
+async def _tool_revenue_ranking(
+    group_by: str = "customer",
+    date_from: str | None = None,
+    date_to: str | None = None,
+    ctx: Context = None,
+) -> str:
+    """Rank revenue. group_by='customer' (default) or 'day' for daily breakdown."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {"group_by": group_by, "date_from": date_from, "date_to": date_to}
+    try:
+        if group_by == "day":
+            return await revenue._revenue_daily_breakdown(args, app_ctx.client)
+        else:
+            return await revenue._customer_revenue_ranking(args, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'revenue_ranking' failed: {scrubbed}. {_recovery_hint('revenue_ranking', e)}"
+        ) from e
+
+
+# ---------------------------------------------------------------------------
+# Analytics tools (2)
+# ---------------------------------------------------------------------------
+
+
+@mcp.tool(name="analytics_compare", annotations=_READ_ONLY)
+async def _tool_analytics_compare(
+    metric: str = "revenue",
+    period_a: str | None = None,
+    period_b: str | None = None,
+    ctx: Context = None,
+) -> str:
+    """Compare metrics between two periods. metric='revenue' or 'outstanding'."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {"metric": metric, "period_a": period_a, "period_b": period_b}
+    try:
+        await ctx.report_progress(0, 2)
+        if metric == "outstanding":
+            result = await analytics._compare_outstanding(args, app_ctx.client)
+        else:
+            result = await analytics._compare_revenue(args, app_ctx.client)
+        await ctx.report_progress(2, 2)
+        return result
+    except ToolError:
+        raise
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'analytics_compare' failed: {scrubbed}. {_recovery_hint('analytics_compare', e)}"
+        ) from e
+
+
+@mcp.tool(name="analytics_targets", annotations=_READ_ONLY)
+async def _tool_analytics_targets(
+    action: str = "report",
+    period: str | None = None,
+    sales_person: str | None = None,
+    target_amount: float | None = None,
+    ctx: Context = None,
+) -> str:
+    """Manage sales targets. action='report', 'underperformers', or 'set'."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {
+        "action": action,
+        "period": period,
+        "sales_person": sales_person,
+        "target_amount": target_amount,
+    }
+    try:
+        if action == "underperformers":
+            return await analytics._underperformers(args, app_ctx.client)
+        elif action == "set":
+            return await analytics._set_target(args, app_ctx.client)
+        else:
+            return await analytics._target_achievement(args, app_ctx.client)
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'analytics_targets' failed: {scrubbed}. {_recovery_hint('analytics_targets', e)}"
+        ) from e
+
+
+# ---------------------------------------------------------------------------
+# Commission tools (1)
+# ---------------------------------------------------------------------------
+
+
+@mcp.tool(name="commission_report", annotations=_READ_ONLY)
+async def _tool_commission_report(
+    period: str | None = None,
+    sales_person_name: str | None = None,
+    flat_rate: float | None = None,
+    ctx: Context = None,
+) -> str:
+    """Calculate commission for sales reps. Omit sales_person_name for all reps."""
+    app_ctx: AppContext = ctx.request_context.lifespan_context
+    args = {"period": period, "sales_person_name": sales_person_name, "flat_rate": flat_rate}
+    try:
+        await ctx.report_progress(0, 2)
+        if sales_person_name:
+            result = await commission._commission_calculate(args, app_ctx.client)
+        else:
+            result = await commission._commission_report(args, app_ctx.client)
+        await ctx.report_progress(2, 2)
+        return result
+    except ToolError:
+        raise
+    except Exception as e:
+        scrubbed = _scrub_secrets(str(e))
+        raise ToolError(
+            f"Tool 'commission_report' failed: {scrubbed}. {_recovery_hint('commission_report', e)}"
+        ) from e
+
+
+# ---------------------------------------------------------------------------
+# Server entry point
+# ---------------------------------------------------------------------------
 
 
 def main() -> None:
     """CLI entry point — runs the FastMCP server over stdio."""
-    logger.info(f"Starting Kledo MCP Server ({_TOOL_COUNT} tools registered)...")
+    logger.info("Starting Kledo MCP Server (24 tools registered)...")
     mcp.run(transport="stdio")
 
 
