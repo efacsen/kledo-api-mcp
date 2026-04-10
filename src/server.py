@@ -18,11 +18,14 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
 
+from typing import Annotated
+
 from dotenv import load_dotenv
 from loguru import logger
 from mcp.server.fastmcp import Context, FastMCP
 from mcp.server.fastmcp.exceptions import ToolError
 from mcp.types import ToolAnnotations
+from pydantic import Field
 
 if __package__:
     from .auth import KledoAuthenticator
@@ -239,13 +242,33 @@ def _scrub_secrets(message: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-@mcp.tool(name="financial_activity", annotations=_READ_ONLY)
+@mcp.tool(
+    name="financial_activity",
+    annotations=_READ_ONLY,
+    description=(
+        "WHAT: Fetches the team activity log from Kledo — actions performed by each user "
+        "(creates, edits, deletes) within an optional date range. "
+        "RETURNS: A chronological list of user actions, each with username, action type, "
+        "affected document reference, and timestamp. No numeric IDs exposed (not needed — "
+        "this is an audit log, not a navigable list). "
+        "NOT: Does not return financial totals or invoice details — use financial_summary "
+        "for aggregated figures. "
+        "SIBLING: Use financial_summary for sales/purchase totals grouped by customer or "
+        "sales rep; use invoice_list to browse individual invoices."
+    ),
+)
 async def _tool_financial_activity(
-    date_from: str | None = None,
-    date_to: str | None = None,
+    date_from: Annotated[
+        str | None,
+        Field(description="Start date. Format: YYYY-MM-DD or Indonesian phrase (e.g. 'bulan ini'). Default: none (all time)."),
+    ] = None,
+    date_to: Annotated[
+        str | None,
+        Field(description="End date. Format: YYYY-MM-DD. Default: none."),
+    ] = None,
     ctx: Context = None,
 ) -> str:
-    """Get team activity report. Shows actions performed by each user."""
+    """Fetch team activity log from Kledo."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
     args = {"date_from": date_from, "date_to": date_to}
     try:
@@ -257,15 +280,40 @@ async def _tool_financial_activity(
         ) from e
 
 
-@mcp.tool(name="financial_summary", annotations=_READ_ONLY)
+@mcp.tool(
+    name="financial_summary",
+    annotations=_READ_ONLY,
+    description=(
+        "WHAT: Fetches an aggregated financial summary from Kledo, grouping sales or "
+        "purchase totals by customer or by sales representative for a date range. "
+        "RETURNS: Grouped rows with contact or rep name, total invoice amount, total paid, "
+        "and outstanding balance. Amounts in IDR. "
+        "NOT: Does not list individual invoices — use invoice_list for that. Does not "
+        "calculate commission — use commission_report for that. "
+        "SIBLING: Use invoice_list to see individual invoice rows; use commission_report "
+        "to calculate per-rep commission from paid invoice subtotals."
+    ),
+)
 async def _tool_financial_summary(
-    type: str = "sales",
-    group_by: str = "customer",
-    date_from: str | None = None,
-    date_to: str | None = None,
+    type: Annotated[
+        str,
+        Field(description="Direction: 'sales' (default) or 'purchase'."),
+    ] = "sales",
+    group_by: Annotated[
+        str,
+        Field(description="Grouping: 'customer' (default) or 'sales_rep'."),
+    ] = "customer",
+    date_from: Annotated[
+        str | None,
+        Field(description="Start date. Format: YYYY-MM-DD or Indonesian phrase. Default: none."),
+    ] = None,
+    date_to: Annotated[
+        str | None,
+        Field(description="End date. Format: YYYY-MM-DD. Default: none."),
+    ] = None,
     ctx: Context = None,
 ) -> str:
-    """Get financial summary. type='sales' or 'purchase'. group_by='customer' or 'sales_rep'."""
+    """Fetch aggregated financial summary grouped by customer or sales rep."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
     args = {"type": type, "group_by": group_by, "date_from": date_from, "date_to": date_to}
     try:
@@ -282,9 +330,20 @@ async def _tool_financial_summary(
         ) from e
 
 
-@mcp.tool(name="financial_balances", annotations=_READ_ONLY)
+@mcp.tool(
+    name="financial_balances",
+    annotations=_READ_ONLY,
+    description=(
+        "WHAT: Fetches current bank account balances for all accounts registered in Kledo. "
+        "RETURNS: A list of accounts — each with account name, account number, bank name, "
+        "and current balance in IDR. No date filtering — always reflects the current state. "
+        "NOT: Does not show transaction history — this is a snapshot of balances only. "
+        "SIBLING: Use financial_activity to see recent transactions; use financial_summary "
+        "for aggregated revenue/cost figures."
+    ),
+)
 async def _tool_financial_balances(ctx: Context = None) -> str:
-    """Get current bank account balances for all accounts."""
+    """Fetch current bank account balances for all Kledo accounts."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
     try:
         return await financial._bank_balances({}, app_ctx.client)
@@ -300,18 +359,54 @@ async def _tool_financial_balances(ctx: Context = None) -> str:
 # ---------------------------------------------------------------------------
 
 
-@mcp.tool(name="invoice_list", annotations=_READ_ONLY)
+@mcp.tool(
+    name="invoice_list",
+    annotations=_READ_ONLY,
+    description=(
+        "WHAT: Lists Kledo sales or purchase invoices filtered by date range, customer, "
+        "payment status, or keyword. "
+        "RETURNS: Up to per_page invoice rows — each includes invoice_id (integer, use this "
+        "in invoice_get), ref_number, customer name, invoice date, subtotal (pre-tax), "
+        "tax amount, gross total, outstanding due, and payment status label. Shows up to 20 "
+        "rows; omitted count is stated explicitly ('... and N more invoices'). "
+        "NOT: Does not return line-item detail — call invoice_get with invoice_id for items "
+        "and product breakdown. "
+        "SIBLING: Use invoice_get to fetch a single invoice by invoice_id; use "
+        "invoice_summarize for aggregate totals (by_customer, by_vendor) without individual rows."
+    ),
+)
 async def _tool_invoice_list(
-    type: str = "sales",
-    date_from: str | None = None,
-    date_to: str | None = None,
-    contact_id: int | None = None,
-    status_id: int | None = None,
-    search: str | None = None,
-    per_page: int = 50,
+    type: Annotated[
+        str,
+        Field(description="Invoice direction: 'sales' (default) or 'purchase'."),
+    ] = "sales",
+    date_from: Annotated[
+        str | None,
+        Field(description="Start date. Format: YYYY-MM-DD or Indonesian phrase (e.g. 'bulan ini', 'januari 2026'). Default: none."),
+    ] = None,
+    date_to: Annotated[
+        str | None,
+        Field(description="End date. Format: YYYY-MM-DD. Default: none. Pair with date_from for a range."),
+    ] = None,
+    contact_id: Annotated[
+        int | None,
+        Field(description="Filter by customer: numeric contact_id from contact_list. Default: none (all customers)."),
+    ] = None,
+    status_id: Annotated[
+        int | None,
+        Field(description="Filter by payment status: 1=Unpaid, 2=Partially Paid, 3=Paid. Default: none (all statuses)."),
+    ] = None,
+    search: Annotated[
+        str | None,
+        Field(description="Keyword search on ref_number or customer name. Default: none."),
+    ] = None,
+    per_page: Annotated[
+        int,
+        Field(description="Max rows to fetch from Kledo. Integer 1-200. Default: 50. Display is capped at 20."),
+    ] = 50,
     ctx: Context = None,
 ) -> str:
-    """List invoices. type='sales' (default) or 'purchase'."""
+    """List sales or purchase invoices with optional filters."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
     args = {
         "type": type,
@@ -334,9 +429,28 @@ async def _tool_invoice_list(
         ) from e
 
 
-@mcp.tool(name="invoice_get", annotations=_READ_ONLY)
-async def _tool_invoice_get(invoice_id: int, ctx: Context = None) -> str:
-    """Get full details for a single invoice by ID."""
+@mcp.tool(
+    name="invoice_get",
+    annotations=_READ_ONLY,
+    description=(
+        "WHAT: Fetches full detail for a single invoice from Kledo by its numeric ID. "
+        "RETURNS: Invoice header (ref_number, date, customer, status, subtotal, tax, total, "
+        "outstanding) plus all line items (product name, quantity, unit price, discount, "
+        "subtotal per line). "
+        "NOT: Does not list multiple invoices — use invoice_list to browse and discover "
+        "invoice_id values. "
+        "SIBLING: Use invoice_list first to find invoice_id; use invoice_summarize for "
+        "aggregate totals without individual line items."
+    ),
+)
+async def _tool_invoice_get(
+    invoice_id: Annotated[
+        int,
+        Field(description="Numeric invoice ID from invoice_list output. Required."),
+    ],
+    ctx: Context = None,
+) -> str:
+    """Fetch full detail for a single invoice by numeric ID."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
     try:
         return await invoices._get_invoice_detail({"invoice_id": invoice_id}, app_ctx.client)
@@ -347,14 +461,37 @@ async def _tool_invoice_get(invoice_id: int, ctx: Context = None) -> str:
         ) from e
 
 
-@mcp.tool(name="invoice_summarize", annotations=_READ_ONLY)
+@mcp.tool(
+    name="invoice_summarize",
+    annotations=_READ_ONLY,
+    description=(
+        "WHAT: Returns aggregated invoice totals from Kledo — overall totals, breakdown by "
+        "customer, or breakdown by vendor — without listing individual rows. "
+        "RETURNS: view='totals' -> grand total, paid, outstanding, tax totals; "
+        "view='by_customer' -> per-customer outstanding sorted descending; "
+        "view='by_vendor' -> per-vendor purchase totals. Amounts in IDR. "
+        "NOT: Does not return individual invoice rows or line items — use invoice_list or "
+        "invoice_get for that. "
+        "SIBLING: Use invoice_list to browse individual invoices; use invoice_get for "
+        "line-item detail on a specific invoice."
+    ),
+)
 async def _tool_invoice_summarize(
-    view: str = "totals",
-    date_from: str | None = None,
-    date_to: str | None = None,
+    view: Annotated[
+        str,
+        Field(description="Summary mode: 'totals' (default, grand totals), 'by_customer' (per-customer outstanding), or 'by_vendor' (per-vendor purchases)."),
+    ] = "totals",
+    date_from: Annotated[
+        str | None,
+        Field(description="Start date. Format: YYYY-MM-DD or Indonesian phrase. Default: none."),
+    ] = None,
+    date_to: Annotated[
+        str | None,
+        Field(description="End date. Format: YYYY-MM-DD. Default: none."),
+    ] = None,
     ctx: Context = None,
 ) -> str:
-    """Summarize invoices. view='totals', 'by_customer', or 'by_vendor'."""
+    """Return aggregated invoice totals without individual rows."""
     app_ctx: AppContext = ctx.request_context.lifespan_context
     args = {"view": view, "date_from": date_from, "date_to": date_to}
     try:
