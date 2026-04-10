@@ -22,12 +22,12 @@ class KledoAuthenticator:
         Initialize authenticator.
 
         Supports two authentication methods:
-        1. API Key (recommended) - Static token, no login required
+        1. Personal Access Token (PAT) - Static token (kledo_pat_xxx), no login required
         2. Email/Password (legacy) - Dynamic token via login endpoint
 
         Args:
             base_url: API base URL
-            api_key: Kledo API key (e.g., kledo_pat_xxx) - recommended
+            api_key: Kledo Personal Access Token (e.g., kledo_pat_xxx)
             email: Kledo account email (fallback method)
             password: Kledo account password (fallback method)
             app_client: Device type (android/ios) - only for email/password auth
@@ -44,7 +44,7 @@ class KledoAuthenticator:
             self.api_key = api_key
             self._access_token = None
             self._token_expiry = None
-            logger.info("Using API key authentication (recommended)")
+            logger.info("Using Personal Access Token (PAT) authentication")
         elif email and password:
             self.auth_method = "email_password"
             self.email = email
@@ -55,8 +55,7 @@ class KledoAuthenticator:
             logger.info("Using email/password authentication (legacy)")
         else:
             raise ValueError(
-                "Must provide either api_key or (email and password). "
-                "API key authentication is recommended for security."
+                "Must provide either api_key (Personal Access Token) or (email and password)."
             )
 
     @property
