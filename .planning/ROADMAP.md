@@ -25,7 +25,7 @@
 **Milestone Goal:** Migrate from pre-1.0 raw `Server` pattern to native `FastMCP` (`mcp>=1.0.0`) with full `@mcp.tool()` decorator adoption, eliminating the `get_tools()`/`handle_tool()` dispatch layer, and reducing the tool surface to 14-16 precisely-described dedicated tools.
 
 - [ ] **Phase 3: SDK Foundation** - Rewrite `server.py` to `FastMCP` with lifespan hook, `instructions` field, and correct error returns
-- [ ] **Phase 4: Tool Interface Migration** - Migrate all 11 tool modules to `@mcp.tool()` decorator pattern with `readOnlyHint`, progress reporting, and transport compatibility preserved
+- [x] **Phase 4: Tool Interface Migration** - Migrate all 11 tool modules to `@mcp.tool()` decorator pattern with `readOnlyHint`, progress reporting, and transport compatibility preserved (completed 2026-04-10)
 - [ ] **Phase 5: Tool Quality** - Rewrite all tool descriptions, add parameter `.describe()` strings, and improve return format for AI consumption
 - [ ] **Phase 6: Tool Consolidation** - Merge 24 tools down to 14-16, delete dead routing code, clean up dependencies
 
@@ -57,7 +57,7 @@
 **Plans**: 3 plans
   - [x] 04-01-PLAN.md — Wave 0: write contract tests for the new @mcp.tool() interface (RED until migration complete)
   - [x] 04-02-PLAN.md — Wave 1: strip get_tools/handle_tool from all 11 modules + rewrite server.py @mcp.tool() registrations
-  - [ ] 04-03-PLAN.md — Wave 2: add readOnlyHint/openWorldHint annotations + ctx.report_progress() to 3 tools + transport regression checks
+  - [x] 04-03-PLAN.md — Wave 2: add readOnlyHint/openWorldHint annotations + ctx.report_progress() to 3 tools + transport regression checks
 
 ### Phase 5: Tool Quality
 **Goal**: Every tool description tells Claude exactly what the tool does, what it returns, and when to pick a sibling tool instead — parameter types and defaults are explicit
@@ -88,6 +88,6 @@
 | 1. HTTP Transport | v1.0 | — | Complete | 2026-04-02 |
 | 2. Security Hardening | v1.0 | — | Complete | 2026-04-02 |
 | 3. SDK Foundation | v1.1 | 0/2 | Planned | - |
-| 4. Tool Interface Migration | v1.1 | 2/3 | In Progress|  |
+| 4. Tool Interface Migration | v1.1 | 3/3 | Complete   | 2026-04-10 |
 | 5. Tool Quality | v1.1 | 0/TBD | Not started | - |
 | 6. Tool Consolidation | v1.1 | 0/TBD | Not started | - |

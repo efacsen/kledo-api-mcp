@@ -29,8 +29,8 @@
 
 ### Compatibility
 
-- [ ] **COMPAT-01**: Existing HTTP transport (bearer token auth, CORS, `/health` endpoint from Phases 1-2) continues to work unchanged after `server.py` rewrite
-- [ ] **COMPAT-02**: stdio transport continues to work for Claude Desktop users — no regression on existing configuration
+- [x] **COMPAT-01**: Existing HTTP transport (bearer token auth, CORS, `/health` endpoint from Phases 1-2) continues to work unchanged after `server.py` rewrite
+- [x] **COMPAT-02**: stdio transport continues to work for Claude Desktop users — no regression on existing configuration
 
 ## Future Requirements
 
