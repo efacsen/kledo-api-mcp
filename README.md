@@ -97,10 +97,9 @@ An MCP server that connects AI assistants (like Claude) to the Kledo accounting 
 - `delivery_list` - List deliveries with date/status filters
 - `delivery_get` - Delivery detail or pending shipments (`view: detail|pending`)
 
-### Financial (3 tools)
+### Financial (2 tools)
 - `financial_summary` - Sales or purchase summary by customer, sales rep, or vendor
 - `financial_balances` - Current bank account balances
-- `financial_activity` - Team activity report for a date range
 
 ### Analytics & Commission (3 tools)
 - `analytics_compare` - Compare revenue or outstanding across periods or sales reps

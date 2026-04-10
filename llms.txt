@@ -40,8 +40,6 @@ This server exposes 24 tools organized by business domain. Use this file to find
 
 - [financial_summary](docs/tools/finance/reports.md): Financial summary grouped by entity. Use `type="sales"` + `group_by="customer"` for sales by customer, `type="sales"` + `group_by="sales_rep"` for sales by salesperson (omzet per sales), `type="purchase"` + `group_by="vendor"` for purchases by vendor. Required: type, group_by.
 - [financial_balances](docs/tools/finance/reports.md): Current bank account balances. Use for: "cash on hand", "bank balances", "available funds", "berapa saldo kas".
-- [financial_activity](docs/tools/finance/reports.md): Team activity report for a date range. Shows what the sales/finance team has been doing. Parameters: date_from, date_to.
-
 ## Analytics & Commission Tools
 
 - [analytics_compare](docs/tools/finance/reports.md): Compare metrics across periods or sales reps. Use `metric="revenue"` to compare revenue (bulan ini vs bulan lalu), `metric="outstanding"` to compare outstanding receivables. Required: metric, period.

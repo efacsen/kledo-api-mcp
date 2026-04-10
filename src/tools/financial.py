@@ -14,24 +14,6 @@ def get_tools() -> list[Tool]:
     """Get list of financial report tools."""
     return [
         Tool(
-            name="financial_activity",
-            description="Get team activity report for a date range. Shows what the sales/finance team has been doing.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "date_from": {
-                        "type": "string",
-                        "description": "Start date in YYYY-MM or YYYY-MM-DD format, or use 'last_month', 'this_month', 'this_year'"
-                    },
-                    "date_to": {
-                        "type": "string",
-                        "description": "End date in YYYY-MM or YYYY-MM-DD format (optional if using period shortcuts)"
-                    }
-                },
-                "required": []
-            }
-        ),
-        Tool(
             name="financial_summary",
             description=(
                 "Get financial summary grouped by customer, sales rep, or vendor for a period. "
@@ -79,9 +61,7 @@ def get_tools() -> list[Tool]:
 
 async def handle_tool(name: str, arguments: Dict[str, Any], client: KledoAPIClient) -> str:
     """Handle financial tool calls."""
-    if name == "financial_activity" or name == "financial_activity_team_report":
-        return await _activity_team_report(arguments, client)
-    elif name == "financial_summary":
+    if name == "financial_summary":
         summary_type = arguments.get("type", "sales")
         group_by = arguments.get("group_by", "customer")
         if summary_type == "purchase":

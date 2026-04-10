@@ -113,10 +113,6 @@ TOOL_METADATA: dict[str, tuple[str, list[str]]] = {
         [],
     ),
     # Financial Tools
-    "financial_activity_team_report": (
-        "Team activity report",
-        ["date_from", "date_to"],
-    ),
     "financial_sales_summary": (
         "Sales by customer",
         ["date_from", "date_to"],
