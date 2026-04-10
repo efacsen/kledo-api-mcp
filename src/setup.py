@@ -139,7 +139,7 @@ class SetupWizard:
             async with httpx.AsyncClient() as client:
                 headers = auth.get_auth_headers()
                 response = await client.get(
-                    f"{base_url}/contact",
+                    f"{base_url}/finance/contacts",
                     headers=headers,
                     params={"page": 1, "per_page": 1},
                     timeout=10.0
