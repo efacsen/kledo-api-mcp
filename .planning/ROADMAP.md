@@ -56,7 +56,7 @@
   5. `commission_report`, `analytics_compare`, and `revenue_summary` emit progress updates during multi-page API fetches so the client shows a live indicator
 **Plans**: 3 plans
   - [x] 04-01-PLAN.md — Wave 0: write contract tests for the new @mcp.tool() interface (RED until migration complete)
-  - [ ] 04-02-PLAN.md — Wave 1: strip get_tools/handle_tool from all 11 modules + rewrite server.py @mcp.tool() registrations
+  - [x] 04-02-PLAN.md — Wave 1: strip get_tools/handle_tool from all 11 modules + rewrite server.py @mcp.tool() registrations
   - [ ] 04-03-PLAN.md — Wave 2: add readOnlyHint/openWorldHint annotations + ctx.report_progress() to 3 tools + transport regression checks
 
 ### Phase 5: Tool Quality
@@ -88,6 +88,6 @@
 | 1. HTTP Transport | v1.0 | — | Complete | 2026-04-02 |
 | 2. Security Hardening | v1.0 | — | Complete | 2026-04-02 |
 | 3. SDK Foundation | v1.1 | 0/2 | Planned | - |
-| 4. Tool Interface Migration | v1.1 | 1/3 | In Progress|  |
+| 4. Tool Interface Migration | v1.1 | 2/3 | In Progress|  |
 | 5. Tool Quality | v1.1 | 0/TBD | Not started | - |
 | 6. Tool Consolidation | v1.1 | 0/TBD | Not started | - |
